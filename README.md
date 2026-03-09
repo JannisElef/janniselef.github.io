@@ -1,5 +1,3 @@
-# Projects
-
-Project Page:
+# Project Page
 
 https://janniselef.github.io

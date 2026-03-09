@@ -1,4 +1,3 @@
-
 ---
 layout: default
 title: Home
@@ -9,7 +8,7 @@ title: Home
 Hello 2
 
 
-## Projekte
+## Projects
 
 - [Test Project](/projects/test-project)
 
