@@ -1,12 +1,19 @@
+
 ---
-title: Startseite
+layout: default
+title: Home
 ---
 
-# Hallo
+# Hello
 
-Testseite.
+Hello 2
 
-## Test
 
-- Punkt 1
-- Punkt 2
+## Projekte
+
+- [Test Project](/projects/test-project)
+
+
+More Projects:
+
+[View all projects](/projects)

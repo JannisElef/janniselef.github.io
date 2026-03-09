@@ -1,2 +1,11 @@
-title: Testseite
-theme: minima
+
+title: Dev Projects
+description: Hardware und Software Projekte
+
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+markdown: kramdown
+highlighter: rouge
