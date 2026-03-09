@@ -29,6 +29,15 @@ body.dark a:hover {
   color:#62a0f7;
 }
 
+body.light .slider {
+  background: #555555;
+}
+
+body.dark .slider {
+  background: #cccccc;
+}
+
+
 header {
   padding:20px;
   border-bottom:1px solid #30363d;
