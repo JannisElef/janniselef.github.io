@@ -2,7 +2,7 @@
 layout: default
 title: Template
 description: Template for a Project
-image: /assets/img/template.jpg
+image: /assets/img/projects_template.png
 tags: [Test, Active]
 repo: https://github.com/JannisElef
 ---
