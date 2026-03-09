@@ -4,12 +4,13 @@ title: Template
 description: Template for a Project
 image: /assets/img/template.jpg
 tags: [Test, Active]
-repo: https://github.com/janniselef/esp32-sensor
+repo: https://github.com/JannisElef
 ---
 
-# Template
+# Template Project
 
 This is a Template for a Project
+
 
 ## Repository
 
@@ -26,6 +27,7 @@ This is a Template for a Project
 {
   "firstName": "Jannis",
   "lastName": "Elef",
-  "age": 20
+  "age": 20,
+  "date": 2026-03-09
 }
 ```
