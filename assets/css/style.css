@@ -1,6 +1,8 @@
 
 body {
-  font-family:'Roboto Mono',monospace;
+  /* font-family:'Roboto Mono',monospace; */
+  /* font-family: 'Geist', monospace; */
+  font-family: 'Geist';
   margin:0;
   transition: background 0.2s, color 0.2s;
 }
