@@ -25,21 +25,23 @@ body.light main {
 body.dark header,
 body.dark aside,
 body.dark main {
-  background:#161b22;
+  background:#212121;
 }
 
 
 body.light a {
-  color:#0366d6;
+  color:#0c72e8;
 }
 body.light a:hover {
   color:#024990;
+  text-decoration: wavy;
 }
 body.dark a {
   color:#8ab4f8;
 }
 body.dark a:hover {
   color:#5390e6;
+  text-decoration: wavy;
 }
 
 
@@ -59,19 +61,18 @@ main {
   flex:1;
   padding:40px;
   border-radius:8px;
-  max-width: 900px;
 }
 
 body.light header,
 body.light aside,
 body.light main {
-  border:1px solid #c5cbd2;
+  border:1px solid #bbc1c9;
 }
 
 body.dark header,
 body.dark aside,
 body.dark main {
-  border:1px solid #3c434b;
+  border:1px solid #475059;
 }
 
 
@@ -138,8 +139,9 @@ body.light .project-card:hover {
 }
 
 body.dark .project-card:hover {
-  box-shadow:0 8px 20px rgba(0,0,0,0.6);
+  box-shadow:0 8px 20px rgba(79, 86, 97, 0.6);
 }
+
 .project-card img {
   width:100%;
   height:200px;
@@ -181,11 +183,11 @@ body.dark .project-card:hover {
 }
 
 body.light .slider {
-  background:#ddd;
+  background:#ccc;
 }
 
 body.dark .slider {
-  background:#444;
+  background:#555;
 }
 
 .slider:before {
