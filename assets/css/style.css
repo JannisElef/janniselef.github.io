@@ -12,9 +12,22 @@ body.light {
   color:#111;
 }
 body.dark {
-  background:#0f1117;
+  background:#161b22;
   color:#e6edf3;
 }
+
+body.light header,
+body.light aside,
+body.light main {
+  background:#f1f1f1;
+}
+
+body.dark header,
+body.dark aside,
+body.dark main {
+  background:#161b22;
+}
+
 
 body.light a {
   color:#0366d6;
@@ -29,37 +42,69 @@ body.dark a:hover {
   color:#62a0f7;
 }
 
-body.light .slider {
-  background: #555555;
-}
-
-body.dark .slider {
-  background: #cccccc;
-}
-
 
 header {
+  margin:20px;
   padding:20px;
-  border-bottom:1px solid #30363d;
-}
-
-nav a {
-  margin-right:20px;
-}
-.container {
-  display:flex;
+  border-radius:8px;
 }
 
 aside {
   width:220px;
   padding:20px;
+  border-radius:8px;
 }
 
 main {
   flex:1;
   padding:40px;
-  max-width:900px;
+  border-radius:8px;
+  max-width: 900px;
 }
+
+body.light header,
+body.light aside,
+body.light main {
+  border:1px solid #d0d7de;
+}
+
+body.dark header,
+body.dark aside,
+body.dark main {
+  border:1px solid #30363d;
+}
+
+
+nav a {
+  margin-right:20px;
+}
+
+.container {
+  display:flex;
+  gap:20px;
+  padding:20px;
+}
+
+.nav {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.nav-left a {
+  margin-right:20px;
+}
+
+.nav-right {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.theme-icon {
+  font-size:16px;
+}
+
 
 .project-grid {
   display:grid;
@@ -90,12 +135,16 @@ main {
   border-radius:4px;
 }
 
+
+/* theme toggle slider */
+
 .switch {
   position:relative;
   display:inline-block;
   width:50px;
   height:24px;
 }
+
 .switch input {
   opacity:0;
   width:0;
@@ -105,13 +154,19 @@ main {
 .slider {
   position:absolute;
   cursor:pointer;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#666;
+  inset:0;
   border-radius:24px;
+  transition:background 0.2s;
 }
+
+body.light .slider {
+  background:#ddd;
+}
+
+body.dark .slider {
+  background:#444;
+}
+
 .slider:before {
   position:absolute;
   content:"";
@@ -120,9 +175,10 @@ main {
   left:3px;
   bottom:3px;
   background:white;
-  transition:0.2s;
   border-radius:50%;
+  transition:transform 0.2s;
 }
+
 input:checked + .slider:before {
-  transform:translateX(26px);
+  transform:translateX(24px);
 }
