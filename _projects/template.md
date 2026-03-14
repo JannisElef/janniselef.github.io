@@ -32,7 +32,6 @@ This is a Template for a Project
 }
 ```
 
-
 ## STL Viewer
 
 {% include stl-viewer.html file="/assets/stl/default_cube.stl" id="template" %}

@@ -1,41 +1,33 @@
 
+// Hol das Theme Toggle Checkbox-Element
 const toggle = document.getElementById("themeToggle");
 
-const themeColors = {
-  light: 0xf1f1f1,
-  dark: 0x161b22
-};
-
-function getCurrentThemeColor() {
-  return themeColors[document.body.className] || themeColors.light;
-}
-
+// Setzt das Theme (light / dark)
 function applyTheme(theme) {
-  document.body.className = theme;
-  localStorage.setItem("theme", theme);
-
-  toggle.checked = (theme === "dark");
+    document.body.className = theme;        // Body-Klasse: light oder dark
+    localStorage.setItem("theme", theme);   // Speichert Auswahl
+    toggle.checked = (theme === "dark");    // Checkbox Sync
 }
 
+// Systemvorgabe erkennen
 function systemTheme() {
-  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    return "dark";
-  }
-  return "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+// Theme beim Laden
 function loadTheme() {
-  let saved = localStorage.getItem("theme");
-
-  if (saved) {
-    applyTheme(saved);
-  } else {
-    applyTheme(systemTheme());
-  }
+    const saved = localStorage.getItem("theme");
+    if(saved){
+        applyTheme(saved);
+    } else {
+        applyTheme(systemTheme());
+    }
 }
 
+// Event Listener für Toggle
 toggle.addEventListener("change", () => {
-  applyTheme(toggle.checked ? "dark" : "light");
+    applyTheme(toggle.checked ? "dark" : "light");
 });
 
+// Initial
 loadTheme();
