@@ -9,3 +9,6 @@ collections:
 
 markdown: kramdown
 highlighter: rouge
+kramdown:
+  syntax_highlighter_opts:
+    css_class: 'highlight'

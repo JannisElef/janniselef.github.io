@@ -11,27 +11,36 @@ repo: https://github.com/JannisElef
 
 This is a Template for a Project
 
-
-## Repository
-
 [GitHub Repo]({{ page.repo }})
+
 
 ## List
 
 - Element 1
 - Element 2
 
+
+## STL Viewer
+
+{% include stl-viewer.html file="/assets/stl/default_cube.stl" id="template" %}
+
+
 ## Code Block
+
+
+```c
+#include <stdio.h>
+
+int main() {
+    printf("Hello, User!\n");
+    return 0;
+}
+```
 
 ```json
 {
   "firstName": "Jannis",
   "lastName": "Elef",
   "age": 20,
-  "date": 2026-03-09
 }
 ```
-
-## STL Viewer
-
-{% include stl-viewer.html file="/assets/stl/default_cube.stl" id="template" %}
