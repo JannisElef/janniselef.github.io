@@ -1,0 +1,71 @@
+
+<div class="stl-container">
+  <button id="load-stl-{{ include.id }}">Load 3D Model</button>
+  <div id="stl-viewer-{{ include.id }}" style="width:100%; height:500px; display:none;"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+const btn = document.getElementById("load-stl-{{ include.id }}");
+const container = document.getElementById("stl-viewer-{{ include.id }}");
+
+btn.addEventListener("click", () => {
+  if(confirm("Load 3D model?")) {
+
+    btn.style.display = "none";
+    container.style.display = "block";
+
+    const scene = new THREE.Scene();
+
+    // Theme Background
+    const bodyClass = document.body.className;
+    scene.background = bodyClass === "dark" ? new THREE.Color(0x161b22) : new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      container.clientWidth / container.clientHeight,
+      0.1,
+      1000
+    );
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
+
+    const loader = new THREE.STLLoader();
+    loader.load("{{ include.file }}", function(geometry){
+      const material = new THREE.MeshStandardMaterial({ color: 0x999999 });
+      const mesh = new THREE.Mesh(geometry, material);
+      geometry.center();
+      scene.add(mesh);
+
+      camera.position.z = geometry.boundingSphere.radius * 2.5;
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.update();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+    });
+
+    // Resize handling
+    window.addEventListener("resize", () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+  }
+});
+</script>

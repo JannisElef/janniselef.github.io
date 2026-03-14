@@ -16,19 +16,6 @@ body.dark {
   color:#e6edf3;
 }
 
-body.light header,
-body.light aside,
-body.light main {
-  background:#f1f1f1;
-}
-
-body.dark header,
-body.dark aside,
-body.dark main {
-  background:#202831;
-}
-
-
 body.light a {
   color:#0c72e8;
 }
@@ -61,6 +48,19 @@ main {
   flex:1;
   padding:40px;
   border-radius:8px;
+}
+
+
+body.light header,
+body.light aside,
+body.light main {
+  background:#f1f1f1;
+}
+
+body.dark header,
+body.dark aside,
+body.dark main {
+  background:#182327;
 }
 
 body.light header,
@@ -123,11 +123,11 @@ nav a {
 }
 
 body.light .project-card {
-  border-color:#d0d7de;
+  border-color:#bbc1c9;
 }
 
 body.dark .project-card {
-  border-color:#30363d;
+  border-color:#475059;
 }
 
 .project-card:hover {
