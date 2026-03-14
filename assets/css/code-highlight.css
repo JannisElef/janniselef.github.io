@@ -1,0 +1,37 @@
+
+/* Container */
+pre.highlight {
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  border: 1px solid var(--border-color);
+  margin: 20px 0;
+}
+
+/* Dark Mode Colors */
+body.dark pre.highlight { background: var(--code-bg-color); color: #abb2bf; }
+body.dark .highlight .c { color: #5c6370; }  /* Kommentare */
+body.dark .highlight .k { color: #c678dd; }  /* Keywords */
+body.dark .highlight .o { color: #56b6c2; }  /* Operatoren */
+body.dark .highlight .s { color: #98c379; }  /* Strings */
+body.dark .highlight .n { color: #e06c75; }  /* Namen/Variablen */
+body.dark .highlight .f { color: #61afef; }  /* Funktionen */
+body.dark .highlight .m { color: #d19a66; }  /* Zahlen/Literale */
+
+/* Light Mode Colors */
+body.light pre.highlight { background: var(--code-bg-color); color: #383a42; }
+body.light .highlight .c { color: #a0a1a7; }
+body.light .highlight .k { color: #a626a4; }
+body.light .highlight .o { color: #0184bc; }
+body.light .highlight .s { color: #50a14f; }
+body.light .highlight .n { color: #e45649; }
+body.light .highlight .f { color: #4078f2; }
+body.light .highlight .m { color: #986801; }
+
+/* Scrollbar */
+pre.highlight::-webkit-scrollbar { height: 8px; }
+pre.highlight::-webkit-scrollbar-thumb { background: rgba(100,100,100,0.3); border-radius:4px; }
+pre.highlight::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }

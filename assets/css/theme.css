@@ -1,0 +1,16 @@
+
+body.light {
+  --bg-color: #f1f1f1;          /* Seitenhintergrund */
+  --text-color: #111;           /* Schriftfarbe */
+  --border-color: #bbc1c9;      /* Rahmenfarbe */
+  --container-color: #f1f1f1;   /* Header, Aside, Main Hintergrund */
+  --code-bg-color: #f5f5f5;     /* Codeblock / STL Viewer Hintergrund */
+}
+
+:root {
+  --bg-color: #161b22;
+  --text-color: #e6edf3;
+  --border-color: #475059;
+  --container-color: #182327;
+  --code-bg-color: #282c34;
+}
