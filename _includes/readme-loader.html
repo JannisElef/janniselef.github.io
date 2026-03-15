@@ -1,0 +1,27 @@
+
+<style>
+    #readme-container h2 {
+      font-size: 2rem;
+    }
+</style>
+
+<div id="readme-container">Loading README.md...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+
+  const readmeURL = "{{ cdn }}/README.md";
+
+  fetch(readmeURL)
+    .then(response => response.text())
+    .then(md => {
+        document.getElementById("readme-container").innerHTML =
+            marked.parse(md);
+    })
+    .catch(() => {
+        document.getElementById("readme-container").innerHTML =
+            "README could not be loaded.";
+    });
+
+</script>
