@@ -17,6 +17,10 @@ date: 2026-03-15
 
 <!-- START --->
 
+## Image Test from [external Repository](https://github.com/{{ page.repo }})
+
+![Test Image]({{ cdn }}/assets/img/preview.png)
+
 
 ## List
 
