@@ -19,8 +19,9 @@ date: 2026-03-15
 
 ## Image Test from [external Repository](https://github.com/{{ page.repo }})
 
-![Test Image]({{ cdn }}/assets/img/preview.png)
-
+<a href="{{ cdn }}/assets/img/preview.png" class="img-preview">
+  <img src="{{ cdn }}/assets/img/preview.png" alt="Test Image">
+</a>
 
 ## List
 

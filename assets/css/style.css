@@ -130,6 +130,16 @@ hr {
     margin: 2rem 0;
 }
 
+.img-preview img {
+  max-height: 400px;
+  transition: filter 0.2s ease, transform 0.2s ease;
+  cursor: zoom-in;
+}
+
+.img-preview:hover img {
+  filter: brightness(0.8);
+  transform: scale(1.02);
+}
 
 
 
