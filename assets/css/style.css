@@ -130,8 +130,9 @@ hr {
     margin: 2rem 0;
 }
 
+/* single image */
 .img-preview img {
-  max-height: 400px;
+  max-height: 300px;
   transition: filter 0.2s ease, transform 0.2s ease;
   cursor: zoom-in;
 }
@@ -141,6 +142,32 @@ hr {
   transform: scale(1.02);
 }
 
+/* image collection */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.image-item {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.image-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: filter 0.2s ease, transform 0.2s ease;
+  cursor: zoom-in;
+}
+
+.image-item:hover img {
+  filter: brightness(0.8);
+  transform: scale(1.02);
+}
 
 
 

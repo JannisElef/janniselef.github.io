@@ -19,9 +19,26 @@ date: 2026-03-15
 
 ## Image Test from [external Repository](https://github.com/{{ page.repo }})
 
-<a href="{{ cdn }}/assets/img/preview.png" class="img-preview">
-  <img src="{{ cdn }}/assets/img/preview.png" alt="Test Image">
-</a>
+<div class="image-grid">
+
+  <a href="{{ cdn }}/assets/img/patterns/Inn.svg" class="image-item">
+    <img src="{{ cdn }}/assets/img/patterns/Inn.svg" alt="Preview">
+  </a>
+
+  <a href="{{ cdn }}/assets/img/patterns/Mohaka.svg" class="image-item">
+    <img src="{{ cdn }}/assets/img/patterns/Mohaka.svg" alt="Preview">
+  </a>
+
+  <a href="{{ cdn }}/assets/img/patterns/Waimakariri.svg" class="image-item">
+    <img src="{{ cdn }}/assets/img/patterns/Waimakariri.svg" alt="Preview">
+  </a>
+
+  <a href="{{ cdn }}/assets/img/patterns/Clarence.svg" class="image-item">
+    <img src="{{ cdn }}/assets/img/patterns/Clarence.svg" alt="Preview">
+  </a>
+
+
+</div>
 
 ## List
 
