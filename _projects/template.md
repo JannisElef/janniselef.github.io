@@ -5,42 +5,17 @@ description: Template for a Project
 repo: JannisElef/project-template
 branch: main
 tags: [Test, Active]
+date: 2026-03-15
 ---
 
 
 {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}
 
-
-# {{ page.title }}
-
-[-> View on GitHub](https://github.com/{{ page.repo }})
+{% include readme-loader.html %} 
 
 ---
 
-
-<div id="readme-container">Loading README...</div>
-
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-<script>
-
-const repo = "{{ page.repo }}";
-const branch = "{{ branch }}";
-
-const readmeURL = "{{ cdn }}/README.md";
-
-fetch(readmeURL)
-  .then(response => response.text())
-  .then(md => {
-      document.getElementById("readme-container").innerHTML =
-          marked.parse(md);
-  })
-  .catch(() => {
-      document.getElementById("readme-container").innerHTML =
-          "README could not be loaded.";
-  });
-
-</script>
+<!-- START --->
 
 
 ## List
@@ -79,3 +54,12 @@ int main() {
   "age": 20
 }
 ```
+
+
+
+<!-- END --->
+
+---
+{% if page.date %}
+**Published:** {{ page.date | date: "%B %-d, %Y" }}
+{% endif %} [-> View on GitHub](https://github.com/{{ page.repo }})

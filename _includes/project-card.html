@@ -1,34 +1,32 @@
 
 <a class="project-card" href="{{ project.url }}">
+    
+    {% if project.repo %}
+        {% assign branch = project.branch | default: "main" %}
+        {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: project.repo | append: "@" | append: branch %}
+        {% assign preview = cdn | append: "/assets/img/preview.png" %}
 
-{% if project.image %}
+        <img src="{{ preview }}" alt="{{ project.title }}">
 
-    <img src="{{ project.image }}" alt="{{ project.title }}">
-
-{% elsif project.repo %}
-
-    {% assign branch = project.branch | default: "main" %}
-    {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: project.repo | append: "@" | append: branch %}
-    {% assign preview = cdn | append: "/assets/img/preview.png" %}
-
-    <img src="{{ preview }}" alt="{{ project.title }}">
-
-{% else %}
-
-    <img src="/assets/img/projects_template.png" alt="{{ project.title }}">
-
-{% endif %}
-
-<h3>{{ project.title }}</h3>
-
-<p>{{ project.description }}</p>
-
-<div class="tags">
-
-{% for tag in project.tags %}
-<span class="tag">{{ tag }}</span>
-{% endfor %}
-
-</div>
+    {% elsif project.image %}
+        <img src="{{ project.image }}" alt="{{ project.title }}">
+    {% else %}
+        <img src="/assets/img/projects_template.png" alt="{{ project.title }}">
+    {% endif %}
+    
+    <h2>{{ project.title }}</h2>
+    
+    
+    <p>{{ project.description }}</p>
+    
+    {% if project.date %}
+        <p class="project-date">{{ project.date | date: "%b %-d, %Y" }}</p>
+    {% endif %}
+    
+    <div class="tags">
+        {% for tag in project.tags %}
+            <span class="tag">{{ tag }}</span>
+        {% endfor %}
+    </div>
 
 </a>
