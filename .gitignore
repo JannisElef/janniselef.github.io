@@ -1,3 +1,4 @@
 .jekyll-cache
 _site
+Gemfile.lock
 test launch local.bat
