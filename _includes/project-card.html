@@ -4,14 +4,15 @@
     {% if project.repo %}
         {% assign branch = project.branch | default: "main" %}
         {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: project.repo | append: "@" | append: branch %}
-        {% assign preview = cdn | append: "/assets/img/preview.png" %}
+        {% assign preview = cdn | append: "/assets/img/thumbnail.png" %}
 
-        <img src="{{ preview }}" alt="{{ project.title }}">
+        <img 
+        src="{{ preview }}" 
+        alt="{{ project.title }}"
+        onerror="this.onerror=null; this.src='/assets/img/patterns/Taieri.svg';">
 
-    {% elsif project.image %}
-        <img src="{{ project.image }}" alt="{{ project.title }}">
     {% else %}
-        <img src="/assets/img/projects_template.png" alt="{{ project.title }}">
+        <img src="/assets/img/patterns/Inn.svg" alt="{{ project.title }}">
     {% endif %}
     
     <h2>{{ project.title }}</h2>
