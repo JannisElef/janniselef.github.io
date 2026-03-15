@@ -1,4 +1,21 @@
+
+# project state
 Working: Project is still being worked on
 Finished: Project is finished
+
+
+# project type
 Test: Project is a test
 PoC: Project is a Proof of Concept
+
+
+# project categories
+3D-Print: 3D-Print Project
+
+
+Electronics: Electronics Project
+
+
+Software: Software Project
+C: C Project
+Python: Python Project
