@@ -10,9 +10,6 @@ Hello 2
 
 ## Projects
 
-- [Test Project](/projects/template)
+- [Template Project](/projects/template)
 
-
-More Projects:
-
-[View all projects](/projects)
+[-> View all projects](/projects)
