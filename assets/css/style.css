@@ -18,8 +18,12 @@ header, aside, main {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0px 20px 20px 20px;
-  margin: 20px;
+  margin: 20px 20px 0px 20px;
   
+}
+
+aside {
+  margin: 20px 0px 20px 20px;
 }
 
 main {
@@ -80,6 +84,8 @@ main {
 }
 
 .stl-container canvas {
+  width: 100% !important;
+  height: 100% !important;
   border-radius: 8px;
   background: var(--code-bg-color);
 }

@@ -33,13 +33,16 @@ btn.addEventListener("click", () => {
 
   const scene = new THREE.Scene();
 
-  // Hintergrundfarbe aus CSS-Variable
-  let codeBgColor = getComputedStyle(document.documentElement)
+  /* let codeBgColor = getComputedStyle(document.documentElement)
                     .getPropertyValue('--code-bg-color')
-                    .trim(); // Entfernt Leerzeichen/Zeilenumbrüche
+                    .trim();
+  scene.background = new THREE.Color(codeBgColor); */
 
-  // THREE.Color akzeptiert Hex-Strings
-  scene.background = new THREE.Color(codeBgColor);
+  if(document.body.classList.contains("dark")){
+    scene.background = new THREE.Color(0x282c34);
+  }else{
+    scene.background = new THREE.Color(0xe8e8e8);
+  }
 
   const camera = new THREE.PerspectiveCamera(
     75,
