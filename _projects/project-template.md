@@ -56,8 +56,6 @@ id="template"
 %}
 
 
-{% include code-highlighter.html %}
-
 ## Code Block from [Repository](https://github.com/{{ page.repo }})
 
 {% include code-viewer.html file="/src/main.c" %}
