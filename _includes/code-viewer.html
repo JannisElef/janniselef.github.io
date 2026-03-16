@@ -1,0 +1,74 @@
+
+<div class="code-wrapper" id="code-wrapper-{{ include.file | replace:'/','-' | replace:'.','-' }}">
+    <div class="code-header">
+        <span class="code-file">{{ include.file | split: "/" | last }}</span>
+        <button class="code-copy" id="copy-{{ include.file | replace:'/','-' | replace:'.','-' }}">Copy</button>
+    </div>
+
+    <pre class="highlight">
+        <code id="code-block-{{ include.file | replace:'/','-' | replace:'.','-' }}"></code>
+    </pre>
+</div>
+
+<script>
+    (async function(){
+    const url = "{{ cdn }}{{ include.file }}";
+    const safeId = "{{ include.file | replace:'/','-' | replace:'.','-' }}";
+    const block = document.getElementById("code-block-" + safeId);
+    const copyBtn = document.getElementById("copy-" + safeId);
+
+    let loaded = false;
+    async function loadCode(){
+        if(loaded) return;
+        loaded = true;
+
+        const res = await fetch(url);
+        const text = await res.text();
+        block.textContent = text;
+
+        // Sprache automatisch anhand Endung
+        const ext = url.split('.').pop().toLowerCase();
+        const langMap = {
+        c:"c", cpp:"cpp", h:"c", hpp:"cpp", js:"javascript", ts:"typescript",
+        py:"python", json:"json", html:"xml", css:"css", sh:"bash", yml:"yaml", yaml:"yaml"
+        };
+        if(langMap[ext]) block.classList.add("language-" + langMap[ext]);
+
+        // Highlight.js
+        async function initHLJS(){
+        if(!window.hljs){
+            await new Promise(res=>{
+            const s = document.createElement('script');
+            s.src = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js";
+            s.onload = res;
+            document.head.appendChild(s);
+            });
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css";
+            document.head.appendChild(link);
+        }
+        hljs.highlightElement(block);
+        }
+        await initHLJS();
+
+        // Copy-Button
+        copyBtn.onclick = async ()=>{
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent='Copied!';
+        setTimeout(()=>copyBtn.textContent='Copy',1500);
+        };
+    }
+
+    // Lazy load wenn sichtbar
+    const observer = new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+        if(entry.isIntersecting){
+            loadCode();
+            observer.disconnect();
+        }
+        });
+    });
+    observer.observe(block.parentNode);
+    })();
+</script>

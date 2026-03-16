@@ -1,0 +1,58 @@
+
+<!-- Highlight.js CSS + Script + lokale Markdown Blöcke -->
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Lade Highlight.js CSS + Script
+  if(!window.hljs){
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css';
+    document.head.appendChild(link);
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js';
+    document.head.appendChild(script);
+    script.onload = () => highlightLocalBlocks();
+  } else {
+    highlightLocalBlocks();
+  }
+
+  function highlightLocalBlocks(){
+    document.querySelectorAll('pre > code').forEach(block=>{
+      if(block.closest('.code-wrapper')) return; // schon verarbeitet
+
+      // Wrapper + Header
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-wrapper';
+
+      const header = document.createElement('div');
+      header.className = 'code-header';
+
+      const fileName = document.createElement('span');
+      fileName.className = 'code-file';
+      fileName.textContent = block.dataset.filename || 'Code';
+      header.appendChild(fileName);
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'code-copy';
+      copyBtn.textContent = 'Copy';
+      copyBtn.onclick = ()=>{
+        navigator.clipboard.writeText(block.textContent);
+        copyBtn.textContent='Copied!';
+        setTimeout(()=>copyBtn.textContent='Copy',1500);
+      };
+      header.appendChild(copyBtn);
+
+      const pre = block.parentNode;
+      pre.parentNode.replaceChild(wrapper, pre);
+      wrapper.appendChild(header);
+      wrapper.appendChild(pre);
+
+      // Highlight.js
+      if(window.hljs){
+        hljs.highlightElement(block);
+      }
+    });
+  }
+});
+</script>

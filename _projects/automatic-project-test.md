@@ -1,13 +1,12 @@
 ---
 layout: default
-title: Template Project
-description: Template for a Project
-repo: JannisElef/project-template
+title: automatic project test
+description: This is a test
+repo: JannisElef/automatic-project-test
 branch: main
-tags: [Test, Active]
-date: 2026-03-15
+tags: ["Active", "Test"]
+date: 2026-03-16
 ---
-
 
 {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}
 

@@ -1,0 +1,59 @@
+
+/* ------------------ Wrapper + Header ------------------ */
+.code-wrapper {
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, #555);
+  background: var(--code-bg-color, transparent); /* transparent fallback */
+}
+
+/* Header mit Dateiname + Copy */
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85rem;
+  background: var(--code-bg-color, transparent);
+  border-bottom: 1px solid var(--border-color, #555);
+}
+
+/* Filename */
+.code-file {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* Copy Button */
+.code-copy {
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 2px 8px;
+}
+
+.code-copy:hover {
+  opacity: 0.8;
+}
+
+
+/* ------------------ Code Block ------------------ */
+pre.highlight, pre.highlight code, .hljs {
+  background: transparent !important;  /* transparent statt weiß */
+  color: var(--text-color, #ddd);      /* Textfarbe */
+  padding: 16px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin: 0;
+  overflow-x: auto;
+  max-height: 400px;
+  word-wrap: normal;
+  box-shadow: none !important;
+}
+
+/* Scrollbar optional */
+pre.highlight::-webkit-scrollbar { height: 8px; }
+pre.highlight::-webkit-scrollbar-thumb { background: rgba(100,100,100,0.3); border-radius:4px; }
+pre.highlight::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
