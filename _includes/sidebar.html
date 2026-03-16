@@ -5,7 +5,9 @@
 
     <ul>
 
-        {% for project in site.projects %}
+        {% assign sorted_projects = site.projects | sort: "date" | reverse %}
+
+        {% for project in sorted_projects %}
 
         <li>
             <a href="{{ project.url }}">

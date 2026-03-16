@@ -7,10 +7,12 @@ title: Projects
 
 <div class="project-grid">
 
-{% for project in site.projects %}
+    {% assign sorted_projects = site.projects | sort: "date" | reverse %}
 
-    {% include project-card.html project=project %}
+    {% for project in sorted_projects %}
 
-{% endfor %}
+        {% include project-card.html project=project %}
+
+    {% endfor %}
 
 </div>
