@@ -1,6 +1,5 @@
 .jekyll-cache
 _site
 Gemfile.lock
-create-project.py
 create new project.bat
 test launch local.bat
