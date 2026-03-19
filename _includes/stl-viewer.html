@@ -1,13 +1,24 @@
-
-<div class="stl-container">
+<div class="stl-container" style="position: relative;">
 
   <button id="load-stl-{{ include.id }}">
-    Load "{{ include.file | split: "/" | last }}"
+    Load {{ include.file | split: "/" | last }}
   </button>
 
-  <div id="stl-viewer-{{ include.id }}" style="width:100%; height:500px; display:none;"></div>
+  <div id="stl-viewer-{{ include.id }}" style="width:100%; height:500px; display:none; position:relative;">
 
+    <!-- Overlay UI -->
+    <div class="stl-ui">
+      <div class="stl-title">
+        {{ include.file | split: "/" | last }}
+      </div>
+      <button id="download-stl-{{ include.id }}" class="stl-download">
+        Download {{ include.file | split: "/" | last }}
+      </button>
+    </div>
+
+  </div>
 </div>
+
 
 <script type="importmap">
 {
@@ -17,7 +28,7 @@
 }
 </script>
 
-<script type="module">
+<script type="module" id="stlviewer03">
 
 import * as THREE from "three";
 import { STLLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js";
@@ -25,6 +36,7 @@ import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/exampl
 
 const btn = document.getElementById("load-stl-{{ include.id }}");
 const container = document.getElementById("stl-viewer-{{ include.id }}");
+const downloadBtn = document.getElementById("download-stl-{{ include.id }}");
 
 btn.addEventListener("click", () => {
 
@@ -33,10 +45,13 @@ btn.addEventListener("click", () => {
 
   const scene = new THREE.Scene();
 
-  /* let codeBgColor = getComputedStyle(document.documentElement)
-                    .getPropertyValue('--code-bg-color')
-                    .trim();
-  scene.background = new THREE.Color(codeBgColor); */
+  /* 
+  const bgColor = getComputedStyle(document.documentElement)
+    .getPropertyValue('--code-bg-color')
+    .trim();
+
+  scene.background = new THREE.Color(bgColor);
+  */
 
   if(document.body.classList.contains("dark")){
     scene.background = new THREE.Color(0x282c34);
@@ -57,7 +72,6 @@ btn.addEventListener("click", () => {
   renderer.domElement.style.border = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim()}`;
   container.appendChild(renderer.domElement);
 
-  // Beleuchtung
   const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
   keyLight.position.set(5,5,5);
   scene.add(keyLight);
@@ -69,14 +83,12 @@ btn.addEventListener("click", () => {
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
   scene.add(hemi);
 
-  // STL Loader
   const loader = new STLLoader();
   loader.load("{{ include.file }}", (geometry) => {
 
     geometry.computeBoundingSphere();
     geometry.center();
 
-    // Mesh Material
     const material = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.4,
@@ -86,15 +98,13 @@ btn.addEventListener("click", () => {
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // Edge Lines
     const edges = new THREE.EdgesGeometry(geometry);
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0x2e2e2e });
     const edgeLines = new THREE.LineSegments(edges, lineMaterial);
     scene.add(edgeLines);
 
-    // Kamera Auto-Position
     const radius = geometry.boundingSphere.radius;
-    camera.position.set(radius*1.5, radius*1.5, radius*1.5);
+    camera.position.set(radius * 1.5, radius * 1.5, radius * 1.5);
     camera.lookAt(geometry.boundingSphere.center);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -109,7 +119,6 @@ btn.addEventListener("click", () => {
 
   });
 
-  // Resize Handling
   window.addEventListener("resize", () => {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
@@ -117,4 +126,14 @@ btn.addEventListener("click", () => {
   });
 
 });
+
+downloadBtn.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.href = "{{ include.file }}";
+  link.download = "{{ include.file | split: '/' | last }}";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
 </script>
