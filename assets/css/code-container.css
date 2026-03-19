@@ -20,10 +20,10 @@
   border-bottom: 1px solid var(--border-color, #555);
 }
 
-/* Filename */
 .code-file {
-  font-weight: 500;
-  opacity: 0.9;
+    color: var(--text-color);
+    font-weight: bold;
+    opacity: 0.8;
 }
 
 

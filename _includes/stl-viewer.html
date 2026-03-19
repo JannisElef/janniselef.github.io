@@ -9,6 +9,10 @@
     <!-- Overlay UI -->
     <div class="stl-ui">
       <div class="stl-title">
+        <!-- GitHub-Link links vom Dateinamen -->
+        <a class="stl-github-link" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
+          🔗
+        </a>
         {{ include.file | split: "/" | last }}
       </div>
       <button id="download-stl-{{ include.id }}" class="stl-download">

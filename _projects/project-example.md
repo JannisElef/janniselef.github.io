@@ -50,7 +50,7 @@ date: 2026-03-14
 
 {% assign stl = cdn | append: "/assets/stl/default_cube.stl" %}
 
-{% include stl-viewer.html
+{% include stl-viewer.html 
 file=stl
 id="template"
 %}
@@ -58,7 +58,9 @@ id="template"
 
 ## Code Block from [Repository](https://github.com/{{ page.repo }})
 
-{% include code-viewer.html file="/src/main.c" %}
+{% include code-viewer.html 
+file="/src/main.c" 
+%}
 
 
 ## Code Block from Markdown
