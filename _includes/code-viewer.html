@@ -1,7 +1,9 @@
 
 <div class="code-wrapper" id="code-wrapper-{{ include.file | replace:'/','-' | replace:'.','-' }}">
     <div class="code-header">
-        <span class="code-file">{{ include.file | split: "/" | last }}</span>
+        <a class="code-file" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
+            🔗{{include.file | split: "/" | last }}
+        </a>
         <button class="code-copy" id="copy-{{ include.file | replace:'/','-' | replace:'.','-' }}">Copy</button>
     </div>
 
