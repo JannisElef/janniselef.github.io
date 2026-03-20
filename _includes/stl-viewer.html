@@ -1,26 +1,22 @@
 <div class="stl-container" style="position: relative;">
 
-  <button id="load-stl-{{ include.id }}">
-    Load {{ include.file | split: "/" | last }}
-  </button>
-
-  <div id="stl-viewer-{{ include.id }}" style="width:100%; height:500px; display:none; position:relative;">
-
-    <!-- Overlay UI -->
-    <div class="stl-ui">
-      <div class="stl-title">
-        <!-- GitHub-Link links vom Dateinamen -->
-        <a class="stl-github-link" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
-          🔗
+  <div class="content-wrapper" id="content-wrapper-{{ include.file | replace:'/','-' | replace:'.','-' }}">
+    <div class="content-header">
+        <a class="content-filename" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
+            🔗 {{include.file | split: "/" | last }}
         </a>
-        {{ include.file | split: "/" | last }}
-      </div>
-      <button id="download-stl-{{ include.id }}" class="stl-download">
-        Download {{ include.file | split: "/" | last }}
-      </button>
+        <button id="load-stl-{{ include.id }}">
+          View {{ include.file | split: "/" | last }}
+        </button>
+        <button id="download-stl-{{ include.id }}" class="stl-download">
+          Download {{ include.file | split: "/" | last }}
+        </button>
     </div>
 
+    <div id="stl-viewer-{{ include.id }}" style="width:100%; height:500px; display:none; position:relative;"></div>
+
   </div>
+  
 </div>
 
 
@@ -49,20 +45,6 @@ btn.addEventListener("click", () => {
 
   const scene = new THREE.Scene();
 
-  /* 
-  const bgColor = getComputedStyle(document.documentElement)
-    .getPropertyValue('--code-bg-color')
-    .trim();
-
-  scene.background = new THREE.Color(bgColor);
-  */
-
-  if(document.body.classList.contains("dark")){
-    scene.background = new THREE.Color(0x282c34);
-  }else{
-    scene.background = new THREE.Color(0xe8e8e8);
-  }
-
   const camera = new THREE.PerspectiveCamera(
     75,
     container.clientWidth / container.clientHeight,
@@ -88,7 +70,7 @@ btn.addEventListener("click", () => {
   scene.add(hemi);
 
   const loader = new STLLoader();
-  loader.load("{{ include.file }}", (geometry) => {
+  loader.load("{{ cdn }}{{ include.file }}", (geometry) => {
 
     geometry.computeBoundingSphere();
     geometry.center();
@@ -118,6 +100,12 @@ btn.addEventListener("click", () => {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
+      
+      if(document.body.classList.contains("dark")){
+        scene.background = new THREE.Color(0x282c34);
+      }else{
+        scene.background = new THREE.Color(0xe8e8e8);
+      }
     }
     animate();
 
@@ -133,8 +121,8 @@ btn.addEventListener("click", () => {
 
 downloadBtn.addEventListener("click", () => {
   const link = document.createElement("a");
-  link.href = "{{ include.file }}";
-  link.download = "{{ include.file | split: '/' | last }}";
+  link.href = "{{ cdn }}{{ include.file }}";
+  link.download = "{{ cdn }}{{ include.file }}";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

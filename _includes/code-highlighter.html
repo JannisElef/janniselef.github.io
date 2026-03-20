@@ -19,17 +19,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   function highlightLocalBlocks(){
     document.querySelectorAll('pre > code').forEach(block=>{
-      if(block.closest('.code-wrapper')) return; // schon verarbeitet
+      if(block.closest('.content-wrapper')) return; // schon verarbeitet
 
       // Wrapper + Header
       const wrapper = document.createElement('div');
-      wrapper.className = 'code-wrapper';
+      wrapper.className = 'content-wrapper';
 
       const header = document.createElement('div');
-      header.className = 'code-header';
+      header.className = 'content-header';
 
       const fileName = document.createElement('span');
-      fileName.className = 'code-file';
+      fileName.className = 'content-filename';
       fileName.textContent = block.dataset.filename || 'Code';
       header.appendChild(fileName);
 
