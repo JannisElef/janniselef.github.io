@@ -1,27 +1,42 @@
 
-<!-- Highlight.js CSS + Script + lokale Markdown Blöcke -->
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  // Lade Highlight.js CSS + Script
-  if(!window.hljs){
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css';
-    document.head.appendChild(link);
 
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js';
-    document.head.appendChild(script);
-    script.onload = () => highlightLocalBlocks();
-  } else {
-    highlightLocalBlocks();
+  function loadHighlightCSS(theme){
+    let existing = document.getElementById("hljs-theme");
+
+    if(existing) existing.remove();
+
+    const link = document.createElement('link');
+    link.id = "hljs-theme";
+    link.rel = 'stylesheet';
+
+    link.href = theme === "dark"
+      ? 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css'
+      : 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-light.min.css';
+
+    document.head.appendChild(link);
+  }
+
+  function getCurrentTheme(){
+    return document.body.classList.contains("dark") ? "dark" : "light";
+  }
+
+  function initHighlight(){
+    if(!window.hljs){
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js';
+      script.onload = () => highlightLocalBlocks();
+      document.head.appendChild(script);
+    } else {
+      highlightLocalBlocks();
+    }
   }
 
   function highlightLocalBlocks(){
     document.querySelectorAll('pre > code').forEach(block=>{
-      if(block.closest('.content-wrapper')) return; // schon verarbeitet
+      if(block.closest('.content-wrapper')) return;
 
-      // Wrapper + Header
       const wrapper = document.createElement('div');
       wrapper.className = 'content-wrapper';
 
@@ -48,11 +63,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
       wrapper.appendChild(header);
       wrapper.appendChild(pre);
 
-      // Highlight.js
       if(window.hljs){
         hljs.highlightElement(block);
       }
     });
   }
+
+  loadHighlightCSS(getCurrentTheme());
+  initHighlight();
+
+  const observer = new MutationObserver(()=>{
+    loadHighlightCSS(getCurrentTheme());
+  });
+
+  observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
 });
 </script>
