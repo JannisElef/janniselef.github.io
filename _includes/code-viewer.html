@@ -26,9 +26,9 @@
 
         const res = await fetch(url);
         const text = await res.text();
-        block.textContent = text;
+        block.textContent = text.trim();
 
-        // Sprache automatisch anhand Endung
+        // Langauge from extension
         const ext = url.split('.').pop().toLowerCase();
         const langMap = {
         c:"c", cpp:"cpp", h:"c", hpp:"cpp", js:"javascript", ts:"typescript",
@@ -62,7 +62,7 @@
         };
     }
 
-    // Lazy load wenn sichtbar
+    // Lazy load
     const observer = new IntersectionObserver(entries=>{
         entries.forEach(entry=>{
         if(entry.isIntersecting){
