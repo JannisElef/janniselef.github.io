@@ -1,6 +1,6 @@
 
 /* ------------------ Wrapper + Header ------------------ */
-.code-wrapper {
+.content-wrapper {
   margin: 20px 0;
   border-radius: 8px;
   overflow: hidden;
@@ -9,7 +9,7 @@
 }
 
 /* Header (filename + copy button) */
-.code-header {
+.content-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -20,10 +20,15 @@
   border-bottom: 1px solid var(--border-color, #555);
 }
 
-.code-file {
-    color: var(--text-color);
-    font-weight: bold;
-    opacity: 0.8;
+.content-filename {
+  color: var(--text-color);
+  font-weight: bold;
+  opacity: 0.8;
+}
+
+a.content-filename:hover {
+  text-decoration: none;
+  opacity: 0.5;
 }
 
 
@@ -46,3 +51,18 @@ pre.highlight, pre.highlight code, .hljs {
 pre.highlight::-webkit-scrollbar { height: 8px; }
 pre.highlight::-webkit-scrollbar-thumb { background: rgba(100,100,100,0.3); border-radius:4px; }
 pre.highlight::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+
+
+
+
+/* stl viewer */
+.stl-container {
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.stl-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  background: var(--code-bg-color);
+}
