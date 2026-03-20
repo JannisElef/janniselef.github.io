@@ -27,10 +27,11 @@ date: 2026-03-15
 
 {% assign stl = cdn | append: "/assets/stl/default_cube.stl" %}
 
-{% include stl-viewer.html
-file=stl
-id="template"
+{% include stl-viewer.html 
+file="/assets/stl/default_cube.stl"
+id="default_cube"
 %}
+
 
 
 ## Code Block
