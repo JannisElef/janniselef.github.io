@@ -48,11 +48,9 @@ date: 2026-03-14
 
 ## STL Viewer
 
-{% assign stl = cdn | append: "/assets/stl/default_cube.stl" %}
-
 {% include stl-viewer.html 
-file=stl
-id="template"
+file="/assets/stl/default_cube.stl"
+id="default_cube"
 %}
 
 
