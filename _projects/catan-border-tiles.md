@@ -4,7 +4,7 @@ title: Catan Border-Tiles
 description: Border-Tiles for the old version of Catan
 repo: JannisElef/catan-border-tiles
 branch: main
-tags: ["3D-Print", "Active"]
+tags: ["3D-Print", "Finished"]
 date: 2026-03-16
 ---
         
@@ -60,7 +60,7 @@ file="/assets/stl/Catan Border-Tiles One_Flat.stl"
 id="stl-one_flat"
 %}
 
-
+[-> View all Tiles](https://github.com/{{ page.repo }}/tree/main/assets/stl)
 
 <!-- END --->
 
