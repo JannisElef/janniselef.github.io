@@ -1,15 +1,22 @@
 
 <a class="project-card" href="{{ project.url }}">
     
-    {% if project.repo %} <!-- use repo's thumbnail.png image -->
+    {% if project.repo %} <!-- use repo's thumbnail.jpg image -->
         {% assign branch = project.branch | default: "main" %}
         {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: project.repo | append: "@" | append: branch %}
-        {% assign preview = cdn | append: "/assets/img/thumbnail.png" %}
+        {% assign preview = cdn | append: "/assets/img/thumbnail.jpg" %}
 
         <img 
-        src="{{ preview }}" 
-        alt="{{ project.title }}"
-        onerror="this.onerror=null; this.src='/assets/img/patterns/Taieri.svg';">  <!-- repo's thumbnail.png image not loaded -> load fallback image -->
+            src="{{ preview }}" 
+            alt="{{ project.title }}"
+            onerror="
+            if (this.src.endsWith('thumbnail.jpg')) {
+                this.src = '{{ cdn }}/assets/img/thumbnail.png';
+            } else {
+                this.onerror = null;
+                this.src = '/assets/img/patterns/Taieri.svg';
+            }
+        ">  <!-- repo's thumbnail.jpg and then thumbnail.png image not loaded -> load fallback svg -->
 
     {% else %}  <!-- no repo specified -->
         <img src="/assets/img/patterns/Inn.svg" alt="{{ project.title }}">
