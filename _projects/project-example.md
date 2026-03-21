@@ -31,7 +31,7 @@ date: 2026-03-14
 
   {% for img in images %}
     <a href="{{ cdn }}{{ img | strip }}" class="image-item">
-      <img src="{{ cdn }}{{ img | strip }}" alt="Preview">
+      <img src="{{ cdn }}{{ img | strip }}" alt="{{ img | split: '/' | last }}">
     </a>
   {% endfor %}
 </div>
