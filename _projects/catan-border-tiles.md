@@ -19,30 +19,31 @@ date: 2026-03-16
 ## Image Test from [Repository](https://github.com/{{ page.repo }})
 
 <div class="image-grid">
+  {% assign images = 
+    "
+    /assets/img/thumbnail.png,
+    /assets/img/thumbnail.png,
+    /assets/img/thumbnail.png,
+    /assets/img/thumbnail.png
+    "
+    | split: "," %}
 
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
+  {% for img in images %}
+    <a href="{{ cdn }}{{ img | strip }}" class="image-item">
+      <img src="{{ cdn }}{{ img | strip }}" alt="Preview">
+    </a>
+  {% endfor %}
 </div>
 
-## List
 
-- Element 1
-- Element 2
-- Element 3
+## Main Tile
+
+{% include stl-viewer.html 
+file="/assets/stl/Catan Border-Tiles Three_Angled.stl"
+id="stl-three_angled"
+%}
+
+## My Version
 
 
 

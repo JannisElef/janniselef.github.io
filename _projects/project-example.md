@@ -20,23 +20,20 @@ date: 2026-03-14
 ## Image Test from [Repository](https://github.com/{{ page.repo }})
 
 <div class="image-grid">
+  {% assign images = 
+    "
+    /assets/img/thumbnail.png,
+    /assets/img/thumbnail.png,
+    /assets/img/thumbnail.png,
+    /assets/img/thumbnail.png
+    "
+    | split: "," %}
 
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
-  <a href="{{ cdn }}/assets/img/thumbnail.png" class="image-item">
-    <img src="{{ cdn }}/assets/img/thumbnail.png" alt="Preview">
-  </a>
-
+  {% for img in images %}
+    <a href="{{ cdn }}{{ img | strip }}" class="image-item">
+      <img src="{{ cdn }}{{ img | strip }}" alt="Preview">
+    </a>
+  {% endfor %}
 </div>
 
 ## List
@@ -50,7 +47,7 @@ date: 2026-03-14
 
 {% include stl-viewer.html 
 file="/assets/stl/default_cube.stl"
-id="default_cube"
+id="stl-default_cube"
 %}
 
 
