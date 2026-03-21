@@ -14,6 +14,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 12px;
+  gap: 8px;
   font-family: 'Fira Code', monospace;
   font-size: 0.85rem;
   background: var(--code-bg-color, transparent);
@@ -24,11 +25,22 @@
   color: var(--text-color);
   font-weight: 500;
   opacity: 0.8;
+
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 a.content-filename:hover {
   text-decoration: none;
   opacity: 0.5;
+}
+
+.content-buttons {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 

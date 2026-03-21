@@ -2,18 +2,16 @@
 
   <div class="content-wrapper" id="content-wrapper-{{ include.file | replace:'/','-' | replace:'.','-' }}">
     <div class="content-header">
-        <a class="content-filename" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
-            🔗 {{include.file | split: "/" | last }}
-        </a>
-        <button id="load-stl-{{ include.id }}">
-          View
-        </button>
-        <button id="download-stl-{{ include.id }}" class="stl-download">
-          Download
-        </button>
+      <a class="content-filename" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
+        🔗 {{include.file | split: "/" | last }}
+      </a>
+      <div class="content-buttons">
+        <button id="load-stl-{{ include.id }}">View</button>
+        <button id="download-stl-{{ include.id }}" class="stl-download">Download</button>
+      </div>
     </div>
 
-    <div id="stl-viewer-{{ include.id }}" style="width:100%; height:500px; display:none; position:relative;"></div>
+    <div id="stl-viewer-{{ include.id }}" style="width:100%; height:300px; display:none; position:relative;"></div>
 
   </div>
   
