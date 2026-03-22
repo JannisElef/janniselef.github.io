@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Ricochet Robots</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#08080f;--sur:#0e0e1b;--red:#ff4455;--blue:#4488ff;--green:#44dd88;--yel:#ffcc00;--mut:#2a2a3a;}
+body{background:var(--bg);display:flex;flex-direction:column;align-items:center;min-height:100vh;font-family:'Courier New',monospace;color:#ddd;padding-bottom:36px;}
+#topbar{width:max-content;display:flex;align-items:center;justify-content:space-between;padding:12px 0 0;gap:8px;min-width:min(704px,96vw);}
+#topbar-left,#topbar-right{display:flex;align-items:center;gap:6px;}
+select{background:var(--sur);border:1px solid var(--mut);color:#bbb;padding:5px 10px;font-family:'Courier New',monospace;font-size:.68rem;letter-spacing:.12em;cursor:pointer;outline:none;transition:border-color .15s;}
+select:hover{border-color:var(--red);}select option{background:var(--sur);}
+#seed-box{display:flex;align-items:center;gap:5px;background:var(--sur);border:1px solid var(--mut);padding:4px 8px;}
+#seed-label{font-size:.56rem;letter-spacing:.15em;color:#3a3a4a;text-transform:uppercase;white-space:nowrap;}
+#seed-input{background:transparent;border:none;color:#5577bb;font-size:.64rem;letter-spacing:.05em;width:110px;padding:0;cursor:text;font-family:'Courier New',monospace;}
+#seed-input:focus{outline:none;color:#88aadd;}
+.ib{background:var(--sur);border:1px solid var(--mut);color:#555;padding:4px 8px;font-size:.7rem;cursor:pointer;transition:all .15s;font-family:'Courier New',monospace;}
+.ib:hover{background:var(--red);border-color:var(--red);color:#fff;}
+h1{font-size:1.38rem;letter-spacing:.38em;color:var(--red);text-transform:uppercase;margin:22px 0 8px;}
+#info{display:flex;gap:18px;margin-bottom:10px;font-size:.73rem;letter-spacing:.1em;color:#3a3a4a;flex-wrap:wrap;justify-content:center;}
+#info .val{color:#d0d0d0;}
+#canvas-wrap{position:relative;box-shadow:0 0 0 1px #1a1a2e,0 0 18px 2px rgba(255,68,85,.13),0 0 40px 6px rgba(68,136,255,.07),0 0 70px 12px rgba(255,68,85,.05);border-radius:2px;}
+#canvas-container canvas{display:block;}
+#drop-overlay{display:none;position:absolute;inset:0;background:rgba(68,136,255,.14);border:2px dashed var(--blue);align-items:center;justify-content:center;font-size:.9rem;letter-spacing:.22em;color:var(--blue);pointer-events:none;text-transform:uppercase;}
+#drop-overlay.active{display:flex;}
+#controls{margin-top:11px;display:flex;gap:9px;flex-wrap:wrap;justify-content:center;}
+button{background:var(--sur);border:1px solid var(--mut);color:#999;padding:6px 15px;font-family:'Courier New',monospace;font-size:.68rem;letter-spacing:.13em;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+button:hover:not(:disabled){background:var(--red);border-color:var(--red);color:#fff;}
+button:disabled{opacity:.28;cursor:default;}
+button.active{background:#0a1f0a;border-color:var(--green);color:var(--green);}
+button.tl-enabled{background:#081508;border-color:#1a4a1a;color:#2d7a2d;}
+button.tl-enabled:hover{background:#44dd88;border-color:#44dd88;color:#000;}
+button.tl-open{background:#061508;border-color:#44dd88;color:#44dd88;}
+button.red{background:#160408;border-color:#6a1828;color:var(--red);}
+button.red:hover:not(:disabled){background:var(--red);border-color:var(--red);color:#fff;}
+button.grey{background:#0e0e14;border-color:#222230;color:#555;}
+button.grey:hover:not(:disabled){background:#222230;border-color:#444;color:#999;}
+#msg{margin-top:8px;min-height:19px;font-size:.74rem;letter-spacing:.12em;color:var(--yel);text-align:center;}
+#subinfo{margin-top:3px;min-height:15px;font-size:.61rem;letter-spacing:.09em;color:#2e2e3e;text-align:center;}
+/* TIMELINE */
+#timeline-panel{margin-top:12px;width:min(704px,96vw);background:#0b0b17;border:1px solid #191928;padding:11px 15px;display:none;}
+#timeline-panel.open{display:block;}
+#tl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+#tl-title{font-size:.66rem;letter-spacing:.2em;color:#555;text-transform:uppercase;}
+#tl-info{font-size:.6rem;color:#3a3a4a;}
+#tl-track{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+#tl-slider{flex:1;accent-color:var(--red);cursor:pointer;}
+#tl-pos{font-size:.66rem;color:#5577bb;min-width:52px;text-align:right;}
+#tl-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+#tl-controls button{padding:5px 12px;font-size:.64rem;}
+#tl-actions{display:flex;gap:8px;justify-content:center;margin-top:8px;border-top:1px solid #191928;padding-top:8px;}
+#tl-actions button{padding:5px 12px;font-size:.62rem;}
+#tl-move-desc{margin-top:6px;font-size:.64rem;color:#3a3a4a;letter-spacing:.08em;text-align:center;min-height:15px;}
+#tl-keys{margin-top:4px;font-size:.56rem;color:#252535;text-align:center;letter-spacing:.06em;}
+/* HOVER TOOLTIP */
+#anno-tooltip{position:fixed;pointer-events:none;display:none;background:#0e0e1b;border:1px solid #3a3a5a;color:#aabbdd;font-size:.64rem;font-family:'Courier New',monospace;padding:3px 8px;z-index:300;letter-spacing:.06em;}
+/* OVERLAYS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(3,3,9,.82);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);z-index:200;align-items:center;justify-content:center;overflow-y:auto;padding:16px;}
+.overlay.open{display:flex;}
+.modal{background:var(--sur);border:1px solid #252538;padding:26px 28px;width:100%;max-height:92vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#444;font-size:1.1rem;cursor:pointer;padding:4px 8px;transition:color .15s;letter-spacing:0;}
+.modal-close:hover{color:var(--red);background:none;border:none;}
+.modal h2{font-size:.86rem;letter-spacing:.22em;color:var(--red);text-transform:uppercase;margin-bottom:18px;padding-right:28px;}
+.modal label{font-size:.62rem;letter-spacing:.14em;color:#484858;text-transform:uppercase;display:block;margin-bottom:5px;}
+.modal input[type=text]{background:#06060f;border:1px solid var(--mut);color:#ccc;padding:7px 10px;font-family:'Courier New',monospace;font-size:.76rem;width:100%;outline:none;letter-spacing:.06em;transition:border-color .15s;}
+.modal input[type=text]:focus{border-color:var(--red);color:#fff;}
+.modal textarea{width:100%;height:130px;background:#04040c;border:1px solid var(--mut);color:#5577bb;font-family:'Courier New',monospace;font-size:.6rem;padding:8px;resize:vertical;outline:none;line-height:1.6;}
+.modal-row{margin-bottom:14px;}
+.modal-btns{display:flex;gap:9px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
+/* WIN */
+#win-modal{max-width:500px;}
+#win-headline{font-size:1.05rem;letter-spacing:.16em;color:var(--yel);text-align:center;margin-bottom:3px;}
+#win-sub{font-size:.65rem;color:#555;text-align:center;margin-bottom:14px;letter-spacing:.1em;}
+#win-stats{background:#06060f;border:1px solid #181828;padding:0;margin:14px 0;}
+.ws-row{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;border-bottom:1px solid #101020;font-size:.71rem;}
+.ws-row:last-child{border-bottom:none;}
+.ws-label{color:#444;letter-spacing:.1em;}.ws-val{color:#ccc;}
+.ws-robots{padding:8px 14px 10px;}
+.ws-rtitle{font-size:.58rem;letter-spacing:.16em;color:#383848;text-transform:uppercase;margin-bottom:8px;}
+.ws-rrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:.7rem;}
+.ws-rname{display:flex;align-items:center;gap:7px;font-weight:bold;}
+.rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+#win-date-bg{text-align:center;font-size:.68rem;color:#3a3a5a;letter-spacing:.14em;margin-top:10px;padding:8px 0;border-top:1px solid #181828;background:#06060f;}
+#win-btns{display:flex;gap:8px;margin-top:16px;align-items:stretch;}
+#win-btns button{flex:1;padding:7px 8px;font-size:.64rem;letter-spacing:.08em;}
+/* NG */
+#ng-modal{max-width:420px;}
+.ng-sec{margin-bottom:16px;}
+.ng-stitle{font-size:.6rem;letter-spacing:.18em;color:#484858;text-transform:uppercase;margin-bottom:9px;}
+.ng-g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.ng-g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.ng-opt{background:#06060f;border:1px solid var(--mut);padding:9px 12px;cursor:pointer;transition:all .15s;text-align:center;}
+.ng-opt:hover{border-color:var(--red);}
+.ng-opt.sel{border-color:var(--red);background:#140306;color:var(--red);}
+.ng-opt .ot{font-size:.7rem;letter-spacing:.1em;}
+.ng-opt .od{font-size:.58rem;color:#3a3a4a;margin-top:2px;letter-spacing:.05em;}
+.ng-opt.sel .od{color:#6a1828;}
+/* SHARE */
+#share-modal{max-width:380px;}
+.sh-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#06060f;border:1px solid #181828;margin-bottom:7px;cursor:pointer;transition:border-color .15s;font-size:.7rem;letter-spacing:.1em;}
+.sh-row:hover{border-color:var(--red);color:#fff;}
+.sh-section-lbl{font-size:.56rem;letter-spacing:.18em;color:#2a2a3a;text-transform:uppercase;margin:10px 0 5px;padding-top:8px;border-top:1px solid #161625;}
+.sh-section-lbl:first-child{margin-top:0;border-top:none;}
+.sh-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0;}
+#qr-wrap{text-align:center;margin:12px 0;display:none;}
+#qr-div{display:inline-block;}
+#qr-lbl{font-size:.52rem;color:#444;letter-spacing:.06em;margin-top:6px;word-break:break-all;max-width:280px;margin-left:auto;margin-right:auto;}
+#qr-dl{display:none;margin-top:8px;}
+#share-msg{text-align:center;font-size:.64rem;color:var(--yel);min-height:18px;margin-top:8px;}
+/* IMPORT */
+#import-drop{border:2px dashed var(--mut);padding:22px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:11px;font-size:.68rem;color:#3a3a4a;letter-spacing:.1em;}
+#import-drop:hover,#import-drop.drag{border-color:var(--blue);color:var(--blue);}
+</style>
+</head>
+<body>
+<div id="anno-tooltip"></div>
+<div id="topbar">
+  <div id="topbar-left">
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="de">&#127465;&#127466; Deutsch</option>
+      <option value="en">&#127468;&#127463; English</option>
+    </select>
+  </div>
+  <div id="topbar-right">
+    <div id="seed-box" title="Map-ID">
+      <span id="seed-label">MAP</span>
+      <input id="seed-input" type="text" spellcheck="false" placeholder="..." onkeydown="skd(event)">
+    </div>
+    <button class="ib" onclick="loadSeedInput()" title="Laden">&#8617;</button>
+    <button class="ib" onclick="openShare()" id="share-ib" title="Teilen">&#10548;</button>
+  </div>
+</div>
+<h1>Ricochet Robots</h1>
+<div id="info">
+  <span id="lbl-moves">Z&Uuml;GE</span>: <span class="val" id="moveCount">0</span>
+  &nbsp;|&nbsp;
+  <span id="lbl-target">ZIEL</span>: <span class="val" id="targetInfo">&mdash;</span>
+  &nbsp;|&nbsp;
+  <span id="lbl-robot">ROBOTER</span>: <span class="val" id="robotInfo">&mdash;</span>
+</div>
+<div id="canvas-wrap">
+  <div id="canvas-container"></div>
+  <div id="drop-overlay">SPIEL ABLEGEN</div>
+</div>
+<div id="controls">
+  <button id="btn-new" onclick="openNewGame()">Neues Spiel</button>
+  <button id="btn-undo" onclick="undoMove()">Zur&uuml;ck (U)</button>
+  <button id="btn-import" onclick="openImport()">Spiel laden</button>
+  <button id="btn-timeline" onclick="toggleTimeline()" disabled>Timeline</button>
+</div>
+<div id="msg"></div>
+<div id="subinfo"></div>
+<div id="timeline-panel">
+  <div id="tl-header">
+    <span id="tl-title">TIMELINE</span>
+    <label id="tl-paths-lbl" style="display:flex;align-items:center;gap:5px;font-size:.6rem;color:#3a3a5a;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;margin-left:10px;">
+      <input type="checkbox" id="tl-paths-cb" checked onchange="showPaths=this.checked" style="accent-color:var(--green);cursor:pointer;">
+      <span id="tl-paths-txt">Pfade anzeigen</span>
+    </label>
+    <span id="tl-info" style="margin-left:auto;"></span>
+  </div>
+  <div id="tl-track">
+    <button onclick="tlSeek(9999)" title="Ende">&#9197;</button>
+    <input type="range" id="tl-slider" min="0" value="0" oninput="tlSeek(+this.value)">
+    <button onclick="tlSeek(0)" title="Start">&#9198;</button>
+    <span id="tl-pos">0/0</span>
+  </div>
+  <div id="tl-controls">
+    <button onclick="tlSeek(0)">&#9198;</button>
+    <button onclick="tlStep(-1)">&#9664; 1</button>
+    <button onclick="tlPlay()" id="tl-btn-play">&#9654; Play</button>
+    <button onclick="tlStep(+1)">1 &#9654;</button>
+    <button onclick="tlSeek(9999)">&#9197;</button>
+  </div>
+  <div id="tl-move-desc"></div>
+  <div id="tl-keys"></div>
+  <div id="tl-actions">
+    <button class="red" onclick="openShare()" id="tl-share-btn">Share Replay &#10548;</button>
+  </div>
+</div>
+<!-- NEW GAME -->
+<div class="overlay" id="ng-overlay">
+  <div class="modal" id="ng-modal">
+    <button class="modal-close" onclick="closeNg()">&#10005;</button>
+    <h2 id="ng-title">Neues Spiel</h2>
+    <div class="ng-sec">
+      <div class="ng-stitle" id="ng-lbl-token">Map-ID oder Replay eingeben</div>
+      <div style="display:flex;gap:7px;align-items:stretch;">
+        <input type="text" id="ng-token-input" placeholder="z.B. a3f2c1d0CM..." spellcheck="false"
+          style="flex:1;background:#04040c;border:1px solid var(--mut);color:#88aadd;padding:7px 10px;font-family:'Courier New',monospace;font-size:.72rem;outline:none;letter-spacing:.05em;transition:border-color .15s;"
+          oninput="ngTokenChanged(this.value)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--mut)'">
+        <button onclick="ngClearToken()" id="ng-tok-clear" style="padding:6px 10px;font-size:.7rem;display:none;">&#10005;</button>
+      </div>
+      <div id="ng-tok-hint" style="font-size:.58rem;color:#3a3a5a;margin-top:5px;letter-spacing:.06em;min-height:14px;"></div>
+    </div>
+    <div id="ng-random-sec">
+      <div class="ng-sec">
+        <div class="ng-stitle" id="ng-lbl-size">Spielfeldgr&ouml;&szlig;e</div>
+        <div class="ng-g2">
+          <div class="ng-opt sel" onclick="ngSel('size','12')" data-ng="size" data-val="12"><div class="ot">12 &times; 12</div><div class="od" id="ng-s12">Klein</div></div>
+          <div class="ng-opt" onclick="ngSel('size','16')" data-ng="size" data-val="16"><div class="ot">16 &times; 16</div><div class="od" id="ng-s16">Standard</div></div>
+        </div>
+      </div>
+      <div class="ng-sec">
+        <div class="ng-stitle" id="ng-lbl-obs">Hindernisse</div>
+        <div class="ng-g3">
+          <div class="ng-opt" onclick="ngSel('obs','L')" data-ng="obs" data-val="L"><div class="ot" id="ng-o-low">Wenig</div><div class="od">10</div></div>
+          <div class="ng-opt sel" onclick="ngSel('obs','M')" data-ng="obs" data-val="M"><div class="ot" id="ng-o-mid">Mittel</div><div class="od">22</div></div>
+          <div class="ng-opt" onclick="ngSel('obs','H')" data-ng="obs" data-val="H"><div class="ot" id="ng-o-high">Viel</div><div class="od">36</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button onclick="closeNg()" id="ng-cancel">Abbrechen</button>
+      <button class="red" onclick="confirmNewGame()" id="ng-confirm">Create Game</button>
+    </div>
+  </div>
+</div>
+<!-- WIN -->
+<div class="overlay" id="win-overlay">
+  <div class="modal" id="win-modal">
+    <button class="modal-close" onclick="closeWin()">&#10005;</button>
+    <div id="win-headline">&#127881; GEL&Ouml;ST!</div>
+    <div id="win-sub"></div>
+    <div class="modal-row">
+      <label id="win-lbl-name">Dein Name</label>
+      <input type="text" id="win-name-input" placeholder="Spieler..." oninput="username=this.value.trim()">
+    </div>
+    <div id="win-stats"></div>
+    <div id="win-date-bg"></div>
+    <div id="win-btns">
+      <button class="grey" onclick="doSaveJSON()" id="win-save-btn">&#8623; Speichern</button>
+      <button class="grey" onclick="winViewReplay()" id="win-view-btn">&#9654; Replay</button>
+      <button class="red" onclick="openShare()" id="win-replay-btn">Replay &#10548;</button>
+    </div>
+  </div>
+</div>
+<!-- IMPORT -->
+<div class="overlay" id="import-overlay" onclick="closeImportOvl(event)">
+  <div class="modal" style="max-width:460px;">
+    <button class="modal-close" onclick="closeImportOvl()">&#10005;</button>
+    <h2 id="import-title">Spiel laden</h2>
+    <div id="import-drop" onclick="triggerFile()"><div id="import-drop-txt">Spieldatei ablegen oder klicken</div></div>
+    <input type="file" id="file-input" accept=".json,application/json" style="display:none" onchange="fileChosen(event)">
+    <label id="import-or-lbl" style="display:block;text-align:center;color:#252535;font-size:.62rem;margin-bottom:9px;letter-spacing:.12em;">— TOKEN ODER SPIELDATEN EINFÜGEN —</label>
+    <textarea id="import-ta" spellcheck="false" placeholder="Map-Token, Replay-Token oder Spieldaten..."></textarea>
+    <div class="modal-btns">
+      <button onclick="closeImportOvl()" id="import-cancel">Abbrechen</button>
+      <button onclick="doImport()" id="import-confirm">Laden</button>
+    </div>
+  </div>
+</div>
+<!-- SHARE -->
+<div class="overlay" id="share-overlay" onclick="closeShare(event)" style="background:rgba(3,3,9,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)">
+  <div class="modal" id="share-modal">
+    <button class="modal-close" onclick="closeShare()">&#10005;</button>
+    <h2 id="share-title">Teilen</h2>
+    <div class="sh-section-lbl" id="sh-sec-map">SPIELFELD</div>
+    <div class="sh-row" onclick="shareAct('copy-map')"><span class="sh-icon">&#8856;</span><span id="sh-cm">Map-ID kopieren</span></div>
+    <div class="sh-row" onclick="shareAct('link-map')"><span class="sh-icon">&#128279;</span><span id="sh-lm">Link kopieren</span></div>
+    <div class="sh-row" onclick="shareAct('qr-map')"><span class="sh-icon">&#9638;</span><span id="sh-qm">QR-Code</span></div>
+    <div class="sh-section-lbl" id="sh-sec-replay" style="display:none">REPLAY</div>
+    <div class="sh-row" id="sh-rc-row" onclick="shareAct('copy-replay')" style="display:none"><span class="sh-icon">&#8856;</span><span id="sh-rc">Replay-ID kopieren</span></div>
+    <div class="sh-row" id="sh-replay-row" onclick="shareAct('link-replay')" style="display:none"><span class="sh-icon">&#128279;</span><span id="sh-lr">Replay-Link kopieren</span></div>
+    <div class="sh-row" id="sh-qr-replay-row" onclick="shareAct('qr-replay')" style="display:none"><span class="sh-icon">&#9638;</span><span id="sh-qr">Replay QR-Code</span></div>
+    <div id="qr-wrap">
+      <div id="qr-div"></div>
+      <div id="qr-lbl"></div>
+      <button id="qr-dl" class="red" onclick="downloadQR()">&#11015; QR herunterladen</button>
+    </div>
+    <div id="share-msg"></div>
+    <div id="sh-save-row" onclick="doSaveJSON()" style="display:none;margin-top:10px;border-top:1px solid #161625;padding-top:10px;" class="sh-row"><span class="sh-icon">&#8623;</span><span id="sh-save-lbl">Replay speichern</span></div>
+  </div>
+</div>
+<script>
+// ═══ i18n ═══
+const T={
+  de:{moves:'Z\u00dcGE',target:'ZIEL',robot:'ROBOTER',btnNew:'Neues Spiel',btnUndo:'Zur\u00fcck (U)',btnImport:'Spiel laden',btnTL:'Timeline',mapLbl:'MAP',
+    solved:n=>`\uD83C\uDF89 GEL\u00d6ST in ${n} Zug${n===1?'':'en'}!`,hint:(n,a)=>`Tipp: ${n} \u2192 ${a}`,noHint:'Kein direkter Tipp',
+    boardLoaded:'\u2713 Spielfeld geladen!',tokErr:'\u26a0 Ung\u00fcltiger Token',
+    keys:'WASD/Pfeile \u00b7 1\u20134 Roboter \u00b7 U R\u00fckg\u00e4ngig',
+    tlKeys:'\u2190\u2192 \u00b1 1 \u00b7 Shift+\u2190\u2192 \u00b1 5 \u00b7 \u2191 Ende, \u2193 Start \u00b7 Leertaste Play/Pause',
+    names:['ROT','BLAU','GR\u00dcN','GELB'],
+    tlLbl:'TIMELINE',tlStart:'Startposition',tlEnd:'Ziel erreicht',tlMove:(i,n,a)=>`Zug ${i}: ${n} ${a}`,
+    impOk:'\u2713 Spiel geladen!',impErr:'\u26a0 Ung\u00fcltige Spieldaten',dateAt:'um',
+    ngTitle:'Neues Spiel',ngSize:'Spielfeldgr\u00f6\u00dfe',ngObs:'Hindernisse',ngSml:'Klein',ngStd:'Standard',ngLow:'Wenig',ngMid:'Mittel',ngHigh:'Viel',ngCancel:'Abbrechen',ngConfirm:'Create Game',
+    ngTokenLbl:'Map-ID oder Replay eingeben',ngTokenPh:'z.B. a3f2c1d0CM\u2026',
+    ngTokMap:'\u2713 Map-ID erkannt \u2013 Spielfeld wird geladen',
+    ngTokReplay:'\u2713 Replay erkannt \u2013 Spielverlauf wird geladen',
+    ngTokInvalid:'\u26a0 Ung\u00fcltiger Code \u2013 zuf\u00e4lliges Spielfeld wird erstellt',
+    ngTokEmpty:'Leer \u2013 zuf\u00e4lliges Spielfeld anhand Konfiguration',
+    winHL:'\uD83C\uDF89 GEL\u00d6ST!',winSub:(n,t)=>`${n} Zug${n===1?'':'en'} \u00b7 ${t}`,winName:'Dein Name',winNamePh:'Spieler...',
+    stMoves:'Z\u00fcge',stTime:'Spielzeit',stBoard:'Spielfeld',stObs:'Hindernisse',stRobots:'Roboter',
+    winSave:'\u23ec Speichern',winView:'\u25b6 Replay',winShare:'Replay \u2934',
+    tlSave:'\u23ec Speichern',tlShare:'Share Replay \u2934',tlPaths:'Pfade anzeigen',
+    impTitle:'Spiel laden',impDrop:'Spieldatei ablegen oder klicken',impCancel:'Abbrechen',impLoad:'Laden',
+    obsN:{L:'Wenig',M:'Mittel',H:'Viel'},dropHint:'SPIEL ABLEGEN',
+    shTitle:'Teilen',shSecMap:'SPIELFELD',shSecReplay:'REPLAY',
+    shSave:'\u23ec Replay speichern',
+    shCM:'Map-ID kopieren',shLM:'Link kopieren',shQM:'QR-Code',
+    shRC:'Replay-ID kopieren',shLR:'Replay-Link kopieren',shQR:'Replay QR-Code',
+    shCopied:'\u2713 In Zwischenablage!',shQrDl:'\u2b07 QR herunterladen',unknown:'Unbekannt',
+    annoTip:(i,nm,a)=>`Schritt ${i}: ${nm} ${a}`,annoRobot:(nm,cnt)=>`${nm} gesamt: ${cnt}`},
+  en:{moves:'MOVES',target:'TARGET',robot:'ROBOT',btnNew:'New Game',btnUndo:'Undo (U)',btnImport:'Load game',btnTL:'Timeline',mapLbl:'MAP',
+    solved:n=>`\uD83C\uDF89 SOLVED in ${n} move${n===1?'':'s'}!`,hint:(n,a)=>`Hint: ${n} \u2192 ${a}`,noHint:'No direct hint',
+    boardLoaded:'\u2713 Board loaded!',tokErr:'\u26a0 Invalid token',
+    keys:'WASD/Arrows \u00b7 1\u20134 select \u00b7 U undo',
+    tlKeys:'\u2190\u2192 \u00b1 1 \u00b7 Shift+\u2190\u2192 \u00b1 5 \u00b7 \u2191 end, \u2193 start \u00b7 Space play/pause',
+    names:['RED','BLUE','GREEN','YELLOW'],
+    tlLbl:'TIMELINE',tlStart:'Start position',tlEnd:'Goal reached',tlMove:(i,n,a)=>`Move ${i}: ${n} ${a}`,
+    impOk:'\u2713 Game loaded!',impErr:'\u26a0 Invalid game data',dateAt:'at',
+    ngTitle:'New Game',ngSize:'Board Size',ngObs:'Obstacles',ngSml:'Small',ngStd:'Standard',ngLow:'Few',ngMid:'Medium',ngHigh:'Many',ngCancel:'Cancel',ngConfirm:'Create Game',
+    ngTokenLbl:'Enter map ID or replay',ngTokenPh:'e.g. a3f2c1d0CM\u2026',
+    ngTokMap:'\u2713 Map ID detected \u2013 board will be loaded',
+    ngTokReplay:'\u2713 Replay detected \u2013 game will be loaded',
+    ngTokInvalid:'\u26a0 Invalid code \u2013 random board will be created',
+    ngTokEmpty:'Empty \u2013 random board from configuration',
+    winHL:'\uD83C\uDF89 SOLVED!',winSub:(n,t)=>`${n} move${n===1?'':'s'} \u00b7 ${t}`,winName:'Your Name',winNamePh:'Player...',
+    stMoves:'Moves',stTime:'Play time',stBoard:'Board',stObs:'Obstacles',stRobots:'Robots',
+    winSave:'\u23ec Save',winView:'\u25b6 Replay',winShare:'Replay \u2934',
+    tlSave:'\u23ec Save',tlShare:'Share Replay \u2934',tlPaths:'Show paths',
+    impTitle:'Load game',impDrop:'Drop game file or click',impCancel:'Cancel',impLoad:'Load',
+    obsN:{L:'Few',M:'Medium',H:'Many'},dropHint:'DROP GAME',
+    shTitle:'Share',shSecMap:'BOARD',shSecReplay:'REPLAY',
+    shSave:'\u23ec Save replay',
+    shCM:'Copy map ID',shLM:'Copy link',shQM:'QR code',
+    shRC:'Copy replay ID',shLR:'Copy replay link',shQR:'Replay QR code',
+    shCopied:'\u2713 Copied!',shQrDl:'\u2b07 Download QR',unknown:'Unknown',
+    annoTip:(i,nm,a)=>`Step ${i}: ${nm} ${a}`,annoRobot:(nm,cnt)=>`${nm} total: ${cnt}`},
+};
+let lang='de',username='';
+const t=()=>T[lang];const rn=i=>t().names[i];
+
+function setLang(l){
+  lang=l;const x=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};const ph=(id,v)=>{const el=document.getElementById(id);if(el)el.placeholder=v;};
+  x('seed-label',t().mapLbl);x('lbl-moves',t().moves);x('lbl-target',t().target);x('lbl-robot',t().robot);
+  x('btn-new',t().btnNew);x('btn-undo',t().btnUndo);x('btn-import',t().btnImport);x('btn-timeline',t().btnTL);
+  x('subinfo',t().keys);x('tl-title',t().tlLbl);x('tl-keys',t().tlKeys);
+  x('ng-title',t().ngTitle);x('ng-lbl-size',t().ngSize);x('ng-lbl-obs',t().ngObs);x('ng-s12',t().ngSml);x('ng-s16',t().ngStd);x('ng-o-low',t().ngLow);x('ng-o-mid',t().ngMid);x('ng-o-high',t().ngHigh);x('ng-cancel',t().ngCancel);x('ng-confirm',t().ngConfirm);
+  x('ng-lbl-token',t().ngTokenLbl);ph('ng-token-input',t().ngTokenPh);
+  x('win-headline',t().winHL);x('win-lbl-name',t().winName);ph('win-name-input',t().winNamePh);
+  x('win-save-btn',t().winSave);x('win-view-btn',t().winView);x('win-replay-btn',t().winShare);
+  x('tl-share-btn',t().tlShare);x('tl-paths-txt',t().tlPaths);
+  x('import-title',t().impTitle);x('import-drop-txt',t().impDrop);x('import-cancel',t().impCancel);x('import-confirm',t().impLoad);ph('import-ta','...');
+  x('drop-overlay',t().dropHint);x('share-title',t().shTitle);x('sh-sec-map',t().shSecMap);x('sh-sec-replay',t().shSecReplay);
+  x('sh-cm',t().shCM);x('sh-lm',t().shLM);x('sh-qm',t().shQM);x('sh-save-lbl',t().shSave);x('sh-rc',t().shRC);x('sh-lr',t().shLR);x('sh-qr',t().shQR);x('qr-dl',t().shQrDl);
+  if(target)updateInfo();
+}
+
+// ═══ Constants ═══
+const RC=['#ff4455','#4488ff','#44dd88','#ffcc00'];
+const ARROWS=['\u2191','\u2192','\u2193','\u2190'];
+const OBS_MAP={L:10,M:22,H:36};
+let COLS=16,ROWS=16,CELL=44;let CR1,CR2,CC1,CC2;
+const uc=()=>{CR1=Math.floor(ROWS/2)-1;CR2=Math.floor(ROWS/2);CC1=Math.floor(COLS/2)-1;CC2=Math.floor(COLS/2);};uc();
+const isC=(r,c)=>r>=CR1&&r<=CR2&&c>=CC1&&c<=CC2;
+const rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+function mb32(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+// ═══ Walls ═══
+let walls;
+function applyBorder(){for(let c=0;c<COLS;c++){walls[0][c]|=1;walls[ROWS-1][c]|=4;}for(let r=0;r<ROWS;r++){walls[r][0]|=8;walls[r][COLS-1]|=2;}}
+function applyCenter(){for(let c=CC1;c<=CC2;c++){walls[CR1][c]|=1;walls[CR2][c]|=4;if(CR1>0)walls[CR1-1][c]|=4;if(CR2<ROWS-1)walls[CR2+1][c]|=1;}for(let r=CR1;r<=CR2;r++){walls[r][CC1]|=8;walls[r][CC2]|=2;if(CC1>0)walls[r][CC1-1]|=2;if(CC2<COLS-1)walls[r][CC2+1]|=8;}}
+function initWalls(rng,n){walls=Array.from({length:ROWS},()=>new Uint8Array(COLS));applyBorder();applyCenter();const WR=[-1,0,1,0],WC=[0,1,0,-1],B=[1,2,4,8],O=[4,8,1,2];let p=0,tr=0;while(p<n&&tr<600){tr++;let r=Math.floor(rng()*(ROWS-2))+1,c=Math.floor(rng()*(COLS-2))+1;if(isC(r,c))continue;let d=Math.floor(rng()*4),nr=r+WR[d],nc=c+WC[d];if(isC(nr,nc))continue;walls[r][c]|=B[d];if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS)walls[nr][nc]|=O[d];p++;}}
+
+// ═══ Compact tokens ═══
+const SIZE_ENC={12:'C',16:'G'};const SIZE_DEC={C:12,G:16};
+
+function mapToToken(){return`${currentSeed.toString(16).padStart(8,'0')}${SIZE_ENC[COLS]||'G'}${currentObs}`;}
+
+// tokenToMap rebuilds board fully from seed — robots and target included
+function tokenToMap(tok){
+  if(!/^[0-9a-f]{8}[CG][LMH]$/i.test(tok))return false;
+  const seed=parseInt(tok.slice(0,8),16),sz=SIZE_DEC[tok[8].toUpperCase()]||16,obs=tok[9].toUpperCase();
+  if(!OBS_MAP[obs])return false;
+  COLS=sz;ROWS=sz;CELL=sz===12?56:44;uc();currentSeed=seed;currentObs=obs;
+  const rng=mb32(seed);initWalls(rng,OBS_MAP[obs]);placeRobots(rng);placeTarget(rng);
+  return true;
+}
+
+function makeReplayHex(){
+  const nibbles=moveLog.map(m=>(m.ri<<2)|m.dir);const bytes=[];
+  for(let i=0;i<nibbles.length;i+=2)bytes.push(i+1<nibbles.length?(nibbles[i]<<4)|nibbles[i+1]:(nibbles[i]<<4)|0xf);
+  return bytes.map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function parseReplayHex(hex){
+  const log=[];
+  for(let i=0;i<hex.length;i+=2){const byte=parseInt(hex.slice(i,i+2),16);const hi=(byte>>4)&0xf,lo=byte&0xf;log.push({ri:(hi>>2)&3,dir:hi&3});if(lo!==0xf)log.push({ri:(lo>>2)&3,dir:lo&3});}
+  return log;
+}
+function makeMetaHex(){
+  const nm=(username||'').slice(0,16);const nameBytes=[];for(let i=0;i<nm.length;i++)nameBytes.push(nm.charCodeAt(i)&0xff);
+  const startMin=gameStartTime?Math.floor(gameStartTime.getTime()/60000):0;
+  const dur=gameEndTime&&gameStartTime?Math.min(Math.round((gameEndTime-gameStartTime)/1000),0xffff):0;
+  const mv=Math.min(moves,0x7f);const solvedBit=solved?0x80:0;
+  const bytes=[nameBytes.length,...nameBytes,(startMin>>16)&0xff,(startMin>>8)&0xff,startMin&0xff,(dur>>8)&0xff,dur&0xff,mv|solvedBit];
+  return bytes.map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function parseMetaHex(hex){
+  const bytes=[];for(let i=0;i<hex.length;i+=2)bytes.push(parseInt(hex.slice(i,i+2),16));
+  let pos=0;const nLen=bytes[pos++]||0;let name='';for(let i=0;i<nLen&&pos<bytes.length;i++)name+=String.fromCharCode(bytes[pos++]);
+  const startMin=((bytes[pos]||0)<<16)|((bytes[pos+1]||0)<<8)|(bytes[pos+2]||0);pos+=3;
+  const dur=((bytes[pos]||0)<<8)|(bytes[pos+1]||0);pos+=2;const mv=bytes[pos]||0;
+  return{name,startTime:startMin?new Date(startMin*60000):null,duration:dur,moves:mv&0x7f,solved:!!(mv&0x80)};
+}
+function gameReportToken(){return`${mapToToken()}_${makeMetaHex()}_${makeReplayHex()}`;}
+function parseGameReportToken(tok){
+  const parts=tok.split('_');if(parts.length!==3)return false;
+  const[mapTok,metaHex,replayHex]=parts;if(!tokenToMap(mapTok))return false;
+  const meta=parseMetaHex(metaHex);
+  username=meta.name||'';gameStartTime=meta.startTime;gameEndTime=meta.startTime&&meta.duration?new Date(meta.startTime.getTime()+meta.duration*1000):null;
+  moves=meta.moves;solved=meta.solved;
+  const rawMoves=parseReplayHex(replayHex).slice(0,moves);
+  let pos=robots.map(b=>({r:b.r,c:b.c}));moveLog=[];
+  for(const m of rawMoves){const{r,c}=simSlide_pos(m.ri,m.dir,pos);if(r===pos[m.ri].r&&c===pos[m.ri].c)continue;moveLog.push({ri:m.ri,dir:m.dir,fromR:pos[m.ri].r,fromC:pos[m.ri].c,toR:r,toC:c});pos[m.ri]={r,c};}
+  pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});history=[];return true;
+}
+function simSlide_pos(ri,dir,pos){
+  const DR=[-1,0,1,0],DC=[0,1,0,-1],EX=[1,2,4,8],EN=[4,8,1,2];let r=pos[ri].r,c=pos[ri].c;
+  while(true){if(walls[r][c]&EX[dir])break;let nr=r+DR[dir],nc=c+DC[dir];if(nr<0||nr>=ROWS||nc<0||nc>=COLS)break;if(walls[nr][nc]&EN[dir])break;if(pos.some((p,i)=>i!==ri&&p.r===nr&&p.c===nc))break;if(isC(nr,nc))break;r=nr;c=nc;}return{r,c};
+}
+
+// ═══ Game state ═══
+let robots,target,selected,moves,history,solved,moveLog=[],gameStartTime=null,gameEndTime=null,currentSeed=null,currentObs='M';
+function placeRobots(rng){robots=[];const used=new Set();for(let i=0;i<4;i++){let r,c;do{r=Math.floor(rng()*ROWS);c=Math.floor(rng()*COLS);}while(used.has(r*COLS+c)||isC(r,c));used.add(r*COLS+c);robots.push({r,c,color:RC[i]});}}
+function placeTarget(rng){const used=new Set(robots.map(b=>b.r*COLS+b.c));let r,c;do{r=Math.floor(rng()*(ROWS-2))+1;c=Math.floor(rng()*(COLS-2))+1;}while(used.has(r*COLS+c)||isC(r,c));const ri=Math.floor(rng()*4);target={r,c,robotIdx:ri,color:RC[ri]};}
+
+function startNewGame(){
+  currentSeed=Math.floor(Math.random()*0xFFFFFFFF);currentObs=ngObs;
+  const rng=mb32(currentSeed);initWalls(rng,OBS_MAP[ngObs]);placeRobots(rng);placeTarget(rng);
+  selected=0;moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;
+  setSeedDisp(mapToToken());setMsg('');updateInfo();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();
+}
+function newGame(){startNewGame();}
+function updateInfo(){if(!target)return;document.getElementById('moveCount').textContent=moves;document.getElementById('targetInfo').textContent=`${rn(target.robotIdx)} \u2192 (${target.c+1},${target.r+1})`;document.getElementById('robotInfo').textContent=rn(selected);}
+function setMsg(txt){document.getElementById('msg').textContent=txt;}
+function setSeedDisp(code){document.getElementById('seed-input').value=code;}
+
+function updateShareReplayVisibility(){
+  const hasReplay=solved&&moveLog.length>0;
+  const show=v=>v?'':'none';
+  document.getElementById('sh-sec-replay').style.display=show(hasReplay);
+  document.getElementById('sh-save-row').style.display=show(hasReplay);
+  document.getElementById('sh-rc-row').style.display=show(hasReplay);
+  document.getElementById('sh-replay-row').style.display=show(hasReplay);
+  document.getElementById('sh-qr-replay-row').style.display=show(hasReplay);
+}
+
+// ═══ Load ═══
+function skd(e){if(e.key==='Enter')loadSeedInput();}
+function loadSeedInput(){const raw=document.getElementById('seed-input').value.trim();if(!raw)return;if(!loadAnyToken(raw))setMsg(t().tokErr);}
+function loadAnyToken(raw){
+  if(/^[0-9a-f]{8}[CG][LMH]_[0-9a-f]+_[0-9a-f]*$/i.test(raw)){
+    if(!parseGameReportToken(raw))return false;
+    setSeedDisp(mapToToken());updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();setMsg(t().impOk);
+    setTimeout(()=>{if(!tlOpen)toggleTimeline();},80);return true;
+  }
+  if(/^[0-9a-f]{8}[CG][LMH]$/i.test(raw)){
+    if(!tokenToMap(raw))return false;
+    selected=0;moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;
+    setSeedDisp(mapToToken());setMsg(t().boardLoaded);updateInfo();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();return true;
+  }
+  try{const o=JSON.parse(raw);if(o.v===1){processImportObj(o);return true;}}catch(e){}
+  return false;
+}
+function readURLParams(){
+  const p=new URLSearchParams(location.search);const r=p.get('r');const map=p.get('map');
+  if(r&&parseGameReportToken(r)){setSeedDisp(mapToToken());updateInfo();enableTL();updateShareReplayVisibility();setTimeout(()=>{if(!tlOpen)toggleTimeline();},200);return true;}
+  if(map&&tokenToMap(map)){
+    selected=0;setSeedDisp(mapToToken());moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;updateInfo();updateShareReplayVisibility();return true;
+  }return false;
+}
+
+// ═══ Movement ═══
+function simSlide(ri,dir,pos){return simSlide_pos(ri,dir,pos);}
+function moveRobot(ri,dir){const pos=robots.map(b=>({r:b.r,c:b.c}));const{r,c}=simSlide(ri,dir,pos);if(r===robots[ri].r&&c===robots[ri].c)return false;history.push(pos);moveLog.push({ri,dir,fromR:robots[ri].r,fromC:robots[ri].c,toR:r,toC:c});robots[ri].r=r;robots[ri].c=c;moves++;updateInfo();checkWin();return true;}
+function checkWin(){const rb=robots[target.robotIdx];if(!solved&&rb.r===target.r&&rb.c===target.c){solved=true;gameEndTime=new Date();setTimeout(()=>openWin(),420);}}
+function undoMove(){if(!history.length)return;const prev=history.pop();moveLog.pop();prev.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});moves=Math.max(0,moves-1);solved=false;setMsg('');updateInfo();}
+
+// ═══ New game ═══
+let ngSize='12',ngObs='M',_ngTokValid=null;
+function ngSel(g,v){
+  document.querySelectorAll(`[data-ng="${g}"]`).forEach(el=>el.classList.toggle('sel',el.dataset.val===v));
+  if(g==='size')ngSize=v;else ngObs=v;
+  // If token field is empty, update the live preview ID
+  const tf=document.getElementById('ng-token-input');
+  if(tf&&!tf.value.trim())_ngUpdateLiveId();
+}
+function ngTokenChanged(val){
+  const hint=document.getElementById('ng-tok-hint');
+  const clearBtn=document.getElementById('ng-tok-clear');
+  const randSec=document.getElementById('ng-random-sec');
+  val=val.trim();
+  clearBtn.style.display=val?'':'none';
+  if(!val){
+    _ngTokValid=null;hint.textContent='';randSec.style.display='';
+    // Feed live generated map ID from current config into seed display
+    _ngUpdateLiveId();
+    return;
+  }
+  if(/^[0-9a-f]{8}[CG][LMH]_[0-9a-f]+_[0-9a-f]*$/i.test(val)){
+    _ngTokValid='replay';hint.textContent=t().ngTokReplay;hint.style.color='#44dd88';
+    setSeedDisp(val.split('_')[0].toUpperCase());randSec.style.display='none';
+  } else if(/^[0-9a-f]{8}[CG][LMH]$/i.test(val)){
+    _ngTokValid='map';hint.textContent=t().ngTokMap;hint.style.color='#4488ff';
+    setSeedDisp(val.toUpperCase());randSec.style.display='none';
+  } else {
+    _ngTokValid='invalid';hint.textContent=t().ngTokInvalid;hint.style.color='#ff4455';
+    randSec.style.display='';
+  }
+}
+// Generate a preview map ID from the currently selected config without committing
+function _ngUpdateLiveId(){
+  const sz=ngSize==='12'?'C':'G';
+  // Use current real seed if we have one, else generate a preview
+  const previewSeed=currentSeed||Math.floor(Math.random()*0xFFFFFFFF);
+  const id=`${previewSeed.toString(16).padStart(8,'0')}${sz}${ngObs}`;
+  setSeedDisp(id);
+}
+function ngClearToken(){document.getElementById('ng-token-input').value='';ngTokenChanged('');}
+function openNewGame(){
+  const curSize=String(COLS);const curObs=currentObs||'M';
+  ngSize=curSize;ngObs=curObs;ngSel('size',curSize);ngSel('obs',curObs);
+  document.getElementById('ng-token-input').value='';
+  document.getElementById('ng-tok-hint').textContent='';
+  document.getElementById('ng-tok-clear').style.display='none';
+  document.getElementById('ng-random-sec').style.display='';
+  _ngUpdateLiveId();
+  document.getElementById('ng-overlay').classList.add('open');
+}
+function closeNg(){document.getElementById('ng-overlay').classList.remove('open');}
+function confirmNewGame(){
+  const tokVal=document.getElementById('ng-token-input').value.trim();
+  closeNg();
+  if(tokVal&&(_ngTokValid==='map'||_ngTokValid==='replay')){
+    if(loadAnyToken(tokVal))return;
+  }
+  COLS=+ngSize;ROWS=+ngSize;CELL=ngSize==='12'?56:44;uc();startNewGame();
+}
+
+// ═══ Win ═══
+function openWin(){
+  document.getElementById('win-name-input').value=username;document.getElementById('win-headline').textContent=t().winHL;
+  const el=gameEndTime&&gameStartTime?Math.round((gameEndTime-gameStartTime)/1000):0;
+  document.getElementById('win-sub').textContent=t().winSub(moves,fmtEl(el));
+  buildWinStats(el);document.getElementById('win-overlay').classList.add('open');updateShareReplayVisibility();
+}
+function closeWin(){document.getElementById('win-overlay').classList.remove('open');setMsg(t().solved(moves));enableTL();}
+function syncU(){const v=document.getElementById('win-name-input').value.trim();if(v)username=v;}
+function buildWinStats(el){
+  const usage=[0,0,0,0];for(const m of moveLog)usage[m.ri]++;const on=t().obsN[currentObs]||currentObs;
+  let h=`<div class="ws-row"><span class="ws-label">${t().stMoves}</span><span class="ws-val">${moves}</span></div>`;
+  h+=`<div class="ws-row"><span class="ws-label">${t().stTime}</span><span class="ws-val">${fmtEl(el)}</span></div>`;
+  h+=`<div class="ws-row"><span class="ws-label">${t().stBoard}</span><span class="ws-val">${COLS}&times;${ROWS}</span></div>`;
+  h+=`<div class="ws-row"><span class="ws-label">${t().stObs}</span><span class="ws-val">${on}</span></div>`;
+  h+=`<div class="ws-robots"><div class="ws-rtitle">${t().stRobots}</div>`;
+  for(let i=0;i<4;i++){const cnt=usage[i];const mv=lang==='de'?(cnt===1?'Zug':'Z\u00fcge'):(cnt===1?'move':'moves');h+=`<div class="ws-rrow"><span class="ws-rname"><span class="rdot" style="background:${RC[i]}"></span><span style="color:${RC[i]}">${rn(i)}</span></span><span class="ws-val">${cnt} ${mv}</span></div>`;}
+  h+=`</div>`;
+  document.getElementById('win-stats').innerHTML=h;document.getElementById('win-date-bg').textContent=gameStartTime?fmtDate(gameStartTime):'';
+}
+function fmtEl(s){const m=Math.floor(s/60),ss=s%60;return m>0?`${m}m ${ss}s`:`${ss}s`;}
+function fmtDate(d){const p=n=>String(n).padStart(2,'0');return`${p(d.getDate())}.${p(d.getMonth()+1)}.${d.getFullYear()} ${t().dateAt} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+
+function winViewReplay(){syncU();document.getElementById('win-overlay').classList.remove('open');setMsg(t().solved(moves));enableTL();if(!tlOpen)toggleTimeline();}
+function winShareReplay(){syncU();const url=`http://localhost:4000/?r=${gameReportToken()}`;navigator.clipboard.writeText(url).catch(()=>{});setMsg(t().shCopied);}
+function doSaveJSON(){
+  syncU();
+  const now=gameEndTime||new Date();
+  const p2=n=>String(n).padStart(2,'0');
+  const fname=`ricochet-robots_replay_${now.getFullYear()}${p2(now.getMonth()+1)}${p2(now.getDate())}${p2(now.getHours())}${p2(now.getMinutes())}${p2(now.getSeconds())}.json`;
+  const json=JSON.stringify({v:1,player:username||t().unknown,date:gameStartTime?gameStartTime.toISOString():(new Date()).toISOString(),dateSolved:gameEndTime?gameEndTime.toISOString():null,lang,board:{rows:ROWS,cols:COLS,seed:currentSeed,obs:currentObs,mapID:mapToToken()},game:{moves,solved,moveLog:moveLog.map((m,i)=>({s:i+1,ri:m.ri,d:m.dir,fr:m.fromR,fc:m.fromC,tr:m.toR,tc:m.toC}))}},null,2);
+  const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fname;a.click();URL.revokeObjectURL(url);
+}
+
+// ═══ Import ═══
+function openImport(){document.getElementById('import-overlay').classList.add('open');}
+function closeImportOvl(e){if(e&&e.target!==document.getElementById('import-overlay'))return;document.getElementById('import-overlay').classList.remove('open');document.getElementById('import-ta').value='';}
+function triggerFile(){document.getElementById('file-input').click();}
+function fileChosen(e){const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=ev=>tryLoad(ev.target.result);fr.readAsText(f);e.target.value='';}
+function doImport(){const txt=document.getElementById('import-ta').value.trim();if(!txt)return;tryLoad(txt);}
+function tryLoad(txt){if(loadAnyToken(txt.trim())){document.getElementById('import-overlay').classList.remove('open');document.getElementById('import-ta').value='';}else setMsg(t().impErr);}
+function processImportObj(o){
+  const b=o.board;COLS=b.cols;ROWS=b.rows;CELL=COLS===12?56:44;uc();currentSeed=b.seed;currentObs=b.obs||'M';
+  const rng=mb32(b.seed);initWalls(rng,OBS_MAP[b.obs]||22);placeRobots(rng);placeTarget(rng);
+  moves=o.game.moves;solved=o.game.solved;
+  moveLog=o.game.moveLog.map(m=>({ri:m.ri!=null?m.ri:m.robot,dir:m.d!=null?m.d:m.dir,fromR:m.fr!=null?m.fr:m.from.r,fromC:m.fc!=null?m.fc:m.from.c,toR:m.tr!=null?m.tr:m.to.r,toC:m.tc!=null?m.tc:m.to.c}));
+  history=[];gameStartTime=o.date?new Date(o.date):null;gameEndTime=o.dateSolved?new Date(o.dateSolved):null;
+  if(o.player&&o.player!==T.de.unknown&&o.player!==T.en.unknown)username=o.player;
+  let pos=robots.map(b=>({r:b.r,c:b.c}));for(const m of moveLog)pos[m.ri]={r:m.toR,c:m.toC};pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});
+  setSeedDisp(b.mapID||b.mapToken||mapToToken());
+  setMsg(t().impOk);updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();
+}
+function setupDrop(){
+  const wrap=document.getElementById('canvas-wrap'),ov=document.getElementById('drop-overlay');
+  wrap.addEventListener('dragover',e=>{e.preventDefault();ov.classList.add('active');});wrap.addEventListener('dragleave',()=>ov.classList.remove('active'));
+  wrap.addEventListener('drop',e=>{e.preventDefault();ov.classList.remove('active');const f=e.dataTransfer.files[0];if(!f)return;const fr=new FileReader();fr.onload=ev=>tryLoad(ev.target.result);fr.readAsText(f);});
+  const id=document.getElementById('import-drop');
+  id.addEventListener('dragover',e=>{e.preventDefault();id.classList.add('drag');});id.addEventListener('dragleave',()=>id.classList.remove('drag'));
+  id.addEventListener('drop',e=>{e.preventDefault();id.classList.remove('drag');const f=e.dataTransfer.files[0];if(!f)return;const fr=new FileReader();fr.onload=ev=>tryLoad(ev.target.result);fr.readAsText(f);});
+}
+
+// ═══ Share ═══
+let _qrURL='';
+function openShare(){document.getElementById('qr-wrap').style.display='none';document.getElementById('qr-dl').style.display='none';document.getElementById('share-msg').textContent='';document.getElementById('share-overlay').classList.add('open');}
+function closeShare(e){if(e&&e.target!==document.getElementById('share-overlay'))return;document.getElementById('share-overlay').classList.remove('open');}
+function shareAct(type){
+  const msg=document.getElementById('share-msg'),qrw=document.getElementById('qr-wrap');qrw.style.display='none';
+  const tok=mapToToken();const mapUrl=`http://localhost:4000/?map=${tok}`;
+  if(type==='copy-map'){navigator.clipboard.writeText(tok).catch(()=>{});msg.textContent=t().shCopied+' \u2014 '+tok;}
+  else if(type==='link-map'){navigator.clipboard.writeText(mapUrl).catch(()=>{});msg.textContent=t().shCopied+' \u2014 '+mapUrl;}
+  else if(type==='qr-map'){_qrURL=mapUrl;document.getElementById('qr-div').innerHTML='';try{new QRCode(document.getElementById('qr-div'),{text:_qrURL,width:180,height:180,colorDark:'#ddeeff',colorLight:'#080810'});}catch(e){}document.getElementById('qr-lbl').textContent=_qrURL;qrw.style.display='block';document.getElementById('qr-dl').style.display='inline-block';}
+  else if(type==='copy-replay'){const rt=gameReportToken();navigator.clipboard.writeText(rt).catch(()=>{});msg.textContent=t().shCopied+' ('+rt.length+' chars)';}
+  else if(type==='link-replay'){const url=`http://localhost:4000/?r=${gameReportToken()}`;navigator.clipboard.writeText(url).catch(()=>{});msg.textContent=t().shCopied;}
+  else if(type==='qr-replay'){_qrURL=`http://localhost:4000/?r=${gameReportToken()}`;document.getElementById('qr-div').innerHTML='';try{new QRCode(document.getElementById('qr-div'),{text:_qrURL,width:180,height:180,colorDark:'#ffeedd',colorLight:'#080810'});}catch(e){}document.getElementById('qr-lbl').textContent=_qrURL.slice(0,70)+'…';qrw.style.display='block';document.getElementById('qr-dl').style.display='inline-block';}
+}
+function downloadQR(){const cv=document.querySelector('#qr-div canvas');if(!cv)return;const a=document.createElement('a');a.download='ricochet_qr.png';a.href=cv.toDataURL('image/png');a.click();}
+
+// ═══ Timeline ═══
+let tlOpen=false,tlSnaps=[],tlCur=0,tlTimer=null;
+function enableTL(){const b=document.getElementById('btn-timeline');b.disabled=false;b.classList.add('tl-enabled');b.classList.remove('tl-open');}
+function disableTL(){const b=document.getElementById('btn-timeline');b.disabled=true;b.classList.remove('tl-enabled','tl-open');closeTimeline();}
+function buildSnaps(){
+  if(!moveLog.length){tlSnaps=[robots.map(b=>({r:b.r,c:b.c}))];return;}
+  let pos=robots.map(b=>({r:b.r,c:b.c}));[...moveLog].reverse().forEach(m=>pos[m.ri]={r:m.fromR,c:m.fromC});
+  const s=[pos.map(p=>({...p}))],cur=pos.map(p=>({...p}));
+  for(const m of moveLog){cur[m.ri]={r:m.toR,c:m.toC};s.push(cur.map(p=>({...p})));}
+  tlSnaps=s;
+}
+function toggleTimeline(){if(document.getElementById('btn-timeline').disabled)return;tlOpen=!tlOpen;const panel=document.getElementById('timeline-panel');const b=document.getElementById('btn-timeline');if(tlOpen){buildSnaps();tlCur=0;panel.classList.add('open');b.classList.remove('tl-enabled');b.classList.add('tl-open');renderTL();}else{closeTimeline();b.classList.remove('tl-open');b.classList.add('tl-enabled');}}
+function closeTimeline(){tlOpen=false;document.getElementById('timeline-panel').classList.remove('open');const b=document.getElementById('btn-timeline');b.classList.remove('tl-open');if(!b.disabled)b.classList.add('tl-enabled');if(tlTimer){clearInterval(tlTimer);tlTimer=null;}if(robots&&moveLog.length){let pos=robots.map(b=>({r:b.r,c:b.c}));[...moveLog].reverse().forEach(m=>pos[m.ri]={r:m.fromR,c:m.fromC});[...moveLog].forEach(m=>{pos[m.ri]={r:m.toR,c:m.toC};});pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});}}
+function renderTL(){
+  const sl=document.getElementById('tl-slider');const max=Math.max(0,tlSnaps.length-1);sl.max=max;sl.value=tlCur;
+  document.getElementById('tl-pos').textContent=`${tlCur}/${max}`;
+  let desc='';if(tlCur===0)desc=t().tlStart;else if(tlCur===tlSnaps.length-1&&solved)desc=t().tlEnd;else{const m=moveLog[tlCur-1];if(m)desc=t().tlMove(tlCur,rn(m.ri),ARROWS[m.dir]);}
+  document.getElementById('tl-move-desc').textContent=desc;document.getElementById('tl-info').textContent=`${username||'\u2014'} \u00b7 ${gameStartTime?fmtDate(gameStartTime):''}`;
+  if(tlSnaps[tlCur])tlSnaps[tlCur].forEach((pos,i)=>{robots[i].r=pos.r;robots[i].c=pos.c;});
+}
+function tlSeek(n){tlCur=Math.max(0,Math.min(n,tlSnaps.length-1));renderTL();}
+function tlStep(d){tlSeek(tlCur+d);}
+function tlPlay(){
+  const btn=document.getElementById('tl-btn-play');
+  if(tlTimer){clearInterval(tlTimer);tlTimer=null;btn.textContent='\u25B6 Play';return;}
+  // If at end, restart from beginning
+  if(tlCur>=tlSnaps.length-1)tlSeek(0);
+  btn.textContent='\u23F8 Pause';
+  tlTimer=setInterval(()=>{if(tlCur>=tlSnaps.length-1){clearInterval(tlTimer);tlTimer=null;btn.textContent='\u25B6 Play';return;}tlSeek(tlCur+1);},620);
+}
+
+// ═══ Annotation hover state + paths toggle ═══
+let annoHoverIdx=-1,annoHoverRobot=-1,showPaths=true;
+
+// ═══ p5 sketch ═══
+let animRobots=null;
+function resetAnim(){if(animRobots){if(animRobots.length!==robots.length)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));else animRobots.forEach((a,i)=>{a.x=robots[i].c*CELL;a.y=robots[i].r*CELL;});}}
+
+new p5(function(p){
+  let lastCols=COLS,lastRows=ROWS;
+  let mouseCanvasX=0,mouseCanvasY=0;
+
+  p.setup=function(){
+    const cnv=p.createCanvas(COLS*CELL,ROWS*CELL);cnv.parent('canvas-container');
+    if(!readURLParams())startNewGame();
+    animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));setLang('de');setupDrop();p.frameRate(60);
+  };
+
+  p.draw=function(){
+    if(COLS!==lastCols||ROWS!==lastRows){p.resizeCanvas(COLS*CELL,ROWS*CELL);lastCols=COLS;lastRows=ROWS;animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));}
+    p.background(14,14,20);drawGrid();drawCenter();drawWalls();drawTarget();
+    if(tlOpen&&moveLog.length)drawAnnotations();
+    for(let i=0;i<4;i++){animRobots[i].x+=(robots[i].c*CELL-animRobots[i].x)*0.26;animRobots[i].y+=(robots[i].r*CELL-animRobots[i].y)*0.26;}
+    drawRobots();drawSel();
+    if(tlOpen)doHoverDetect();
+  };
+
+  function drawGrid(){p.stroke(22,22,34);p.strokeWeight(0.5);for(let r=0;r<=ROWS;r++)p.line(0,r*CELL,COLS*CELL,r*CELL);for(let c=0;c<=COLS;c++)p.line(c*CELL,0,c*CELL,ROWS*CELL);}
+  function drawCenter(){const x=CC1*CELL,y=CR1*CELL,w=(CC2-CC1+1)*CELL,h=(CR2-CR1+1)*CELL;p.fill(16,16,26);p.noStroke();p.rect(x,y,w,h);p.fill(33,33,48);p.rect(x+5,y+5,w-10,h-10,5);p.stroke(52,52,72);p.strokeWeight(1.1);p.line(x+w/2,y+8,x+w/2,y+h-8);p.line(x+8,y+h/2,x+w-8,y+h/2);p.noFill();p.stroke(58,58,88,105);p.strokeWeight(1.8);p.rect(x+1,y+1,w-2,h-2,3);}
+  function drawWalls(){p.strokeWeight(3.5);p.strokeCap(p.SQUARE);for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(isC(r,c))continue;const w=walls[r][c],x=c*CELL,y=r*CELL;p.stroke(210,70,34);if(w&1)p.line(x+1,y,x+CELL-1,y);if(w&2)p.line(x+CELL,y+1,x+CELL,y+CELL-1);if(w&4)p.line(x+1,y+CELL,x+CELL-1,y+CELL);if(w&8)p.line(x,y+1,x,y+CELL-1);}const cx=CC1*CELL,cy=CR1*CELL,cw=(CC2-CC1+1)*CELL,ch=(CR2-CR1+1)*CELL;p.stroke(58,58,90);p.strokeWeight(2.5);p.line(cx,cy,cx+cw,cy);p.line(cx+cw,cy,cx+cw,cy+ch);p.line(cx+cw,cy+ch,cx,cy+ch);p.line(cx,cy+ch,cx,cy);}
+  function drawTarget(){if(!target)return;const x=target.c*CELL+CELL/2,y=target.r*CELL+CELL/2,s=CELL*0.36;const[r,g,b]=rgb(target.color);p.push();p.translate(x,y);const pulse=0.72+0.28*Math.sin(p.frameCount*0.08);p.noFill();p.stroke(r,g,b,60*pulse);p.strokeWeight(1.5);p.ellipse(0,0,CELL*0.8*pulse,CELL*0.8*pulse);p.stroke(r,g,b);p.strokeWeight(2.5);p.line(-s,0,s,0);p.line(0,-s,0,s);p.fill(r,g,b);p.noStroke();p.ellipse(0,0,7,7);p.pop();}
+
+  function drawAnnotations(){
+    if(!showPaths)return;
+    const DR=[-1,0,1,0],DC=[0,1,0,-1];
+    for(let i=0;i<moveLog.length;i++){
+      const m=moveLog[i];
+      const isCur=(i===tlCur-1);
+      const isHovMove=(annoHoverIdx===i);
+      const isHovRobot=(annoHoverRobot===m.ri);
+      const highlight=isCur||isHovMove||isHovRobot;
+      const[r,g,b]=rgb(RC[m.ri]);
+      const alpha=highlight?230:38;
+      const x1=m.fromC*CELL+CELL/2,y1=m.fromR*CELL+CELL/2;
+      const x2=m.toC*CELL+CELL/2,y2=m.toR*CELL+CELL/2;
+      // Path line
+      p.stroke(r,g,b,highlight?170:16);p.strokeWeight(highlight?2.5:1);p.line(x1,y1,x2,y2);
+      // Circle at START position
+      p.push();p.translate(x1,y1);
+      const sz=highlight?CELL*0.62:CELL*0.38;
+      p.noFill();p.stroke(r,g,b,alpha);p.strokeWeight(highlight?2.2:0.8);p.ellipse(0,0,sz,sz);
+      p.pop();
+      // Arrowhead at END
+      p.push();p.translate(x2,y2);
+      const adx=DC[m.dir],ady=DR[m.dir],aLen=highlight?10:6;
+      p.fill(r,g,b,alpha);p.noStroke();
+      p.push();p.translate(adx*2,ady*2);p.rotate(Math.atan2(ady,adx));
+      p.triangle(aLen,0,-aLen*0.6,aLen*0.7,-aLen*0.6,-aLen*0.7);
+      p.pop();p.pop();
+    }
+  }
+
+  function doHoverDetect(){
+    const mx=mouseCanvasX,my=mouseCanvasY;
+    if(mx<0||mx>COLS*CELL||my<0||my>ROWS*CELL){
+      if(annoHoverIdx!==-1||annoHoverRobot!==-1){annoHoverIdx=-1;annoHoverRobot=-1;hideTooltip();}return;
+    }
+    let newHovM=-1,newHovR=-1;
+    // Check robot body hover first (takes priority — focuses robot, not its first path)
+    for(let i=0;i<4;i++){
+      const rx=animRobots[i].x+CELL/2,ry=animRobots[i].y+CELL/2;
+      if(Math.hypot(mx-rx,my-ry)<CELL*0.3){newHovR=i;break;}
+    }
+    if(newHovR===-1){
+      // Check start-circle hover
+      const hoverR=CELL*0.33;
+      for(let i=moveLog.length-1;i>=0;i--){
+        const m=moveLog[i];
+        const cx=m.fromC*CELL+CELL/2,cy=m.fromR*CELL+CELL/2;
+        if(Math.hypot(mx-cx,my-cy)<hoverR){newHovM=i;break;}
+      }
+      // Check path line hover (if paths shown)
+      if(newHovM===-1&&showPaths){
+        for(let i=moveLog.length-1;i>=0;i--){
+          const m=moveLog[i];
+          const x1=m.fromC*CELL+CELL/2,y1=m.fromR*CELL+CELL/2;
+          const x2=m.toC*CELL+CELL/2,y2=m.toR*CELL+CELL/2;
+          const dist=distPointToSegment(mx,my,x1,y1,x2,y2);
+          if(dist<7){newHovM=i;break;}
+        }
+      }
+    }
+    if(newHovM!==annoHoverIdx||newHovR!==annoHoverRobot){
+      annoHoverIdx=newHovM;annoHoverRobot=newHovR;
+      if(newHovM>=0){
+        const m=moveLog[newHovM];
+        showTooltip(t().annoTip(newHovM+1,rn(m.ri),ARROWS[m.dir]),RC[m.ri]);
+      } else if(newHovR>=0){
+        const cnt=moveLog.filter(m=>m.ri===newHovR).length;
+        showTooltip(t().annoRobot(rn(newHovR),cnt),RC[newHovR]);
+      } else {
+        hideTooltip();
+      }
+    }
+  }
+
+  function distPointToSegment(px,py,ax,ay,bx,by){
+    const dx=bx-ax,dy=by-ay;const lenSq=dx*dx+dy*dy;
+    if(lenSq===0)return Math.hypot(px-ax,py-ay);
+    let t=((px-ax)*dx+(py-ay)*dy)/lenSq;t=Math.max(0,Math.min(1,t));
+    return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
+  }
+
+  function showTooltip(txt,color){
+    const tt=document.getElementById('anno-tooltip');
+    tt.textContent=txt;tt.style.color=color||'#aabbdd';tt.style.display='block';
+  }
+  function hideTooltip(){document.getElementById('anno-tooltip').style.display='none';}
+
+  p.mouseMoved=p.mouseDragged=function(){
+    const rect=document.getElementById('canvas-container').getBoundingClientRect();
+    mouseCanvasX=p.mouseX;mouseCanvasY=p.mouseY;
+    const tt=document.getElementById('anno-tooltip');
+    tt.style.left=(p.mouseX+rect.left+14)+'px';tt.style.top=(p.mouseY+rect.top-10)+'px';
+  };
+
+  function drawRobots(){for(let i=0;i<4;i++){const ax=animRobots[i].x+CELL/2,ay=animRobots[i].y+CELL/2;const[r,g,b]=rgb(robots[i].color);const sel=i===selected&&!tlOpen&&!solved;p.push();p.translate(ax,ay);if(sel){p.noStroke();p.fill(r,g,b,22);p.ellipse(0,0,CELL*0.95,CELL*0.95);p.fill(r,g,b,9);p.ellipse(0,0,CELL*1.18,CELL*1.18);}p.fill(0,0,0,48);p.noStroke();p.ellipse(2,3,CELL*0.54,CELL*0.54);p.fill(r,g,b);p.stroke(255,255,255,48);p.strokeWeight(1.5);p.ellipse(0,0,CELL*0.54,CELL*0.54);p.fill(255,255,255,68);p.noStroke();p.ellipse(-4,-4,CELL*0.16,CELL*0.12);p.fill(14,14,20);p.ellipse(0,0,CELL*0.15,CELL*0.15);p.pop();}}
+  function drawSel(){if(solved||tlOpen)return;const rb=robots[selected],x=rb.c*CELL,y=rb.r*CELL;const[r,g,b]=rgb(robots[selected].color);p.noFill();p.stroke(r,g,b,175);p.strokeWeight(2);p.rect(x+2,y+2,CELL-4,CELL-4,3);}
+
+  p.keyPressed=function(){
+    if(tlOpen){
+      if(document.activeElement&&document.activeElement.tagName==='INPUT')return;
+      const kc=p.keyCode;
+      if(p.key===' '){tlPlay();return;}
+      if(kc===38||kc===36){tlSeek(9999);return;}// ArrowUp/Home → END
+      if(kc===40||kc===35){tlSeek(0);return;}// ArrowDown/End → START
+      // ArrowLeft/Right handled by hold-scroll via document keydown
+      return;
+    }
+    if(anyOpen()||solved)return;
+    if(p.key==='u'||p.key==='U'){undoMove();return;}
+    const dm={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3,W:0,D:1,S:2,A:3};
+    if(['1','2','3','4'].includes(p.key)){selected=+p.key-1;updateInfo();return;}
+    if(dm[p.key]!==undefined)moveRobot(selected,dm[p.key]);
+  };
+
+  p.mousePressed=function(){
+    if(anyOpen()||tlOpen||solved)return;
+    const mc=Math.floor(p.mouseX/CELL),mr=Math.floor(p.mouseY/CELL);
+    for(let i=0;i<4;i++)if(robots[i].r===mr&&robots[i].c===mc){selected=i;updateInfo();return;}
+    if(mc>=0&&mc<COLS&&mr>=0&&mr<ROWS){const rb=robots[selected],dc=mc-rb.c,dr=mr-rb.r;if(Math.abs(dc)>Math.abs(dr))moveRobot(selected,dc>0?1:3);else if(dr!==0)moveRobot(selected,dr>0?2:0);}
+  };
+},document.getElementById('canvas-container'));
+
+function anyOpen(){return['ng-overlay','win-overlay','import-overlay','share-overlay'].some(id=>document.getElementById(id).classList.contains('open'));}
+
+// Hold-to-scroll for arrow keys in timeline
+let _holdTimer=null,_holdInterval=null;
+function _holdStart(dir){
+  if(_holdTimer||_holdInterval)return;
+  // immediate first step
+  tlStep(dir);
+  // after 300ms start repeating every 80ms
+  _holdTimer=setTimeout(()=>{
+    _holdTimer=null;
+    _holdInterval=setInterval(()=>tlStep(dir),80);
+  },300);
+}
+function _holdStop(){
+  if(_holdTimer){clearTimeout(_holdTimer);_holdTimer=null;}
+  if(_holdInterval){clearInterval(_holdInterval);_holdInterval=null;}
+}
+
+document.addEventListener('keydown',e=>{
+  const tlActive=document.getElementById('timeline-panel').classList.contains('open');
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!tlActive)e.preventDefault();
+  if(tlActive){
+    if(document.activeElement&&document.activeElement.tagName==='INPUT')return;
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+      e.preventDefault();
+      if(e.repeat)return;// handled by interval
+      const shift=e.shiftKey;
+      _holdStart(e.key==='ArrowLeft'?-1*(shift?5:1):(shift?5:1));
+    }
+  }
+  if(e.key==='Escape')['ng-overlay','import-overlay','share-overlay'].forEach(id=>document.getElementById(id).classList.remove('open'));
+});
+document.addEventListener('keyup',e=>{
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight')_holdStop();
+});
+</script>
+</body>
+</html>
