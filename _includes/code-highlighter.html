@@ -50,11 +50,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
       const copyBtn = document.createElement('button');
       copyBtn.className = 'code-copy';
-      copyBtn.textContent = 'Copy';
+      copyBtn.textContent = '⧉ Copy';
       copyBtn.onclick = ()=>{
         navigator.clipboard.writeText(block.textContent);
         copyBtn.textContent='Copied!';
-        setTimeout(()=>copyBtn.textContent='Copy',1500);
+        setTimeout(()=>copyBtn.textContent='⧉ Copy',1500);
       };
       header.appendChild(copyBtn);
 
