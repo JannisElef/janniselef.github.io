@@ -39,8 +39,8 @@
       <button class="p5-btn-run"   data-target="{{ _id }}">▶ &nbsp; Run</button>
       <button class="p5-btn-stop"  data-target="{{ _id }}" style="display:none">■ Stop</button>
       <button class="p5-btn-reset" data-target="{{ _id }}">↺ &nbsp; Reset</button>
-      <button class="p5-btn-copy"  data-target="{{ _id }}">Copy</button>
-      <button class="p5-btn-save"  data-target="{{ _id }}" style="display:none">↓ Save</button>
+      <button class="p5-btn-copy"  data-target="{{ _id }}">⧉ Copy</button>
+      <button class="p5-btn-save"  data-target="{{ _id }}" style="display:none">⭳ Save</button>
     </div>
   </div>
 
@@ -305,6 +305,7 @@ function draw() {
       const res = await fetch(cdn + file);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       ta.value = await res.text();
+      ta.value = ta.value.trim();
     } catch (e) {
       ta.value = '// Could not load ' + file + '\n// ' + e.message;
     }
