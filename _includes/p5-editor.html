@@ -1,0 +1,526 @@
+{% comment %}
+  p5-editor.html — Jekyll include for an inline p5.js editor with live preview.
+
+  Parameters:
+    file      (optional) Path to a .js file in the CDN repo (e.g. /src/sketch.js)
+              If omitted, a blank starter sketch is loaded.
+    height    (optional) Canvas / editor height in px. Default: 340
+    id        (optional) Unique ID suffix. Default: "default"
+
+  Usage examples:
+    Blank editor:
+      {% include p5-editor.html %}
+
+    With sketch from repo (cdn variable must be set in the page):
+      {% include p5-editor.html file="/src/sketch.js" height="420" id="my-sketch" %}
+
+  The cdn variable is expected to be defined in the page front-matter loader:
+    {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}
+{% endcomment %}
+
+{% assign _id     = include.id     | default: "default" %}
+{% assign _height = include.height | default: 340 %}
+{% assign _file   = include.file   | default: "" %}
+
+<div class="content-wrapper p5-editor-wrapper" id="p5-editor-{{ _id }}">
+
+  <!-- Header bar -->
+  <div class="content-header">
+    {% if _file != '' %}
+      <a class="content-filename"
+         href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ _file }}"
+         target="_blank" rel="noopener noreferrer">
+        🔗 {{ _file | split: "/" | last }}
+      </a>
+    {% else %}
+      <span class="content-filename">p5.js sketch</span>
+    {% endif %}
+    <div class="content-buttons">
+      <button class="p5-btn-run"   data-target="{{ _id }}">▶ &nbsp; Run</button>
+      <button class="p5-btn-stop"  data-target="{{ _id }}" style="display:none">■ Stop</button>
+      <button class="p5-btn-reset" data-target="{{ _id }}">↺ &nbsp; Reset</button>
+      <button class="p5-btn-copy"  data-target="{{ _id }}">Copy</button>
+      <button class="p5-btn-save"  data-target="{{ _id }}" style="display:none">↓ Save</button>
+    </div>
+  </div>
+
+  <!-- Editor + Preview -->
+  <div class="p5-body" data-height="{{ _height }}" style="height:340px">
+
+    <!-- Code editor (textarea + highlight overlay) -->
+    <div class="p5-editor-pane">
+      <div class="p5-editor-inner">
+        <pre class="p5-highlight" id="p5-hl-{{ _id }}" aria-hidden="true"><code class="language-javascript"></code></pre>
+        <textarea
+          class="p5-code"
+          id="p5-code-{{ _id }}"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+          data-file="{{ _file }}"
+          data-cdn="{% if _file != '' %}{{ cdn }}{% endif %}"
+        >{% if _file == '' %}// Blank p5.js sketch — edit and hit ▶ Run
+function setup() {
+  createCanvas(400, 400);
+  background(30);
+}
+
+function draw() {
+  fill(255, 100, 200, 80);
+  noStroke();
+  ellipse(mouseX, mouseY, 40, 40);
+}{% endif %}</textarea>
+      </div>
+    </div>
+
+    <!-- Resize handle -->
+    <div class="p5-resize-handle" data-target="{{ _id }}"></div>
+
+    <!-- Preview pane -->
+    <div class="p5-preview-pane" id="p5-preview-{{ _id }}">
+      <div class="p5-placeholder">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span>Press <strong>▶ &nbsp; Run</strong> to start</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<style id="p5-editor-style">
+.p5-editor-wrapper .content-header button {
+  color: var(--text-color);
+}
+
+.p5-body {
+  display: flex;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+/* Editor pane */
+.p5-editor-pane {
+  flex: 1 1 50%;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border-color);
+}
+
+.p5-editor-inner {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Overlay: pre and textarea share IDENTICAL metrics ── */
+.p5-highlight,
+.p5-code {
+  /* identical box model */
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+
+  /* identical typography — must match pixel-for-pixel */
+  font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+  font-size: 13.5px;          /* px not rem — avoids sub-pixel differences */
+  line-height: 21px;          /* px not em */
+  letter-spacing: 0;
+  tab-size: 2;
+  -moz-tab-size: 2;
+
+  /* identical wrapping */
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+}
+
+/* Highlight layer — behind, never interactive */
+.p5-highlight {
+  overflow: hidden;           /* scrolled via JS mirror */
+  pointer-events: none;
+  border: none;
+  background: transparent !important;
+  box-shadow: none !important;
+  z-index: 0;
+}
+
+.p5-highlight code {
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  background: transparent !important;
+  padding: 0;
+  margin: 0;
+}
+
+/* Textarea — on top, text invisible so highlight shows */
+.p5-code {
+  overflow-y: scroll;
+  overflow-x: auto;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--text-color);
+  z-index: 1;
+}
+
+/* Single styled scrollbar */
+.p5-code::-webkit-scrollbar         { width: 8px; height: 8px; }
+.p5-code::-webkit-scrollbar-track   { background: transparent; }
+.p5-code::-webkit-scrollbar-thumb   { background: var(--border-color); border-radius: 4px; }
+.p5-code::-webkit-scrollbar-thumb:hover { background: rgba(180,180,180,.6); cursor: auto; }
+
+/* Resize handle */
+.p5-resize-handle {
+  width: 5px;
+  background: var(--border-color);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  z-index: 2;
+}
+.p5-resize-handle:hover,
+.p5-resize-handle.dragging { background: rgba(180,180,180,.6); }
+
+/* Preview pane */
+.p5-preview-pane {
+  flex: 1 1 50%;
+  min-width: 80px;
+  position: relative;
+  background: var(--code-bg-color);
+  overflow: hidden;
+  align-self: stretch;
+}
+
+.p5-preview-pane canvas { display: block; }
+
+/* Placeholder */
+.p5-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-color);
+  opacity: 0.4;
+  font-size: 0.82rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 600px) {
+  .p5-body { flex-direction: column; height: auto !important; }
+  .p5-editor-pane { min-height: 200px; border-right: none; border-bottom: 1px solid var(--border-color); }
+  .p5-preview-pane { min-height: 240px; }
+  .p5-resize-handle { display: none; }
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.min.js"></script>
+<script>
+(function () {
+  if (window.__p5EditorInit) return;
+  window.__p5EditorInit = true;
+
+  const instances = {};
+
+  function getTextarea(id)    { return document.getElementById('p5-code-'    + id); }
+  function getHighlight(id)   { return document.getElementById('p5-hl-'      + id); }
+  function getPreviewPane(id) { return document.getElementById('p5-preview-' + id); }
+
+  /* ── Syntax highlighting ─────────────────────────────────────────────── */
+  function syncHighlight(id) {
+    const ta  = getTextarea(id);
+    const pre = getHighlight(id);
+    if (!ta || !pre) return;
+    const code = pre.querySelector('code');
+    if (!code) return;
+
+    // Mirror scroll
+    pre.scrollTop  = ta.scrollTop;
+    pre.scrollLeft = ta.scrollLeft;
+
+    // Use hljs.highlight() — never mutates inline styles
+    if (window.hljs) {
+      code.innerHTML = hljs.highlight(ta.value, { language: 'javascript', ignoreIllegals: true }).value;
+    } else {
+      code.textContent = ta.value;
+    }
+
+    // Hard-reset any background hljs might inject via classes
+    pre.style.cssText  = 'background:transparent!important;box-shadow:none;padding:14px 16px;';
+    code.style.cssText = 'background:transparent!important;padding:0;';
+  }
+
+  function initHighlight(id) {
+    const ta = getTextarea(id);
+    if (!ta) return;
+
+    ta.addEventListener('input',  () => syncHighlight(id));
+    ta.addEventListener('scroll', () => {
+      const pre = getHighlight(id);
+      if (pre) { pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; }
+    });
+
+    // Poll until hljs ready, then highlight
+    (function tryInit() {
+      if (window.hljs) syncHighlight(id);
+      else setTimeout(tryInit, 80);
+    })();
+
+    // Re-highlight after theme toggle — wait for new hljs stylesheet to load
+    new MutationObserver(() => {
+      const link = document.getElementById('hljs-theme');
+      if (link) {
+        link.addEventListener('load', () => syncHighlight(id), { once: true });
+        setTimeout(() => syncHighlight(id), 300); // fallback
+      } else {
+        setTimeout(() => syncHighlight(id), 100);
+      }
+    }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  /* ── File loader ─────────────────────────────────────────────────────── */
+  async function loadFile(ta) {
+    const { file, cdn } = ta.dataset;
+    if (!file || !cdn) return;
+    ta.value = '// loading ' + file + ' …';
+    try {
+      const res = await fetch(cdn + file);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      ta.value = await res.text();
+    } catch (e) {
+      ta.value = '// Could not load ' + file + '\n// ' + e.message;
+    }
+    ta.dispatchEvent(new Event('input'));
+  }
+
+  /* ── Canvas fit (aspect ratio + snap) ───────────────────────────────── */
+  function fitCanvasToPane(id) {
+    const preview = getPreviewPane(id);
+    const inst    = instances[id];
+    if (!preview || !inst) return;
+    const canvas = preview.querySelector('canvas');
+    if (!canvas || !inst.width || !inst.height) return;
+
+    const ratio = inst.height / inst.width;
+    const paneW = preview.clientWidth;
+    const maxH  = 500;
+    const capW  = Math.min(paneW, Math.round(maxH / ratio));
+    const newH  = Math.round(capW * ratio);
+
+    inst.resizeCanvas(capW, newH);
+
+    // Snap editor width so scrollbar sits flush with canvas edge
+    const body       = preview.closest('.p5-body');
+    const editorPane = body && body.querySelector('.p5-editor-pane');
+    if (body && editorPane) {
+      const newEditorW = body.getBoundingClientRect().width - capW - 5;
+      if (newEditorW > 80) {
+        editorPane.style.flex  = 'none';
+        editorPane.style.width = newEditorW + 'px';
+        preview.style.flex     = 'none';
+        preview.style.width    = capW + 'px';
+      }
+      // Adjust body height so square canvas stays square
+      body.style.height = newH + 'px';
+    }
+  }
+
+  /* ── Sketch control ──────────────────────────────────────────────────── */
+  function stopSketch(id) {
+    if (instances[id]) instances[id].noLoop(); // keep last frame
+    const w = document.getElementById('p5-editor-' + id);
+    if (w) {
+      w.querySelector('.p5-btn-run').style.display  = '';
+      w.querySelector('.p5-btn-stop').style.display = 'none';
+    }
+  }
+
+  function runSketch(id) {
+    if (instances[id]) { instances[id].remove(); delete instances[id]; }
+    const ta      = getTextarea(id);
+    const preview = getPreviewPane(id);
+    if (!ta || !preview) return;
+    preview.innerHTML = '';
+
+    try {
+      const fn = new Function('p', `with(p){
+        ${ta.value}
+        if(typeof setup!=='undefined')       p.setup=setup;
+        if(typeof draw!=='undefined')        p.draw=draw;
+        if(typeof mousePressed!=='undefined')p.mousePressed=mousePressed;
+        if(typeof mouseMoved!=='undefined')  p.mouseMoved=mouseMoved;
+        if(typeof keyPressed!=='undefined')  p.keyPressed=keyPressed;
+      }`);
+      instances[id] = new p5(fn, preview);
+      setTimeout(() => fitCanvasToPane(id), 80);
+    } catch (e) {
+      preview.innerHTML = '<pre style="color:#ff6b6b;padding:16px;font-family:monospace;font-size:13px;white-space:pre-wrap;">' + e + '</pre>';
+    }
+
+    const w = document.getElementById('p5-editor-' + id);
+    if (w) {
+      w.querySelector('.p5-btn-run').style.display  = 'none';
+      w.querySelector('.p5-btn-stop').style.display = '';
+      w.querySelector('.p5-btn-save').style.display = '';
+    }
+  }
+
+  function resetSketch(id) {
+    if (instances[id]) { instances[id].remove(); delete instances[id]; }
+    const preview = getPreviewPane(id);
+    if (preview) {
+      preview.innerHTML =
+        '<div class="p5-placeholder">'
+        + '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
+        + '<span>Press <strong>&#9654; Run</strong> to start</span></div>';
+    }
+    const w = document.getElementById('p5-editor-' + id);
+    if (w) {
+      w.querySelector('.p5-btn-run').style.display  = '';
+      w.querySelector('.p5-btn-stop').style.display = 'none';
+      w.querySelector('.p5-btn-save').style.display = 'none';
+    }
+    const ta = getTextarea(id);
+    if (ta && ta.dataset.file && ta.dataset.cdn) {
+      loadFile(ta).then(() => syncHighlight(id));
+    } else {
+      syncHighlight(id);
+    }
+  }
+
+  /* ── Tab key ─────────────────────────────────────────────────────────── */
+  function enableTab(ta) {
+    ta.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      e.preventDefault();
+      const s = ta.selectionStart;
+      ta.value = ta.value.slice(0, s) + '  ' + ta.value.slice(ta.selectionEnd);
+      ta.selectionStart = ta.selectionEnd = s + 2;
+    });
+  }
+
+  /* ── Resize handle ───────────────────────────────────────────────────── */
+  function enableResize(handle) {
+    let startX, startLeftW, startRightW;
+    handle.addEventListener('mousedown', e => {
+      e.preventDefault();
+      handle.classList.add('dragging');
+      startX = e.clientX;
+      const body  = handle.closest('.p5-body');
+      const left  = body.querySelector('.p5-editor-pane');
+      const right = body.querySelector('.p5-preview-pane');
+      startLeftW  = left.getBoundingClientRect().width;
+      startRightW = right.getBoundingClientRect().width;
+
+      const onMove = ev => {
+        const newL = Math.max(80, Math.min(startLeftW + startRightW - 80, startLeftW + ev.clientX - startX));
+        left.style.flex  = 'none';
+        left.style.width = newL + 'px';
+        right.style.flex = '1';
+        fitCanvasToPane(handle.dataset.target);
+      };
+      const onUp = () => {
+        handle.classList.remove('dragging');
+        fitCanvasToPane(handle.dataset.target);
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup',   onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup',   onUp);
+    });
+  }
+
+  /* ── Init ────────────────────────────────────────────────────────────── */
+  async function initAll() {
+    // Apply heights
+    document.querySelectorAll('.p5-body[data-height]').forEach(el => {
+      el.style.height = el.dataset.height + 'px';
+    });
+
+    // Init editors
+    for (const ta of document.querySelectorAll('.p5-code')) {
+      enableTab(ta);
+      const id = ta.id.replace('p5-code-', '');
+      if (ta.dataset.file && ta.dataset.cdn) {
+        await loadFile(ta);
+      }
+      initHighlight(id);
+    }
+
+    document.querySelectorAll('.p5-resize-handle').forEach(enableResize);
+
+    // Button delegation
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-target]');
+      if (!btn) return;
+      const id = btn.dataset.target;
+      if (btn.classList.contains('p5-btn-run'))   { runSketch(id);   return; }
+      if (btn.classList.contains('p5-btn-stop'))  { stopSketch(id);  return; }
+      if (btn.classList.contains('p5-btn-reset')) { resetSketch(id); return; }
+
+      if (btn.classList.contains('p5-btn-copy')) {
+        const ta = getTextarea(id);
+        if (!ta) return;
+        navigator.clipboard.writeText(ta.value).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = orig, 1400);
+        });
+        return;
+      }
+
+      if (btn.classList.contains('p5-btn-save')) {
+        const preview = getPreviewPane(id);
+        const canvas  = preview && preview.querySelector('canvas');
+        if (!canvas) return;
+        const now = new Date();
+        const ts  = now.getFullYear()
+                  + String(now.getMonth()+1).padStart(2,'0')
+                  + String(now.getDate()).padStart(2,'0')
+                  + '-' + String(now.getHours()).padStart(2,'0')
+                  + String(now.getMinutes()).padStart(2,'0')
+                  + String(now.getSeconds()).padStart(2,'0');
+        const ta       = getTextarea(id);
+        const filePath = ta ? ta.dataset.file : '';
+        const baseName = filePath ? filePath.split('/').pop().replace(/\.[^.]+$/, '') : 'sketch-' + id;
+        const a = document.createElement('a');
+        a.download = baseName + '-' + ts + '.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+        return;
+      }
+    });
+
+    // Ctrl/Cmd+Enter to run
+    document.addEventListener('keydown', e => {
+      if (!(e.ctrlKey || e.metaKey) || e.key !== 'Enter') return;
+      const ta = e.target.closest('.p5-code');
+      if (ta) runSketch(ta.id.replace('p5-code-', ''));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
+})();
+</script>
