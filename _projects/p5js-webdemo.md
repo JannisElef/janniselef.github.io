@@ -18,15 +18,15 @@ date: 2026-03-22
 
 ## Flow Field
 
-{% include p5-editor.html file="/src/flowfield.js" id="flow" height="360" %}
+{% include p5js-editor.html file="/src/flowfield.js" id="flow" height="360" %}
 
 ## Bouncing Balls
 
-{% include p5-editor.html file="/src/balls.js" id="balls" height="360" %}
+{% include p5js-editor.html file="/src/balls.js" id="balls" height="360" %}
 
 ## Blank Editor
 
-{% include p5-editor.html id="blank" height="360" %}
+{% include p5js-editor.html id="blank" height="360" %}
 
 <!-- END --->
 
