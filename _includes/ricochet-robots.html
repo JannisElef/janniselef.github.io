@@ -251,7 +251,7 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     <div id="win-btns">
       <button class="grey" onclick="doSaveJSON()" id="win-save-btn">&#8623; Speichern</button>
       <button class="grey" onclick="winViewReplay()" id="win-view-btn">&#9654; Replay</button>
-      <button class="red" onclick="closeWin();openNewGame();" id="win-again-btn">&#9654;&#9654; Nochmal</button>
+      <button class="red" onclick="closeWin();openNewGame();" id="win-again-btn" onkeydown="if(event.key==='Enter'){closeWin();openNewGame();}">&#9654;&#9654; Erneut spielen</button>
     </div>
   </div>
 </div>
@@ -297,10 +297,10 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
 // BASE_URL is injected by the page embedding this script
 const BASE_URL=window.RICOCHET_BASE_URL||location.href.split('?')[0];
 const T={
-  de:{moves:'Z\u00dcGE',target:'ZIEL',robot:'ROBOTER',btnNew:'Neues Spiel',btnUndo:'Zur\u00fcck (U)',btnImport:'Spiel laden',btnTL:'Timeline',mapLbl:'MAP',
+  de:{moves:'Z\u00dcGE',target:'ZIEL',robot:'ROBOTER',btnNew:'Neues Spiel',btnUndo:'Zur\u00fcck (Ctrl+Z)',btnImport:'Spiel laden',btnTL:'Timeline',mapLbl:'MAP',
     solved:n=>`\uD83C\uDF89 GEL\u00d6ST in ${n} Zug${n===1?'':'en'}!`,hint:(n,a)=>`Tipp: ${n} \u2192 ${a}`,noHint:'Kein direkter Tipp',
     boardLoaded:'\u2713 Spielfeld geladen!',tokErr:'\u26a0 Ung\u00fcltiger Token',
-    keys:'WASD/Pfeile \u00b7 1\u20134 Roboter \u00b7 U R\u00fckg\u00e4ngig',
+    keys:'WASD/Pfeile \u00b7 1\u20134 Roboter \u00b7 Ctrl+Z R\u00fckg\u00e4ngig',
     tlKeys:'\u2190\u2192 \u00b1 1 \u00b7 Shift+\u2190\u2192 \u00b1 5 \u00b7 \u2191 Ende, \u2193 Start \u00b7 Leertaste Play/Pause',
     names:['ROT','BLAU','GR\u00dcN','GELB'],
     tlLbl:'TIMELINE',tlStart:'Startposition',tlEnd:'Ziel erreicht',tlMove:(i,n,a)=>`Zug ${i}: ${n} ${a}`,
@@ -313,7 +313,7 @@ const T={
     ngTokEmpty:'Leer \u2013 zuf\u00e4lliges Spielfeld anhand Konfiguration',
     winHL:'\uD83C\uDF89 GEL\u00d6ST!',winSub:(n,t)=>`${n} Zug${n===1?'':'en'} \u00b7 ${t}`,winName:'Dein Name',winNamePh:'Spieler...',
     stMoves:'Z\u00fcge',stTime:'Spielzeit',stBoard:'Spielfeld',stObs:'Hindernisse',stRobots:'Roboter',
-    winSave:'\u23ec Speichern',winView:'\u25b6 Replay',winAgain:'\u25b6\u25b6 Nochmal',
+    winSave:'\u23ec Speichern',winView:'\u25b6 Replay',winAgain:'\u25b6\u25b6 Erneut spielen',
     tlSave:'\u23ec Speichern',tlShare:'Share Replay \u2934',tlPaths:'Pfade anzeigen',
     impTitle:'Spiel laden',impDrop:'Spieldatei ablegen oder klicken',impCancel:'Abbrechen',impLoad:'Laden',
     obsN:{L:'Wenig',M:'Mittel',H:'Viel'},dropHint:'SPIEL ABLEGEN',
@@ -323,10 +323,10 @@ const T={
     shRC:'Replay-ID kopieren',shLR:'Replay-Link kopieren',shQR:'Replay QR-Code',
     shCopied:'\u2713 In Zwischenablage!',shQrDl:'\u2b07 QR herunterladen',unknown:'Unbekannt',
     annoTip:(i,nm,a)=>`Schritt ${i}: ${nm} ${a}`,annoRobot:(nm,cnt)=>`${nm} gesamt: ${cnt}`},
-  en:{moves:'MOVES',target:'TARGET',robot:'ROBOT',btnNew:'New Game',btnUndo:'Undo (U)',btnImport:'Load game',btnTL:'Timeline',mapLbl:'MAP',
+  en:{moves:'MOVES',target:'TARGET',robot:'ROBOT',btnNew:'New Game',btnUndo:'Undo (Ctrl+Z)',btnImport:'Load game',btnTL:'Timeline',mapLbl:'MAP',
     solved:n=>`\uD83C\uDF89 SOLVED in ${n} move${n===1?'':'s'}!`,hint:(n,a)=>`Hint: ${n} \u2192 ${a}`,noHint:'No direct hint',
     boardLoaded:'\u2713 Board loaded!',tokErr:'\u26a0 Invalid token',
-    keys:'WASD/Arrows \u00b7 1\u20134 select \u00b7 U undo',
+    keys:'WASD/Arrows \u00b7 1\u20134 select \u00b7 Ctrl+Z undo',
     tlKeys:'\u2190\u2192 \u00b1 1 \u00b7 Shift+\u2190\u2192 \u00b1 5 \u00b7 \u2191 end, \u2193 start \u00b7 Space play/pause',
     names:['RED','BLUE','GREEN','YELLOW'],
     tlLbl:'TIMELINE',tlStart:'Start position',tlEnd:'Goal reached',tlMove:(i,n,a)=>`Move ${i}: ${n} ${a}`,
@@ -630,12 +630,19 @@ function shareAct(type){
   const tok=mapToToken();const mapUrl=`${BASE_URL}?map=${tok}`;
   if(type==='copy-map'){navigator.clipboard.writeText(tok).catch(()=>{});msg.textContent=t().shCopied+' \u2014 '+tok;}
   else if(type==='link-map'){navigator.clipboard.writeText(mapUrl).catch(()=>{});msg.textContent=t().shCopied+' \u2014 '+mapUrl;}
-  else if(type==='qr-map'){_qrURL=mapUrl;document.getElementById('qr-div').innerHTML='';try{new QRCode(document.getElementById('qr-div'),{text:_qrURL,width:180,height:180,colorDark:'#ddeeff',colorLight:'#080810'});}catch(e){}document.getElementById('qr-lbl').textContent=_qrURL;qrw.style.display='block';document.getElementById('qr-dl').style.display='inline-block';}
+  else if(type==='qr-map'){_qrType='map';_qrURL=mapUrl;document.getElementById('qr-div').innerHTML='';try{new QRCode(document.getElementById('qr-div'),{text:_qrURL,width:180,height:180,colorDark:'#ddeeff',colorLight:'#080810'});}catch(e){}document.getElementById('qr-lbl').textContent=_qrURL;qrw.style.display='block';document.getElementById('qr-dl').style.display='inline-block';}
   else if(type==='copy-replay'){const rt=gameReportToken();navigator.clipboard.writeText(rt).catch(()=>{});msg.textContent=t().shCopied+' ('+rt.length+' chars)';}
   else if(type==='link-replay'){const url=`${BASE_URL}?r=${gameReportToken()}`;navigator.clipboard.writeText(url).catch(()=>{});msg.textContent=t().shCopied;}
-  else if(type==='qr-replay'){_qrURL=`${BASE_URL}?r=${gameReportToken()}`;document.getElementById('qr-div').innerHTML='';try{new QRCode(document.getElementById('qr-div'),{text:_qrURL,width:180,height:180,colorDark:'#ffeedd',colorLight:'#080810'});}catch(e){}document.getElementById('qr-lbl').textContent=_qrURL.slice(0,70)+'…';qrw.style.display='block';document.getElementById('qr-dl').style.display='inline-block';}
+  else if(type==='qr-replay'){_qrType='replay';_qrURL=`${BASE_URL}?r=${gameReportToken()}`;document.getElementById('qr-div').innerHTML='';try{new QRCode(document.getElementById('qr-div'),{text:_qrURL,width:180,height:180,colorDark:'#ffeedd',colorLight:'#080810'});}catch(e){}document.getElementById('qr-lbl').textContent=_qrURL.slice(0,70)+'…';qrw.style.display='block';document.getElementById('qr-dl').style.display='inline-block';}
 }
-function downloadQR(){const cv=document.querySelector('#qr-div canvas');if(!cv)return;const a=document.createElement('a');a.download='ricochet_qr.png';a.href=cv.toDataURL('image/png');a.click();}
+let _qrType='map';
+function downloadQR(){
+  const cv=document.querySelector('#qr-div canvas');if(!cv)return;
+  const a=document.createElement('a');
+  const tok=_qrType==='replay'?gameReportToken():mapToToken();
+  a.download=`ricochet-robots_${_qrType==='replay'?'replay_'+tok:'map_'+tok}.png`;
+  a.href=cv.toDataURL('image/png');a.click();
+}
 
 // ═══ Timeline ═══
 let tlOpen=false,tlSnaps=[],tlCur=0,tlTimer=null;
@@ -703,7 +710,12 @@ new p5(function(p){
     cnv.parent('canvas-container');
     if(!readURLParams())startNewGame();
     animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));
-    setLang('de');setupDrop();p.frameRate(60);
+    // Auto-detect language from browser; fall back to 'en'
+    const sysLang=(navigator.language||navigator.userLanguage||'en').slice(0,2).toLowerCase();
+    const detectedLang=T[sysLang]?sysLang:'en';
+    document.getElementById('lang-select').value=detectedLang;
+    setLang(detectedLang);
+    setupDrop();p.frameRate(60);
   };
 
   p.draw=function(){
@@ -828,7 +840,6 @@ new p5(function(p){
     if(tlOpen){
       if(document.activeElement&&document.activeElement.tagName==='INPUT')return;
       const kc=p.keyCode;
-      if(p.key===' '){tlPlay();return;}
       if(kc===38){tlSeek(9999);return;}// ArrowUp → END
       if(kc===40){tlSeek(0);return;}// ArrowDown → START
       if(kc===36){tlSeek(0);return;}// Home → START
@@ -837,7 +848,7 @@ new p5(function(p){
       return;
     }
     if(anyOpen()||solved)return;
-    if(p.key==='u'||p.key==='U'){undoMove();return;}
+    if((p.key==='z'||p.key==='Z')&&(p.keyIsDown(17)||p.keyIsDown(91))){undoMove();return;}// Ctrl+Z / Cmd+Z
     const dm={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3,W:0,D:1,S:2,A:3};
     if(['1','2','3','4'].includes(p.key)){selected=+p.key-1;updateInfo();return;}
     if(dm[p.key]!==undefined)moveRobot(selected,dm[p.key]);
@@ -931,7 +942,11 @@ function _holdStop(){
 document.addEventListener('keydown',e=>{
   const tlActive=document.getElementById('timeline-panel').classList.contains('open');
   const navKey=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End'].includes(e.key);
-  if(navKey)e.preventDefault();// always block scroll for nav keys
+  if(navKey)e.preventDefault();
+  // Space in timeline: prevent scroll + play/pause
+  if(e.key===' '&&tlActive&&!(document.activeElement&&document.activeElement.tagName==='INPUT')){
+    e.preventDefault();tlPlay();return;
+  }
   if(tlActive){
     if(document.activeElement&&document.activeElement.tagName==='INPUT')return;
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
@@ -939,6 +954,11 @@ document.addEventListener('keydown',e=>{
       const shift=e.shiftKey;
       _holdStart(e.key==='ArrowLeft'?-1*(shift?5:1):(shift?5:1));
     }
+  }
+  // Enter confirms open popups
+  if(e.key==='Enter'){
+    if(document.getElementById('ng-overlay').classList.contains('open')){confirmNewGame();return;}
+    if(document.getElementById('win-overlay').classList.contains('open')){closeWin();openNewGame();return;}
   }
   if(e.key==='Escape')['ng-overlay','import-overlay','share-overlay'].forEach(id=>document.getElementById(id).classList.remove('open'));
 });
