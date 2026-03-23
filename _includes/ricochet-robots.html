@@ -277,8 +277,8 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     <h2 id="share-title">Teilen</h2>
     <div class="sh-section-lbl" id="sh-sec-map">SPIELFELD</div>
     <div class="sh-row" onclick="shareAct('copy-map')"><span class="sh-icon">&#8856;</span><span id="sh-cm">Map-ID kopieren</span></div>
-    <div class="sh-row" onclick="shareAct('link-map')"><span class="sh-icon">&#128279;</span><span id="sh-lm">Link kopieren</span></div>
-    <div class="sh-row" onclick="shareAct('qr-map')"><span class="sh-icon">&#9638;</span><span id="sh-qm">QR-Code</span></div>
+    <div class="sh-row" onclick="shareAct('link-map')"><span class="sh-icon">&#128279;</span><span id="sh-lm">Map Link kopieren</span></div>
+    <div class="sh-row" onclick="shareAct('qr-map')"><span class="sh-icon">&#9638;</span><span id="sh-qm">Map QR-Code</span></div>
     <div class="sh-section-lbl" id="sh-sec-replay" style="display:none">REPLAY</div>
     <div class="sh-row" id="sh-rc-row" onclick="shareAct('copy-replay')" style="display:none"><span class="sh-icon">&#8856;</span><span id="sh-rc">Replay-ID kopieren</span></div>
     <div class="sh-row" id="sh-replay-row" onclick="shareAct('link-replay')" style="display:none"><span class="sh-icon">&#128279;</span><span id="sh-lr">Replay-Link kopieren</span></div>
@@ -289,7 +289,7 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
       <button id="qr-dl" class="red" onclick="downloadQR()">&#11015; QR herunterladen</button>
     </div>
     <div id="share-msg"></div>
-    <div id="sh-save-row" onclick="doSaveJSON()" style="display:none;margin-top:10px;border-top:1px solid #161625;padding-top:10px;" class="sh-row"><span class="sh-icon">&#8623;</span><span id="sh-save-lbl">Replay speichern</span></div>
+    <div id="sh-save-row" onclick="doSaveJSON()" style="display:none;margin-top:10px;border-top:1px solid #161625;padding-top:10px;" class="sh-row"><span class="sh-icon">&#8623;</span><span id="sh-save-lbl">Download Replay</span></div>
   </div>
 </div>
 <script>
@@ -318,8 +318,8 @@ const T={
     impTitle:'Spiel laden',impDrop:'Spieldatei ablegen oder klicken',impCancel:'Abbrechen',impLoad:'Laden',
     obsN:{L:'Wenig',M:'Mittel',H:'Viel'},dropHint:'SPIEL ABLEGEN',
     shTitle:'Teilen',shSecMap:'SPIELFELD',shSecReplay:'REPLAY',
-    shSave:'\u23ec Replay speichern',
-    shCM:'Map-ID kopieren',shLM:'Link kopieren',shQM:'QR-Code',
+    shSave:'Download Replay',
+    shCM:'Map-ID kopieren',shLM:'Map Link kopieren',shQM:'Map QR-Code',
     shRC:'Replay-ID kopieren',shLR:'Replay-Link kopieren',shQR:'Replay QR-Code',
     shCopied:'\u2713 In Zwischenablage!',shQrDl:'\u2b07 QR herunterladen',unknown:'Unbekannt',
     annoTip:(i,nm,a)=>`Schritt ${i}: ${nm} ${a}`,annoRobot:(nm,cnt)=>`${nm} gesamt: ${cnt}`},
@@ -344,8 +344,8 @@ const T={
     impTitle:'Load game',impDrop:'Drop game file or click',impCancel:'Cancel',impLoad:'Load',
     obsN:{L:'Few',M:'Medium',H:'Many'},dropHint:'DROP GAME',
     shTitle:'Share',shSecMap:'BOARD',shSecReplay:'REPLAY',
-    shSave:'\u23ec Save replay',
-    shCM:'Copy map ID',shLM:'Copy link',shQM:'QR code',
+    shSave:'Download Replay',
+    shCM:'Copy map ID',shLM:'Copy map link',shQM:'Map QR code',
     shRC:'Copy replay ID',shLR:'Copy replay link',shQR:'Replay QR code',
     shCopied:'\u2713 Copied!',shQrDl:'\u2b07 Download QR',unknown:'Unknown',
     annoTip:(i,nm,a)=>`Step ${i}: ${nm} ${a}`,annoRobot:(nm,cnt)=>`${nm} total: ${cnt}`},
@@ -829,8 +829,10 @@ new p5(function(p){
       if(document.activeElement&&document.activeElement.tagName==='INPUT')return;
       const kc=p.keyCode;
       if(p.key===' '){tlPlay();return;}
-      if(kc===38||kc===36){tlSeek(9999);return;}// ArrowUp/Home → END
-      if(kc===40||kc===35){tlSeek(0);return;}// ArrowDown/End → START
+      if(kc===38){tlSeek(9999);return;}// ArrowUp → END
+      if(kc===40){tlSeek(0);return;}// ArrowDown → START
+      if(kc===36){tlSeek(0);return;}// Home → START
+      if(kc===35){tlSeek(9999);return;}// End → END
       // ArrowLeft/Right handled by hold-scroll via document keydown
       return;
     }
@@ -928,12 +930,12 @@ function _holdStop(){
 
 document.addEventListener('keydown',e=>{
   const tlActive=document.getElementById('timeline-panel').classList.contains('open');
-  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!tlActive)e.preventDefault();
+  const navKey=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End'].includes(e.key);
+  if(navKey)e.preventDefault();// always block scroll for nav keys
   if(tlActive){
     if(document.activeElement&&document.activeElement.tagName==='INPUT')return;
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
-      e.preventDefault();
-      if(e.repeat)return;// handled by interval
+      if(e.repeat)return;
       const shift=e.shiftKey;
       _holdStart(e.key==='ArrowLeft'?-1*(shift?5:1):(shift?5:1));
     }
