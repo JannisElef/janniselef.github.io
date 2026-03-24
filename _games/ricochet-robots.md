@@ -1,7 +1,7 @@
 ---
 layout: none
 title: Ricochet Robots
-description: Browser-based Ricochet Robots puzzle — share maps and replays via compact tokens or QR codes.
+description: Ricochet Robots like puzzle - share maps and replays via compact tokens or QR codes.
 # repo: JannisElef/ricochet-robots
 branch: main
 tags: [Game, Active]
