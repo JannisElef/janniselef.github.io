@@ -12,7 +12,7 @@ title: Projects
     {% for project in sorted_projects %}
 
         {% include project-card.html project=project %}
-
+        
     {% endfor %}
 
 </div>

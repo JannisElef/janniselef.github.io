@@ -1,14 +1,16 @@
 
-<a class="project-card" href="{{ project.url }}">
+{% assign item = include.project | default: include.game %}
+
+<a class="project-card" href="{{ item.url }}">
     
-    {% if project.repo %} <!-- use repo's thumbnail.jpg image -->
-        {% assign branch = project.branch | default: "main" %}
-        {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: project.repo | append: "@" | append: branch %}
+    {% if item.repo %}
+        {% assign branch = item.branch | default: "main" %}
+        {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: item.repo | append: "@" | append: branch %}
         {% assign preview = cdn | append: "/assets/img/thumbnail.jpg" %}
 
         <img 
             src="{{ preview }}" 
-            alt="{{ project.title }}"
+            alt="{{ item.title }}"
             onerror="
             if (this.src.endsWith('thumbnail.jpg')) {
                 this.src = '{{ cdn }}/assets/img/thumbnail.png';
@@ -16,23 +18,22 @@
                 this.onerror = null;
                 this.src = '/assets/img/patterns/Taieri.svg';
             }
-        ">  <!-- repo's thumbnail.jpg and then thumbnail.png image not loaded -> load fallback svg -->
+        ">
 
-    {% else %}  <!-- no repo specified -->
-        <img src="/assets/img/patterns/Inn.svg" alt="{{ project.title }}">
+    {% else %}
+        <img src="/assets/img/patterns/Inn.svg" alt="{{ item.title }}">
     {% endif %}
     
-    <h2>{{ project.title }}</h2>
+    <h2>{{ item.title }}</h2>
     
+    <p>{{ item.description }}</p>
     
-    <p>{{ project.description }}</p>
-    
-    {% if project.date %}
-        <p class="project-date">{{ project.date | date: "%b %-d, %Y" }}</p>
+    {% if item.date %}
+        <p class="project-date">{{ item.date | date: "%b %-d, %Y" }}</p>
     {% endif %}
     
     <div class="tags">
-        {% for tag in project.tags %}
+        {% for tag in item.tags %}
             <span class="tag">{{ tag }}</span>
         {% endfor %}
     </div>
