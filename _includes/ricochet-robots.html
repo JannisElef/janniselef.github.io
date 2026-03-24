@@ -220,6 +220,10 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
         </div>
       </div>
     </div>
+    <div class="ng-sec" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#0c0c1e;border:1px solid var(--mut);">
+      <input type="checkbox" id="ng-ext-cb" style="accent-color:var(--yel);cursor:pointer;width:15px;height:15px;flex-shrink:0;" onchange="ngExtMode=this.checked">
+      <label for="ng-ext-cb" style="cursor:pointer;font-size:.68rem;letter-spacing:.1em;color:#c0c0a0;text-transform:uppercase;" id="ng-ext-lbl">Erweiterter Modus — Diagonale Spiegel</label>
+    </div>
     <div class="ng-sec">
       <div class="ng-stitle" id="ng-lbl-token">Map-ID oder Replay laden</div>
       <div style="display:flex;gap:7px;align-items:stretch;">
@@ -307,6 +311,7 @@ const T={
     impOk:'\u2713 Spiel geladen!',impErr:'\u26a0 Ung\u00fcltige Spieldaten',dateAt:'um',
     ngTitle:'Neues Spiel',ngSize:'Spielfeldgr\u00f6\u00dfe',ngObs:'Hindernisse',ngSml:'Klein',ngStd:'Standard',ngLow:'Wenig',ngMid:'Mittel',ngHigh:'Viel',ngCancel:'Abbrechen',ngConfirm:'Create Game',
     ngTokenLbl:'Map-ID oder Replay eingeben',ngTokenPh:'z.B. a3f2c1d0CM\u2026',
+    ngExtLbl:'Erweiterter Modus \u2014 Diagonale Spiegel',extBadge:'\u25c7 Erweiterter Modus',
     ngTokMap:'\u2713 Map-ID erkannt \u2013 Spielfeld wird geladen',
     ngTokReplay:'\u2713 Replay erkannt \u2013 Spielverlauf wird geladen',
     ngTokInvalid:'\u26a0 Ung\u00fcltiger Code \u2013 zuf\u00e4lliges Spielfeld wird erstellt',
@@ -333,6 +338,7 @@ const T={
     impOk:'\u2713 Game loaded!',impErr:'\u26a0 Invalid game data',dateAt:'at',
     ngTitle:'New Game',ngSize:'Board Size',ngObs:'Obstacles',ngSml:'Small',ngStd:'Standard',ngLow:'Few',ngMid:'Medium',ngHigh:'Many',ngCancel:'Cancel',ngConfirm:'Create Game',
     ngTokenLbl:'Enter map ID or replay',ngTokenPh:'e.g. a3f2c1d0CM\u2026',
+    ngExtLbl:'Extended Mode \u2014 Diagonal Mirrors',extBadge:'\u25c7 Extended Mode',
     ngTokMap:'\u2713 Map ID detected \u2013 board will be loaded',
     ngTokReplay:'\u2713 Replay detected \u2013 game will be loaded',
     ngTokInvalid:'\u26a0 Invalid code \u2013 random board will be created',
@@ -360,6 +366,7 @@ function setLang(l){
   x('subinfo',t().keys);x('tl-title',t().tlLbl);x('tl-keys',t().tlKeys);
   x('ng-title',t().ngTitle);x('ng-lbl-size',t().ngSize);x('ng-lbl-obs',t().ngObs);x('ng-s12',t().ngSml);x('ng-s16',t().ngStd);x('ng-o-low',t().ngLow);x('ng-o-mid',t().ngMid);x('ng-o-high',t().ngHigh);x('ng-cancel',t().ngCancel);x('ng-confirm',t().ngConfirm);
   x('ng-lbl-token',t().ngTokenLbl);ph('ng-token-input',t().ngTokenPh);
+  x('ng-ext-lbl',t().ngExtLbl);
   x('win-headline',t().winHL);x('win-lbl-name',t().winName);ph('win-name-input',t().winNamePh);
   x('win-save-btn',t().winSave);x('win-view-btn',t().winView);x('win-again-btn',t().winAgain);
   x('tl-share-btn',t().tlShare);x('tl-paths-txt',t().tlPaths);
@@ -367,6 +374,7 @@ function setLang(l){
   x('drop-overlay',t().dropHint);x('share-title',t().shTitle);x('sh-sec-map',t().shSecMap);x('sh-sec-replay',t().shSecReplay);
   x('sh-cm',t().shCM);x('sh-lm',t().shLM);x('sh-qm',t().shQM);x('sh-save-lbl',t().shSave);x('sh-rc',t().shRC);x('sh-lr',t().shLR);x('sh-qr',t().shQR);x('qr-dl',t().shQrDl);
   if(target)updateInfo();
+  if(typeof updateExtBadge==='function')updateExtBadge();
 }
 
 // ═══ Constants ═══
@@ -388,15 +396,46 @@ function initWalls(rng,n){walls=Array.from({length:ROWS},()=>new Uint8Array(COLS
 // ═══ Compact tokens ═══
 const SIZE_ENC={12:'C',16:'G'};const SIZE_DEC={C:12,G:16};
 
-function mapToToken(){return`${currentSeed.toString(16).padStart(8,'0')}${SIZE_ENC[COLS]||'G'}${currentObs}`;}
+// diagWalls: Map keyed "r,c" → {type: 0='\',1='/', ri: robot color index that passes through}
+let diagWalls=new Map(),extMode=false;
+
+// Pack/unpack diag walls: each mirror = 2 bytes: byte0=r, byte1= (c<<3)|(ri<<1)|type
+function diagToHex(){
+  const bytes=[];
+  for(const[k,v]of diagWalls){
+    const[r,c]=[...k.split(',').map(Number)];
+    bytes.push(r,(c<<3)|(v.ri<<1)|v.type);
+  }
+  return bytes.map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function hexToDiag(hex){
+  diagWalls=new Map();
+  for(let i=0;i<hex.length;i+=4){
+    const r=parseInt(hex.slice(i,i+2),16);
+    const b2=parseInt(hex.slice(i+2,i+4),16);
+    const c=(b2>>3)&31,ri=(b2>>1)&3,type=b2&1;
+    diagWalls.set(`${r},${c}`,{type,ri});
+  }
+}
+
+function mapToToken(){
+  const base=`${currentSeed.toString(16).padStart(8,'0')}${SIZE_ENC[COLS]||'G'}${currentObs}`;
+  if(!extMode||diagWalls.size===0)return base;
+  return`${base}X${diagToHex()}`;
+}
 
 // tokenToMap rebuilds board fully from seed — robots and target included
 function tokenToMap(tok){
-  if(!/^[0-9a-f]{8}[CG][LMH]$/i.test(tok))return false;
-  const seed=parseInt(tok.slice(0,8),16),sz=SIZE_DEC[tok[8].toUpperCase()]||16,obs=tok[9].toUpperCase();
+  // strip optional X+diag suffix
+  const xIdx=tok.toUpperCase().indexOf('X',10);
+  const base=xIdx>=0?tok.slice(0,xIdx):tok;
+  const diagHex=xIdx>=0?tok.slice(xIdx+1):'';
+  if(!/^[0-9a-f]{8}[CG][LMH]$/i.test(base))return false;
+  const seed=parseInt(base.slice(0,8),16),sz=SIZE_DEC[base[8].toUpperCase()]||16,obs=base[9].toUpperCase();
   if(!OBS_MAP[obs])return false;
   COLS=sz;ROWS=sz;CELL=sz===12?56:44;uc();currentSeed=seed;currentObs=obs;
   const rng=mb32(seed);initWalls(rng,OBS_MAP[obs]);placeRobots(rng);placeTarget(rng);
+  if(diagHex){hexToDiag(diagHex);extMode=true;}else{diagWalls=new Map();extMode=false;}
   return true;
 }
 
@@ -438,20 +477,68 @@ function parseGameReportToken(tok){
   pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});history=[];return true;
 }
 function simSlide_pos(ri,dir,pos){
-  const DR=[-1,0,1,0],DC=[0,1,0,-1],EX=[1,2,4,8],EN=[4,8,1,2];let r=pos[ri].r,c=pos[ri].c;
-  while(true){if(walls[r][c]&EX[dir])break;let nr=r+DR[dir],nc=c+DC[dir];if(nr<0||nr>=ROWS||nc<0||nc>=COLS)break;if(walls[nr][nc]&EN[dir])break;if(pos.some((p,i)=>i!==ri&&p.r===nr&&p.c===nc))break;if(isC(nr,nc))break;r=nr;c=nc;}return{r,c};
+  // dir: 0=N,1=E,2=S,3=W
+  const DR=[-1,0,1,0],DC=[0,1,0,-1],EX=[1,2,4,8],EN=[4,8,1,2];
+  // Diagonal deflect tables: type0='\', type1='/'
+  // type0 '\': N↔W, S↔E  type1 '/': N↔E, S↔W
+  const DIAG_DEFLECT=[[3,2,1,0],[1,0,3,2]];// [type][incomingDir] → outDir
+  let r=pos[ri].r,c=pos[ri].c,d=dir;
+  let safety=0;
+  while(safety++<ROWS*COLS*4){
+    // Check for diagonal mirror at current position (entered this cell)
+    if(extMode&&safety>1){
+      const dm=diagWalls.get(`${r},${c}`);
+      if(dm&&dm.ri!==ri){
+        // deflect!
+        d=DIAG_DEFLECT[dm.type][d];
+      }
+    }
+    if(walls[r][c]&EX[d])break;
+    const nr=r+DR[d],nc=c+DC[d];
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS)break;
+    if(walls[nr][nc]&EN[d])break;
+    if(pos.some((p,i)=>i!==ri&&p.r===nr&&p.c===nc))break;
+    if(isC(nr,nc))break;
+    r=nr;c=nc;
+  }
+  return{r,c};
+}
+
+function updateExtBadge(){
+  let badge=document.getElementById('ext-badge');
+  if(!badge){badge=document.createElement('div');badge.id='ext-badge';badge.style.cssText='position:fixed;bottom:12px;right:12px;background:#1a1a08;border:1px solid #6a6a00;color:#cccc00;font-family:\'Courier New\',monospace;font-size:.6rem;letter-spacing:.14em;padding:4px 9px;text-transform:uppercase;z-index:50;pointer-events:none;';document.body.appendChild(badge);}
+  badge.style.display=extMode?'block':'none';
+  badge.textContent=t().extBadge;
 }
 
 // ═══ Game state ═══
 let robots,target,selected,moves,history,solved,moveLog=[],gameStartTime=null,gameEndTime=null,currentSeed=null,currentObs='M';
+let ngExtMode=false;
+
+function placeDiagWalls(rng){
+  // Place ~COLS/3 diagonal mirrors, avoiding center block, border, and existing walls
+  diagWalls=new Map();
+  const count=Math.floor(COLS/3);
+  let tries=0;
+  while(diagWalls.size<count&&tries<300){
+    tries++;
+    const r=1+Math.floor(rng()*(ROWS-2)),c=1+Math.floor(rng()*(COLS-2));
+    if(isC(r,c))continue;
+    if(diagWalls.has(`${r},${c}`))continue;
+    const type=Math.floor(rng()*2);// 0=\, 1=/
+    const ri=Math.floor(rng()*4);// which robot color passes through
+    diagWalls.set(`${r},${c}`,{type,ri});
+  }
+}
 function placeRobots(rng){robots=[];const used=new Set();for(let i=0;i<4;i++){let r,c;do{r=Math.floor(rng()*ROWS);c=Math.floor(rng()*COLS);}while(used.has(r*COLS+c)||isC(r,c));used.add(r*COLS+c);robots.push({r,c,color:RC[i]});}}
 function placeTarget(rng){const used=new Set(robots.map(b=>b.r*COLS+b.c));let r,c;do{r=Math.floor(rng()*(ROWS-2))+1;c=Math.floor(rng()*(COLS-2))+1;}while(used.has(r*COLS+c)||isC(r,c));const ri=Math.floor(rng()*4);target={r,c,robotIdx:ri,color:RC[ri]};}
 
 function startNewGame(){
-  currentSeed=Math.floor(Math.random()*0xFFFFFFFF);currentObs=ngObs;
+  currentSeed=Math.floor(Math.random()*0xFFFFFFFF);currentObs=ngObs;extMode=ngExtMode;
   const rng=mb32(currentSeed);initWalls(rng,OBS_MAP[ngObs]);placeRobots(rng);placeTarget(rng);
+  if(extMode)placeDiagWalls(rng);else diagWalls=new Map();
   selected=0;moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;
-  setSeedDisp(mapToToken());setMsg('');updateInfo();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();
+  setSeedDisp(mapToToken());setMsg('');updateInfo();updateExtBadge();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();
 }
 function newGame(){startNewGame();}
 function updateInfo(){if(!target)return;document.getElementById('moveCount').textContent=moves;document.getElementById('targetInfo').textContent=`${rn(target.robotIdx)} \u2192 (${target.c+1},${target.r+1})`;document.getElementById('robotInfo').textContent=rn(selected);}
@@ -472,15 +559,15 @@ function updateShareReplayVisibility(){
 function skd(e){if(e.key==='Enter')loadSeedInput();}
 function loadSeedInput(){const raw=document.getElementById('seed-input').value.trim();if(!raw)return;if(!loadAnyToken(raw))setMsg(t().tokErr);}
 function loadAnyToken(raw){
-  if(/^[0-9a-f]{8}[CG][LMH]_[0-9a-f]+_[0-9a-f]*$/i.test(raw)){
+  if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?_[0-9a-f]+_[0-9a-f]*$/i.test(raw)){
     if(!parseGameReportToken(raw))return false;
-    setSeedDisp(mapToToken());updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();setMsg(t().impOk);
+    setSeedDisp(mapToToken());updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();updateExtBadge();setMsg(t().impOk);
     setTimeout(()=>{if(!tlOpen)toggleTimeline();},80);return true;
   }
-  if(/^[0-9a-f]{8}[CG][LMH]$/i.test(raw)){
+  if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?$/i.test(raw)){
     if(!tokenToMap(raw))return false;
     selected=0;moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;
-    setSeedDisp(mapToToken());setMsg(t().boardLoaded);updateInfo();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();return true;
+    setSeedDisp(mapToToken());setMsg(t().boardLoaded);updateInfo();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();updateExtBadge();return true;
   }
   try{const o=JSON.parse(raw);if(o.v===1){processImportObj(o);return true;}}catch(e){}
   return false;
@@ -520,10 +607,10 @@ function ngTokenChanged(val){
     _ngUpdateLiveId();
     return;
   }
-  if(/^[0-9a-f]{8}[CG][LMH]_[0-9a-f]+_[0-9a-f]*$/i.test(val)){
+  if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?_[0-9a-f]+_[0-9a-f]*$/i.test(val)){
     _ngTokValid='replay';hint.textContent=t().ngTokReplay;hint.style.color='#44dd88';
     setSeedDisp(val.split('_')[0].toUpperCase());randSec.style.display='none';
-  } else if(/^[0-9a-f]{8}[CG][LMH]$/i.test(val)){
+  } else if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?$/i.test(val)){
     _ngTokValid='map';hint.textContent=t().ngTokMap;hint.style.color='#4488ff';
     setSeedDisp(val.toUpperCase());randSec.style.display='none';
   } else {
@@ -543,6 +630,8 @@ function ngClearToken(){document.getElementById('ng-token-input').value='';ngTok
 function openNewGame(){
   const curSize=String(COLS);const curObs=currentObs||'M';
   ngSize=curSize;ngObs=curObs;ngSel('size',curSize);ngSel('obs',curObs);
+  ngExtMode=extMode;
+  document.getElementById('ng-ext-cb').checked=extMode;
   document.getElementById('ng-token-input').value='';
   document.getElementById('ng-tok-hint').textContent='';
   document.getElementById('ng-tok-clear').style.display='none';
@@ -557,8 +646,7 @@ function confirmNewGame(){
   if(tokVal&&(_ngTokValid==='map'||_ngTokValid==='replay')){
     if(loadAnyToken(tokVal))return;
   }
-  COLS=+ngSize;ROWS=+ngSize;CELL=ngSize==='12'?56:44;uc();startNewGame();
-}
+  COLS=+ngSize;ROWS=+ngSize;CELL=ngSize==='12'?56:44;uc();startNewGame();}
 
 // ═══ Win ═══
 function openWin(){
@@ -610,7 +698,7 @@ function processImportObj(o){
   if(o.player&&o.player!==T.de.unknown&&o.player!==T.en.unknown)username=o.player;
   let pos=robots.map(b=>({r:b.r,c:b.c}));for(const m of moveLog)pos[m.ri]={r:m.toR,c:m.toC};pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});
   setSeedDisp(b.mapID||b.mapToken||mapToToken());
-  setMsg(t().impOk);updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();
+  setMsg(t().impOk);updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();updateExtBadge();
 }
 function setupDrop(){
   const wrap=document.getElementById('canvas-wrap'),ov=document.getElementById('drop-overlay');
@@ -727,7 +815,7 @@ new p5(function(p){
       if(animRobots)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));
     }
     if(!walls||!robots||!animRobots)return;// not yet initialised
-    p.background(20,20,32);drawGrid();drawCenter();drawWalls();drawTarget();
+    p.background(20,20,32);drawGrid();drawCenter();drawWalls();if(extMode)drawDiagWalls();drawTarget();
     if(tlOpen&&moveLog.length)drawAnnotations();
     for(let i=0;i<4;i++){animRobots[i].x+=(robots[i].c*CELL-animRobots[i].x)*0.26;animRobots[i].y+=(robots[i].r*CELL-animRobots[i].y)*0.26;}
     drawRobots();drawSel();
@@ -737,6 +825,44 @@ new p5(function(p){
   function drawGrid(){p.stroke(36,36,56);p.strokeWeight(0.5);for(let r=0;r<=ROWS;r++)p.line(0,r*CELL,COLS*CELL,r*CELL);for(let c=0;c<=COLS;c++)p.line(c*CELL,0,c*CELL,ROWS*CELL);}
   function drawCenter(){const x=CC1*CELL,y=CR1*CELL,w=(CC2-CC1+1)*CELL,h=(CR2-CR1+1)*CELL;p.fill(16,16,26);p.noStroke();p.rect(x,y,w,h);p.fill(33,33,48);p.rect(x+5,y+5,w-10,h-10,5);p.stroke(52,52,72);p.strokeWeight(1.1);p.line(x+w/2,y+8,x+w/2,y+h-8);p.line(x+8,y+h/2,x+w-8,y+h/2);p.noFill();p.stroke(58,58,88,105);p.strokeWeight(1.8);p.rect(x+1,y+1,w-2,h-2,3);}
   function drawWalls(){p.strokeWeight(3.5);p.strokeCap(p.SQUARE);for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(isC(r,c))continue;const w=walls[r][c],x=c*CELL,y=r*CELL;p.stroke(210,70,34);if(w&1)p.line(x+1,y,x+CELL-1,y);if(w&2)p.line(x+CELL,y+1,x+CELL,y+CELL-1);if(w&4)p.line(x+1,y+CELL,x+CELL-1,y+CELL);if(w&8)p.line(x,y+1,x,y+CELL-1);}const cx=CC1*CELL,cy=CR1*CELL,cw=(CC2-CC1+1)*CELL,ch=(CR2-CR1+1)*CELL;p.stroke(58,58,90);p.strokeWeight(2.5);p.line(cx,cy,cx+cw,cy);p.line(cx+cw,cy,cx+cw,cy+ch);p.line(cx+cw,cy+ch,cx,cy+ch);p.line(cx,cy+ch,cx,cy);}
+  function drawDiagWalls(){
+    const pad=CELL*0.12;
+    for(const[k,v]of diagWalls){
+      const[r,c]=k.split(',').map(Number);
+      const x=c*CELL,y=r*CELL;
+      const[rr,gg,bb]=rgb(RC[v.ri]);
+      // Draw glow background
+      p.strokeWeight(4.5);p.stroke(rr,gg,bb,28);
+      if(v.type===0){p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);}// '\'
+      else{p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);}// '/'
+      // Draw main mirror line in robot color
+      p.strokeWeight(2.5);p.stroke(rr,gg,bb,200);
+      if(v.type===0){p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);}
+      else{p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);}
+      // Small dot at center
+      p.fill(rr,gg,bb,160);p.noStroke();p.ellipse(x+CELL/2,y+CELL/2,3.5,3.5);
+    }
+  }
+  function drawDiagWalls(){
+    p.strokeWeight(2.5);p.strokeCap(p.ROUND);
+    const pad=CELL*0.12;
+    for(const[k,v]of diagWalls){
+      const[r,c]=k.split(',').map(Number);
+      const[rr,gg,bb]=rgb(RC[v.ri]);
+      p.stroke(rr,gg,bb,200);
+      const x=c*CELL,y=r*CELL;
+      if(v.type===0){// '\'  NW to SE
+        p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);
+      } else {// '/' NE to SW
+        p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);
+      }
+      // faint glow
+      p.stroke(rr,gg,bb,40);p.strokeWeight(6);
+      if(v.type===0)p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);
+      else p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);
+      p.strokeWeight(2.5);
+    }
+  }
   function drawTarget(){if(!target)return;const x=target.c*CELL+CELL/2,y=target.r*CELL+CELL/2,s=CELL*0.36;const[r,g,b]=rgb(target.color);p.push();p.translate(x,y);const pulse=0.72+0.28*Math.sin(p.frameCount*0.08);p.noFill();p.stroke(r,g,b,60*pulse);p.strokeWeight(1.5);p.ellipse(0,0,CELL*0.8*pulse,CELL*0.8*pulse);p.stroke(r,g,b);p.strokeWeight(2.5);p.line(-s,0,s,0);p.line(0,-s,0,s);p.fill(r,g,b);p.noStroke();p.ellipse(0,0,7,7);p.pop();}
 
   function drawAnnotations(){
