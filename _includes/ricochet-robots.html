@@ -198,7 +198,6 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     <button class="red" onclick="openShare()" id="tl-share-btn">Share Replay &#10548;</button>
   </div>
 </div>
-<!-- NEW GAME -->
 <div class="overlay" id="ng-overlay" onclick="if(event.target===this)closeNg()">
   <div class="modal" id="ng-modal">
     <button class="modal-close" onclick="closeNg()">&#10005;</button>
@@ -224,6 +223,10 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
       <input type="checkbox" id="ng-ext-cb" style="accent-color:var(--yel);cursor:pointer;width:15px;height:15px;flex-shrink:0;" onchange="ngExtMode=this.checked">
       <label for="ng-ext-cb" style="cursor:pointer;font-size:.68rem;letter-spacing:.1em;color:#c0c0a0;text-transform:uppercase;" id="ng-ext-lbl">Erweiterter Modus — Diagonale Spiegel</label>
     </div>
+    <div class="ng-sec" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#0c0c1e;border:1px solid var(--mut);border-top:none;">
+      <input type="checkbox" id="ng-portal-cb" style="accent-color:#cc88ff;cursor:pointer;width:15px;height:15px;flex-shrink:0;" onchange="ngPortalMode=this.checked">
+      <label for="ng-portal-cb" style="cursor:pointer;font-size:.68rem;letter-spacing:.1em;color:#cc99ff;text-transform:uppercase;" id="ng-portal-lbl">Portalmodus — Teleportation</label>
+    </div>
     <div class="ng-sec">
       <div class="ng-stitle" id="ng-lbl-token">Map-ID oder Replay laden</div>
       <div style="display:flex;gap:7px;align-items:stretch;">
@@ -240,7 +243,6 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     </div>
   </div>
 </div>
-<!-- WIN -->
 <div class="overlay" id="win-overlay" onclick="if(event.target===this)closeWin()">
   <div class="modal" id="win-modal">
     <button class="modal-close" onclick="closeWin()">&#10005;</button>
@@ -259,7 +261,6 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     </div>
   </div>
 </div>
-<!-- IMPORT -->
 <div class="overlay" id="import-overlay" onclick="closeImportOvl(event)">
   <div class="modal" style="max-width:460px;">
     <button class="modal-close" onclick="closeImportOvl()">&#10005;</button>
@@ -274,7 +275,6 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     </div>
   </div>
 </div>
-<!-- SHARE -->
 <div class="overlay" id="share-overlay" onclick="closeShare(event)" style="background:rgba(3,3,9,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)">
   <div class="modal" id="share-modal">
     <button class="modal-close" onclick="closeShare()">&#10005;</button>
@@ -304,14 +304,15 @@ const T={
   de:{moves:'Z\u00dcGE',target:'ZIEL',robot:'ROBOTER',btnNew:'Neues Spiel',btnUndo:'Zur\u00fcck (Ctrl+Z)',btnImport:'Spiel laden',btnTL:'Timeline',mapLbl:'MAP',
     solved:n=>`\uD83C\uDF89 GEL\u00d6ST in ${n} Zug${n===1?'':'en'}!`,hint:(n,a)=>`Tipp: ${n} \u2192 ${a}`,noHint:'Kein direkter Tipp',
     boardLoaded:'\u2713 Spielfeld geladen!',tokErr:'\u26a0 Ung\u00fcltiger Token',
-    keys:'WASD/Pfeile \u00b7 1\u20134 Roboter \u00b7 Ctrl+Z R\u00fckg\u00e4ngig',
+    keys:'WASD/Pfeile \u00b7 1\u20134 Roboter \u00b7 Ctrl+Z R\u00fckg\u00e4ngig \u00b7 N Neues Spiel',
     tlKeys:'\u2190\u2192 \u00b1 1 \u00b7 Shift+\u2190\u2192 \u00b1 5 \u00b7 \u2191 Ende, \u2193 Start \u00b7 Leertaste Play/Pause',
     names:['ROT','BLAU','GR\u00dcN','GELB'],
     tlLbl:'TIMELINE',tlStart:'Startposition',tlEnd:'Ziel erreicht',tlMove:(i,n,a)=>`Zug ${i}: ${n} ${a}`,
     impOk:'\u2713 Spiel geladen!',impErr:'\u26a0 Ung\u00fcltige Spieldaten',dateAt:'um',
     ngTitle:'Neues Spiel',ngSize:'Spielfeldgr\u00f6\u00dfe',ngObs:'Hindernisse',ngSml:'Klein',ngStd:'Standard',ngLow:'Wenig',ngMid:'Mittel',ngHigh:'Viel',ngCancel:'Abbrechen',ngConfirm:'Create Game',
     ngTokenLbl:'Map-ID oder Replay eingeben',ngTokenPh:'z.B. a3f2c1d0CM\u2026',
-    ngExtLbl:'Erweiterter Modus \u2014 Diagonale Spiegel',extBadge:'\u25c7 Erweiterter Modus',
+    ngExtLbl:'Erweiterter Modus \u2014 Diagonale Spiegel',extBadge:'Diagonale Spiegel',
+    ngPortalLbl:'Portalmodus \u2014 Teleportation',portalBadge:'Portalmodus',
     ngTokMap:'\u2713 Map-ID erkannt \u2013 Spielfeld wird geladen',
     ngTokReplay:'\u2713 Replay erkannt \u2013 Spielverlauf wird geladen',
     ngTokInvalid:'\u26a0 Ung\u00fcltiger Code \u2013 zuf\u00e4lliges Spielfeld wird erstellt',
@@ -331,14 +332,15 @@ const T={
   en:{moves:'MOVES',target:'TARGET',robot:'ROBOT',btnNew:'New Game',btnUndo:'Undo (Ctrl+Z)',btnImport:'Load game',btnTL:'Timeline',mapLbl:'MAP',
     solved:n=>`\uD83C\uDF89 SOLVED in ${n} move${n===1?'':'s'}!`,hint:(n,a)=>`Hint: ${n} \u2192 ${a}`,noHint:'No direct hint',
     boardLoaded:'\u2713 Board loaded!',tokErr:'\u26a0 Invalid token',
-    keys:'WASD/Arrows \u00b7 1\u20134 select \u00b7 Ctrl+Z undo',
+    keys:'WASD/Arrows \u00b7 1\u20134 select \u00b7 Ctrl+Z undo \u00b7 N new game',
     tlKeys:'\u2190\u2192 \u00b1 1 \u00b7 Shift+\u2190\u2192 \u00b1 5 \u00b7 \u2191 end, \u2193 start \u00b7 Space play/pause',
     names:['RED','BLUE','GREEN','YELLOW'],
     tlLbl:'TIMELINE',tlStart:'Start position',tlEnd:'Goal reached',tlMove:(i,n,a)=>`Move ${i}: ${n} ${a}`,
     impOk:'\u2713 Game loaded!',impErr:'\u26a0 Invalid game data',dateAt:'at',
     ngTitle:'New Game',ngSize:'Board Size',ngObs:'Obstacles',ngSml:'Small',ngStd:'Standard',ngLow:'Few',ngMid:'Medium',ngHigh:'Many',ngCancel:'Cancel',ngConfirm:'Create Game',
     ngTokenLbl:'Enter map ID or replay',ngTokenPh:'e.g. a3f2c1d0CM\u2026',
-    ngExtLbl:'Extended Mode \u2014 Diagonal Mirrors',extBadge:'\u25c7 Extended Mode',
+    ngExtLbl:'Extended Mode \u2014 Diagonal Mirrors',extBadge:'Diagonal Mirrors',
+    ngPortalLbl:'Portal Mode \u2014 Teleportation',portalBadge:'Portal Mode',
     ngTokMap:'\u2713 Map ID detected \u2013 board will be loaded',
     ngTokReplay:'\u2713 Replay detected \u2013 game will be loaded',
     ngTokInvalid:'\u26a0 Invalid code \u2013 random board will be created',
@@ -366,7 +368,7 @@ function setLang(l){
   x('subinfo',t().keys);x('tl-title',t().tlLbl);x('tl-keys',t().tlKeys);
   x('ng-title',t().ngTitle);x('ng-lbl-size',t().ngSize);x('ng-lbl-obs',t().ngObs);x('ng-s12',t().ngSml);x('ng-s16',t().ngStd);x('ng-o-low',t().ngLow);x('ng-o-mid',t().ngMid);x('ng-o-high',t().ngHigh);x('ng-cancel',t().ngCancel);x('ng-confirm',t().ngConfirm);
   x('ng-lbl-token',t().ngTokenLbl);ph('ng-token-input',t().ngTokenPh);
-  x('ng-ext-lbl',t().ngExtLbl);
+  x('ng-ext-lbl',t().ngExtLbl);x('ng-portal-lbl',t().ngPortalLbl);
   x('win-headline',t().winHL);x('win-lbl-name',t().winName);ph('win-name-input',t().winNamePh);
   x('win-save-btn',t().winSave);x('win-view-btn',t().winView);x('win-again-btn',t().winAgain);
   x('tl-share-btn',t().tlShare);x('tl-paths-txt',t().tlPaths);
@@ -395,9 +397,53 @@ function initWalls(rng,n){walls=Array.from({length:ROWS},()=>new Uint8Array(COLS
 
 // ═══ Compact tokens ═══
 const SIZE_ENC={12:'C',16:'G'};const SIZE_DEC={C:12,G:16};
+const PORTAL_COLORS=['#cc44ff','#00ddcc','#ff8844','#44aaff','#ffdd22','#88ff44'];
 
 // diagWalls: Map keyed "r,c" → {type: 0='\',1='/', ri: robot color index that passes through}
+// portals: array of pairs [{r,c},{r,c}], shared palette index
 let diagWalls=new Map(),extMode=false;
+let portals=[],portalMap=new Map(),portalMode=false;
+
+function portalsToHex(){
+  const bytes=[];
+  for(const p of portals)bytes.push(p[0].r,p[0].c,p[1].r,p[1].c);
+  return bytes.map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function hexToPortals(hex){
+  portals=[];portalMap=new Map();
+  for(let i=0;i<hex.length;i+=8){
+    const r1=parseInt(hex.slice(i,i+2),16),c1=parseInt(hex.slice(i+2,i+4),16);
+    const r2=parseInt(hex.slice(i+4,i+6),16),c2=parseInt(hex.slice(i+6,i+8),16);
+    const ci=portals.length%PORTAL_COLORS.length;
+    const a={r:r1,c:c1,ci},b={r:r2,c:c2,ci};
+    portals.push([a,b]);
+    portalMap.set(`${r1},${c1}`,b);portalMap.set(`${r2},${c2}`,a);
+  }
+}
+function placePortals(rng){
+  portals=[];portalMap=new Map();
+  const countByObs={L:2,M:3,H:5};
+  const count=countByObs[currentObs]||3;
+  const used=new Set([...robots.map(b=>`${b.r},${b.c}`),`${target.r},${target.c}`]);
+  const diagSet=new Set([...diagWalls.keys()]);
+  let tries=0;
+  while(portals.length<count&&tries<500){
+    tries++;
+    const r1=1+Math.floor(rng()*(ROWS-2)),c1=1+Math.floor(rng()*(COLS-2));
+    const r2=1+Math.floor(rng()*(ROWS-2)),c2=1+Math.floor(rng()*(COLS-2));
+    if(isC(r1,c1)||isC(r2,c2))continue;
+    if(r1===r2&&c1===c2)continue;
+    const k1=`${r1},${c1}`,k2=`${r2},${c2}`;
+    if(used.has(k1)||used.has(k2))continue;
+    if(diagSet.has(k1)||diagSet.has(k2))continue;
+    if(portalMap.has(k1)||portalMap.has(k2))continue;
+    const ci=portals.length%PORTAL_COLORS.length;
+    const a={r:r1,c:c1,ci},b={r:r2,c:c2,ci};
+    portals.push([a,b]);
+    portalMap.set(k1,b);portalMap.set(k2,a);
+    used.add(k1);used.add(k2);
+  }
+}
 
 // Pack/unpack diag walls: each mirror = 2 bytes: byte0=r, byte1= (c<<3)|(ri<<1)|type
 function diagToHex(){
@@ -420,22 +466,27 @@ function hexToDiag(hex){
 
 function mapToToken(){
   const base=`${currentSeed.toString(16).padStart(8,'0')}${SIZE_ENC[COLS]||'G'}${currentObs}`;
-  if(!extMode||diagWalls.size===0)return base;
-  return`${base}X${diagToHex()}`;
+  let suffix='';
+  if(extMode&&diagWalls.size>0)suffix+=`X${diagToHex()}`;
+  if(portalMode&&portals.length>0)suffix+=`P${portalsToHex()}`;
+  return suffix?base+suffix:base;
 }
 
 // tokenToMap rebuilds board fully from seed — robots and target included
 function tokenToMap(tok){
-  // strip optional X+diag suffix
-  const xIdx=tok.toUpperCase().indexOf('X',10);
-  const base=xIdx>=0?tok.slice(0,xIdx):tok;
-  const diagHex=xIdx>=0?tok.slice(xIdx+1):'';
+  // Extract optional X and P suffixes (must come after 10-char base)
+  let rest=tok.slice(10);
+  const base=tok.slice(0,10);
   if(!/^[0-9a-f]{8}[CG][LMH]$/i.test(base))return false;
   const seed=parseInt(base.slice(0,8),16),sz=SIZE_DEC[base[8].toUpperCase()]||16,obs=base[9].toUpperCase();
   if(!OBS_MAP[obs])return false;
   COLS=sz;ROWS=sz;CELL=sz===12?56:44;uc();currentSeed=seed;currentObs=obs;
   const rng=mb32(seed);initWalls(rng,OBS_MAP[obs]);placeRobots(rng);placeTarget(rng);
-  if(diagHex){hexToDiag(diagHex);extMode=true;}else{diagWalls=new Map();extMode=false;}
+  // Parse suffixes
+  diagWalls=new Map();extMode=false;portals=[];portalMode=false;
+  const xm=rest.match(/X([0-9a-f]*)/i);if(xm){hexToDiag(xm[1]);extMode=true;}
+  const pm=rest.match(/P([0-9a-f]*)/i);if(pm){hexToPortals(pm[1]);portalMode=pm[1].length>0;}
+  _portalLookup=buildPortalLookup();
   return true;
 }
 
@@ -473,24 +524,43 @@ function parseGameReportToken(tok){
   moves=meta.moves;solved=meta.solved;
   const rawMoves=parseReplayHex(replayHex).slice(0,moves);
   let pos=robots.map(b=>({r:b.r,c:b.c}));moveLog=[];
-  for(const m of rawMoves){const{r,c}=simSlide_pos(m.ri,m.dir,pos);if(r===pos[m.ri].r&&c===pos[m.ri].c)continue;moveLog.push({ri:m.ri,dir:m.dir,fromR:pos[m.ri].r,fromC:pos[m.ri].c,toR:r,toC:c});pos[m.ri]={r,c};}
+  for(const m of rawMoves){const{r,c,waypoints}=simSlide_pos(m.ri,m.dir,pos);if(r===pos[m.ri].r&&c===pos[m.ri].c)continue;moveLog.push({ri:m.ri,dir:m.dir,fromR:pos[m.ri].r,fromC:pos[m.ri].c,toR:r,toC:c,wp:waypoints||[]});pos[m.ri]={r,c};}
   pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});history=[];return true;
 }
 function simSlide_pos(ri,dir,pos){
-  // dir: 0=N,1=E,2=S,3=W
   const DR=[-1,0,1,0],DC=[0,1,0,-1],EX=[1,2,4,8],EN=[4,8,1,2];
-  // Diagonal deflect tables: type0='\', type1='/'
-  // type0 '\': N↔W, S↔E  type1 '/': N↔E, S↔W
-  const DIAG_DEFLECT=[[3,2,1,0],[1,0,3,2]];// [type][incomingDir] → outDir
+  const DIAG_DEFLECT=[[3,2,1,0],[1,0,3,2]];
   let r=pos[ri].r,c=pos[ri].c,d=dir;
   let safety=0;
-  while(safety++<ROWS*COLS*4){
-    // Check for diagonal mirror at current position (entered this cell)
+  const teleported=new Set();
+  const waypoints=[];// deflection/portal points for path animation
+  while(safety++<ROWS*COLS*8){
     if(extMode&&safety>1){
       const dm=diagWalls.get(`${r},${c}`);
       if(dm&&dm.ri!==ri){
-        // deflect!
-        d=DIAG_DEFLECT[dm.type][d];
+        const nd=DIAG_DEFLECT[dm.type][d];
+        if(nd!==d){waypoints.push({r,c});d=nd;}
+      }
+    }
+    if (portalMode && safety > 1) {
+      const pe = _portalLookup.get(`${r},${c}`);
+      // Wir prüfen, ob wir gerade erst aus einem Portal gekommen sind, um Endlosschleifen zu vermeiden
+      const lastWP = waypoints.length > 0 ? waypoints[waypoints.length - 1] : null;
+      const justExited = lastWP && lastWP.portal && lastWP.destR === r && lastWP.destC === c;
+
+      if (pe !== undefined && !justExited) {
+          const other = portals[pe.pi][pe.end === 0 ? 1 : 0];
+          // Prüfen, ob der Ausgang frei ist (kein anderer Roboter, keine Wand im Feld)
+          const occupied = pos.some((p, i) => i !== ri && p.r === other.r && p.c === other.c);
+          if (!occupied && !isC(other.r, other.c)) {
+              // Speichere den Sprung als Wegpunkt
+              waypoints.push({ r, c, portal: true, destR: other.r, destC: other.c });
+              // Teleportiere den Roboter "unsichtbar" zum Ausgang
+              r = other.r;
+              c = other.c;
+              // WICHTIG: Kein 'continue' oder 'break'! 
+              // Die Schleife läuft direkt weiter und prüft das nächste Feld in Bewegungsrichtung.
+          }
       }
     }
     if(walls[r][c]&EX[d])break;
@@ -501,32 +571,63 @@ function simSlide_pos(ri,dir,pos){
     if(isC(nr,nc))break;
     r=nr;c=nc;
   }
-  return{r,c};
+  return{r,c,waypoints};
 }
 
 function updateExtBadge(){
   let badge=document.getElementById('ext-badge');
-  if(!badge){badge=document.createElement('div');badge.id='ext-badge';badge.style.cssText='position:fixed;bottom:12px;right:12px;background:#1a1a08;border:1px solid #6a6a00;color:#cccc00;font-family:\'Courier New\',monospace;font-size:.6rem;letter-spacing:.14em;padding:4px 9px;text-transform:uppercase;z-index:50;pointer-events:none;';document.body.appendChild(badge);}
-  badge.style.display=extMode?'block':'none';
-  badge.textContent=t().extBadge;
+  if(!badge){badge=document.createElement('div');badge.id='ext-badge';badge.style.cssText='position:fixed;bottom:12px;right:12px;background:#0e0e1a;border:1px solid #444;color:#ccc;font-family:\'Courier New\',monospace;font-size:.6rem;letter-spacing:.12em;padding:4px 9px;text-transform:uppercase;z-index:50;pointer-events:none;line-height:1.8;text-align:right;';document.body.appendChild(badge);}
+  const lines=[];
+  if(extMode)lines.push('<span style="color:#cccc00">◇ '+t().extBadge+'</span>');
+  if(portalMode)lines.push('<span style="color:#cc88ff">⊕ '+t().portalBadge+'</span>');
+  badge.innerHTML=lines.join('<br>');
+  badge.style.display=lines.length?'block':'none';
 }
 
 // ═══ Game state ═══
 let robots,target,selected,moves,history,solved,moveLog=[],gameStartTime=null,gameEndTime=null,currentSeed=null,currentObs='M';
-let ngExtMode=false;
+let ngExtMode=false,ngPortalMode=false;
+
+// Build a fast lookup: "r,c" → portal pair index + which end (0 or 1)
+function buildPortalLookup(){
+  const map=new Map();
+  for(let i=0;i<portals.length;i++){
+    map.set(`${portals[i][0].r},${portals[i][0].c}`,{pi:i,end:0});
+    map.set(`${portals[i][1].r},${portals[i][1].c}`,{pi:i,end:1});
+  }
+  return map;
+}
+let _portalLookup=new Map();
 
 function placeDiagWalls(rng){
-  // Place ~COLS/3 diagonal mirrors, avoiding center block, border, and existing walls
   diagWalls=new Map();
-  const count=Math.floor(COLS/3);
+  // count by obs: L=max1, M=max3, H=max5
+  const maxCount={L:1,M:3,H:5}[currentObs]||3;
+  // DIAG_DEFLECT[type][inDir]→outDir: type0='\', type1='/'
+  const DIAG_DEFLECT=[[3,2,1,0],[1,0,3,2]];
+  const DR=[-1,0,1,0],DC=[0,1,0,-1];
   let tries=0;
-  while(diagWalls.size<count&&tries<300){
+  while(diagWalls.size<maxCount&&tries<400){
     tries++;
     const r=1+Math.floor(rng()*(ROWS-2)),c=1+Math.floor(rng()*(COLS-2));
     if(isC(r,c))continue;
     if(diagWalls.has(`${r},${c}`))continue;
-    const type=Math.floor(rng()*2);// 0=\, 1=/
-    const ri=Math.floor(rng()*4);// which robot color passes through
+    const type=Math.floor(rng()*2);
+    const ri=Math.floor(rng()*4);
+    // Validate: for each incoming direction, check that the deflected outgoing direction
+    // is not immediately blocked by a wall (robot would get stuck inside the cell)
+    let bad=false;
+    for(let inDir=0;inDir<4;inDir++){
+      const outDir=DIAG_DEFLECT[type][inDir];
+      // Check if the cell has a wall on the outgoing side
+      if(walls[r][c]&[1,2,4,8][outDir]){bad=true;break;}
+      // Also check if the neighbor in incoming direction has a wall facing this cell
+      const nr=r+DR[inDir],nc=c+DC[inDir];
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS){
+        if(walls[nr][nc]&[4,8,1,2][inDir]){}// wall blocks entry — fine, robot won't enter
+      }
+    }
+    if(bad)continue;
     diagWalls.set(`${r},${c}`,{type,ri});
   }
 }
@@ -534,9 +635,12 @@ function placeRobots(rng){robots=[];const used=new Set();for(let i=0;i<4;i++){le
 function placeTarget(rng){const used=new Set(robots.map(b=>b.r*COLS+b.c));let r,c;do{r=Math.floor(rng()*(ROWS-2))+1;c=Math.floor(rng()*(COLS-2))+1;}while(used.has(r*COLS+c)||isC(r,c));const ri=Math.floor(rng()*4);target={r,c,robotIdx:ri,color:RC[ri]};}
 
 function startNewGame(){
-  currentSeed=Math.floor(Math.random()*0xFFFFFFFF);currentObs=ngObs;extMode=ngExtMode;
+  currentSeed=Math.floor(Math.random()*0xFFFFFFFF);currentObs=ngObs;
+  extMode=ngExtMode;portalMode=ngPortalMode;
   const rng=mb32(currentSeed);initWalls(rng,OBS_MAP[ngObs]);placeRobots(rng);placeTarget(rng);
   if(extMode)placeDiagWalls(rng);else diagWalls=new Map();
+  if(portalMode)placePortals(rng);else portals=[];
+  _portalLookup=buildPortalLookup();
   selected=0;moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;
   setSeedDisp(mapToToken());setMsg('');updateInfo();updateExtBadge();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();
 }
@@ -559,12 +663,12 @@ function updateShareReplayVisibility(){
 function skd(e){if(e.key==='Enter')loadSeedInput();}
 function loadSeedInput(){const raw=document.getElementById('seed-input').value.trim();if(!raw)return;if(!loadAnyToken(raw))setMsg(t().tokErr);}
 function loadAnyToken(raw){
-  if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?_[0-9a-f]+_[0-9a-f]*$/i.test(raw)){
+  if(/^[0-9a-f]{8}[CG][LMH]([XP][0-9a-f]*)*_[0-9a-f]+_[0-9a-f]*$/i.test(raw)){
     if(!parseGameReportToken(raw))return false;
     setSeedDisp(mapToToken());updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();updateExtBadge();setMsg(t().impOk);
     setTimeout(()=>{if(!tlOpen)toggleTimeline();},80);return true;
   }
-  if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?$/i.test(raw)){
+  if(/^[0-9a-f]{8}[CG][LMH]([XP][0-9a-f]*)*$/i.test(raw)){
     if(!tokenToMap(raw))return false;
     selected=0;moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;
     setSeedDisp(mapToToken());setMsg(t().boardLoaded);updateInfo();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();updateExtBadge();return true;
@@ -582,9 +686,9 @@ function readURLParams(){
 
 // ═══ Movement ═══
 function simSlide(ri,dir,pos){return simSlide_pos(ri,dir,pos);}
-function moveRobot(ri,dir){const pos=robots.map(b=>({r:b.r,c:b.c}));const{r,c}=simSlide(ri,dir,pos);if(r===robots[ri].r&&c===robots[ri].c)return false;history.push(pos);moveLog.push({ri,dir,fromR:robots[ri].r,fromC:robots[ri].c,toR:r,toC:c});robots[ri].r=r;robots[ri].c=c;moves++;updateInfo();checkWin();return true;}
+function moveRobot(ri,dir){const pos=robots.map(b=>({r:b.r,c:b.c}));const{r,c,waypoints}=simSlide(ri,dir,pos);if(r===robots[ri].r&&c===robots[ri].c)return false;history.push(pos);moveLog.push({ri,dir,fromR:robots[ri].r,fromC:robots[ri].c,toR:r,toC:c,wp:waypoints||[]});if(animRobots&&animRobots[ri]){animRobots[ri].path=(waypoints||[]).map(w=>({...w}));animRobots[ri].path.push({r:r,c:c});}robots[ri].r=r;robots[ri].c=c;moves++;updateInfo();checkWin();return true;}
 function checkWin(){const rb=robots[target.robotIdx];if(!solved&&rb.r===target.r&&rb.c===target.c){solved=true;gameEndTime=new Date();setTimeout(()=>openWin(),420);}}
-function undoMove(){if(!history.length)return;const prev=history.pop();moveLog.pop();prev.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});moves=Math.max(0,moves-1);solved=false;setMsg('');updateInfo();}
+function undoMove(){if(!history.length)return;const prev=history.pop();moveLog.pop();prev.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;if(animRobots&&animRobots[i])animRobots[i].path=[];});moves=Math.max(0,moves-1);solved=false;setMsg('');updateInfo();}
 
 // ═══ New game ═══
 let ngSize='12',ngObs='M',_ngTokValid=null;
@@ -607,10 +711,10 @@ function ngTokenChanged(val){
     _ngUpdateLiveId();
     return;
   }
-  if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?_[0-9a-f]+_[0-9a-f]*$/i.test(val)){
+  if(/^[0-9a-f]{8}[CG][LMH]([XP][0-9a-f]*)*_[0-9a-f]+_[0-9a-f]*$/i.test(val)){
     _ngTokValid='replay';hint.textContent=t().ngTokReplay;hint.style.color='#44dd88';
     setSeedDisp(val.split('_')[0].toUpperCase());randSec.style.display='none';
-  } else if(/^[0-9a-f]{8}[CG][LMH](X[0-9a-f]*)?$/i.test(val)){
+  } else if(/^[0-9a-f]{8}[CG][LMH]([XP][0-9a-f]*)*$/i.test(val)){
     _ngTokValid='map';hint.textContent=t().ngTokMap;hint.style.color='#4488ff';
     setSeedDisp(val.toUpperCase());randSec.style.display='none';
   } else {
@@ -630,8 +734,9 @@ function ngClearToken(){document.getElementById('ng-token-input').value='';ngTok
 function openNewGame(){
   const curSize=String(COLS);const curObs=currentObs||'M';
   ngSize=curSize;ngObs=curObs;ngSel('size',curSize);ngSel('obs',curObs);
-  ngExtMode=extMode;
+  ngExtMode=extMode;ngPortalMode=portalMode;
   document.getElementById('ng-ext-cb').checked=extMode;
+  document.getElementById('ng-portal-cb').checked=portalMode;
   document.getElementById('ng-token-input').value='';
   document.getElementById('ng-tok-hint').textContent='';
   document.getElementById('ng-tok-clear').style.display='none';
@@ -782,7 +887,7 @@ let annoHoverIdx=-1,annoHoverRobot=-1,showPaths=true;
 
 // ═══ p5 sketch ═══
 let animRobots=null;
-function resetAnim(){if(animRobots){if(animRobots.length!==robots.length)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));else animRobots.forEach((a,i)=>{a.x=robots[i].c*CELL;a.y=robots[i].r*CELL;});}}
+function resetAnim(){if(animRobots){if(animRobots.length!==robots.length)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL,path:[]}));else animRobots.forEach((a,i)=>{a.x=robots[i].c*CELL;a.y=robots[i].r*CELL;a.path=[];});}}
 
 new p5(function(p){
   let lastCols=COLS,lastRows=ROWS,lastInnerW=window.innerWidth;
@@ -797,7 +902,7 @@ new p5(function(p){
     const cnv=p.createCanvas(COLS*CELL,ROWS*CELL);
     cnv.parent('canvas-container');
     if(!readURLParams())startNewGame();
-    animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));
+    animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL,path:[]}));
     // Auto-detect language from browser; fall back to 'en'
     const sysLang=(navigator.language||navigator.userLanguage||'en').slice(0,2).toLowerCase();
     const detectedLang=T[sysLang]?sysLang:'en';
@@ -812,12 +917,34 @@ new p5(function(p){
       CELL=newCell;
       p.resizeCanvas(COLS*CELL,ROWS*CELL);
       lastCols=COLS;lastRows=ROWS;lastInnerW=window.innerWidth;
-      if(animRobots)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));
+      if(animRobots)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL,path:[]}));
     }
     if(!walls||!robots||!animRobots)return;// not yet initialised
-    p.background(20,20,32);drawGrid();drawCenter();drawWalls();if(extMode)drawDiagWalls();drawTarget();
+    p.background(20,20,32);drawGrid();drawCenter();drawWalls();if(extMode)drawDiagWalls();if(portalMode)drawPortals();drawTarget();
     if(tlOpen&&moveLog.length)drawAnnotations();
-    for(let i=0;i<4;i++){animRobots[i].x+=(robots[i].c*CELL-animRobots[i].x)*0.26;animRobots[i].y+=(robots[i].r*CELL-animRobots[i].y)*0.26;}
+    
+    for(let i=0;i<4;i++){
+      let ar = animRobots[i];
+      if (ar.path && ar.path.length > 0) {
+        let wp = ar.path[0];
+        let tx = wp.c * CELL;
+        let ty = wp.r * CELL;
+        
+        ar.x += (tx - ar.x) * 0.42;
+        ar.y += (ty - ar.y) * 0.42;
+        
+        if (Math.abs(ar.x - tx) < 2 && Math.abs(ar.y - ty) < 2) {
+          if (wp.portal) { 
+            ar.x = wp.destC * CELL; 
+            ar.y = wp.destR * CELL; 
+          }
+          ar.path.shift();
+        }
+      } else {
+        ar.x += (robots[i].c * CELL - ar.x) * 0.42;
+        ar.y += (robots[i].r * CELL - ar.y) * 0.42;
+      }
+    }
     drawRobots();drawSel();
     if(tlOpen)doHoverDetect();
   };
@@ -826,41 +953,50 @@ new p5(function(p){
   function drawCenter(){const x=CC1*CELL,y=CR1*CELL,w=(CC2-CC1+1)*CELL,h=(CR2-CR1+1)*CELL;p.fill(16,16,26);p.noStroke();p.rect(x,y,w,h);p.fill(33,33,48);p.rect(x+5,y+5,w-10,h-10,5);p.stroke(52,52,72);p.strokeWeight(1.1);p.line(x+w/2,y+8,x+w/2,y+h-8);p.line(x+8,y+h/2,x+w-8,y+h/2);p.noFill();p.stroke(58,58,88,105);p.strokeWeight(1.8);p.rect(x+1,y+1,w-2,h-2,3);}
   function drawWalls(){p.strokeWeight(3.5);p.strokeCap(p.SQUARE);for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(isC(r,c))continue;const w=walls[r][c],x=c*CELL,y=r*CELL;p.stroke(210,70,34);if(w&1)p.line(x+1,y,x+CELL-1,y);if(w&2)p.line(x+CELL,y+1,x+CELL,y+CELL-1);if(w&4)p.line(x+1,y+CELL,x+CELL-1,y+CELL);if(w&8)p.line(x,y+1,x,y+CELL-1);}const cx=CC1*CELL,cy=CR1*CELL,cw=(CC2-CC1+1)*CELL,ch=(CR2-CR1+1)*CELL;p.stroke(58,58,90);p.strokeWeight(2.5);p.line(cx,cy,cx+cw,cy);p.line(cx+cw,cy,cx+cw,cy+ch);p.line(cx+cw,cy+ch,cx,cy+ch);p.line(cx,cy+ch,cx,cy);}
   function drawDiagWalls(){
-    const pad=CELL*0.12;
+    const pad=CELL*0.14;
     for(const[k,v]of diagWalls){
       const[r,c]=k.split(',').map(Number);
       const x=c*CELL,y=r*CELL;
       const[rr,gg,bb]=rgb(RC[v.ri]);
-      // Draw glow background
-      p.strokeWeight(4.5);p.stroke(rr,gg,bb,28);
-      if(v.type===0){p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);}// '\'
-      else{p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);}// '/'
-      // Draw main mirror line in robot color
-      p.strokeWeight(2.5);p.stroke(rr,gg,bb,200);
+      p.strokeCap(p.ROUND);
+      p.stroke(rr,gg,bb,36);p.strokeWeight(5.5);
       if(v.type===0){p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);}
       else{p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);}
-      // Small dot at center
-      p.fill(rr,gg,bb,160);p.noStroke();p.ellipse(x+CELL/2,y+CELL/2,3.5,3.5);
+      p.stroke(rr,gg,bb,210);p.strokeWeight(2.2);
+      if(v.type===0){p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);}
+      else{p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);}
+      p.fill(rr,gg,bb,180);p.noStroke();p.ellipse(x+CELL/2,y+CELL/2,3,3);
     }
   }
-  function drawDiagWalls(){
-    p.strokeWeight(2.5);p.strokeCap(p.ROUND);
-    const pad=CELL*0.12;
-    for(const[k,v]of diagWalls){
-      const[r,c]=k.split(',').map(Number);
-      const[rr,gg,bb]=rgb(RC[v.ri]);
-      p.stroke(rr,gg,bb,200);
-      const x=c*CELL,y=r*CELL;
-      if(v.type===0){// '\'  NW to SE
-        p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);
-      } else {// '/' NE to SW
-        p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);
+  function drawPortals(){
+    const pulse=0.65+0.35*Math.sin(p.frameCount*0.07);
+    const sz=CELL*0.54;
+    for(let pi=0;pi<portals.length;pi++){
+      const pair=portals[pi];
+      const col=PORTAL_COLORS[pi%PORTAL_COLORS.length];
+      const[rr,gg,bb]=rgb(col);
+      for(let e=0;e<2;e++){
+        const pt=pair[e];
+        const cx=pt.c*CELL+CELL/2,cy=pt.r*CELL+CELL/2;
+        // Pulsing outer ring
+        p.noFill();p.stroke(rr,gg,bb,50*pulse);p.strokeWeight(1.2);
+        p.ellipse(cx,cy,sz*pulse,sz*pulse);
+        // Solid inner ring
+        p.stroke(rr,gg,bb,190);p.strokeWeight(2);
+        p.ellipse(cx,cy,sz*0.7,sz*0.7);
+        // Center fill
+        p.fill(rr,gg,bb,90);p.noStroke();
+        p.ellipse(cx,cy,sz*0.38,sz*0.38);
+        // Partner number label
+        p.fill(rr,gg,bb,220);p.noStroke();
+        p.textAlign(p.CENTER,p.CENTER);p.textSize(Math.max(7,CELL*0.28));
+        p.text(String(pi+1),cx,cy);
       }
-      // faint glow
-      p.stroke(rr,gg,bb,40);p.strokeWeight(6);
-      if(v.type===0)p.line(x+pad,y+pad,x+CELL-pad,y+CELL-pad);
-      else p.line(x+CELL-pad,y+pad,x+pad,y+CELL-pad);
-      p.strokeWeight(2.5);
+      // Line connecting the pair
+      const ax=pair[0].c*CELL+CELL/2,ay=pair[0].r*CELL+CELL/2;
+      const bx=pair[1].c*CELL+CELL/2,by=pair[1].r*CELL+CELL/2;
+      p.stroke(rr,gg,bb,18);p.strokeWeight(1);p.drawingContext.setLineDash([3,5]);
+      p.line(ax,ay,bx,by);p.drawingContext.setLineDash([]);
     }
   }
   function drawTarget(){if(!target)return;const x=target.c*CELL+CELL/2,y=target.r*CELL+CELL/2,s=CELL*0.36;const[r,g,b]=rgb(target.color);p.push();p.translate(x,y);const pulse=0.72+0.28*Math.sin(p.frameCount*0.08);p.noFill();p.stroke(r,g,b,60*pulse);p.strokeWeight(1.5);p.ellipse(0,0,CELL*0.8*pulse,CELL*0.8*pulse);p.stroke(r,g,b);p.strokeWeight(2.5);p.line(-s,0,s,0);p.line(0,-s,0,s);p.fill(r,g,b);p.noStroke();p.ellipse(0,0,7,7);p.pop();}
@@ -876,18 +1012,55 @@ new p5(function(p){
       const highlight=isCur||isHovMove||isHovRobot;
       const[r,g,b]=rgb(RC[m.ri]);
       const alpha=highlight?230:38;
+      const lw=highlight?2.5:1;
+      const la=highlight?170:16;
+
+      // Build segment list: from→wp0→wp1→...→to
+      const pts=[{r:m.fromR,c:m.fromC},...(m.wp||[]).filter(w=>!w.portal),{r:m.toR,c:m.toC}];
+      // For portals, inject the jump visually as a dotted gap
+      const wpFull=[{r:m.fromR,c:m.fromC},...(m.wp||[])];
+      // Simple approach: draw solid segments between consecutive non-portal waypoints
+      let seg=[{r:m.fromR,c:m.fromC}];
+      for(const w of(m.wp||[])){
+        if(w.portal){
+          // Draw segment up to portal entry
+          for(let s=0;s<seg.length-1;s++){
+            p.stroke(r,g,b,la);p.strokeWeight(lw);p.strokeCap(p.ROUND);
+            p.line(seg[s].c*CELL+CELL/2,seg[s].r*CELL+CELL/2,seg[s+1].c*CELL+CELL/2,seg[s+1].r*CELL+CELL/2);
+          }
+          const portalAlpha = highlight ? la * 0.5 : la * 0.2; 
+          if (portalAlpha > 5) { // Performance: Nur zeichnen wenn sichtbar
+              p.drawingContext.setLineDash([4, 4]);
+              p.stroke(r, g, b, portalAlpha);
+              p.strokeWeight(lw * 0.8);
+              p.line(w.c*CELL+CELL/2, w.r*CELL+CELL/2, w.destC*CELL+CELL/2, w.destR*CELL+CELL/2);
+              p.drawingContext.setLineDash([]);
+          }
+          seg = [{r: w.destR, c: w.destC}];
+        } else {
+          seg.push({r:w.r,c:w.c});
+        }
+      }
+      // Final segment to destination
+      seg.push({r:m.toR,c:m.toC});
+      for(let s=0;s<seg.length-1;s++){
+        p.stroke(r,g,b,la);p.strokeWeight(lw);p.strokeCap(p.ROUND);
+        p.line(seg[s].c*CELL+CELL/2,seg[s].r*CELL+CELL/2,seg[s+1].c*CELL+CELL/2,seg[s+1].r*CELL+CELL/2);
+      }
+      // Circle at START
       const x1=m.fromC*CELL+CELL/2,y1=m.fromR*CELL+CELL/2;
-      const x2=m.toC*CELL+CELL/2,y2=m.toR*CELL+CELL/2;
-      // Path line
-      p.stroke(r,g,b,highlight?170:16);p.strokeWeight(highlight?2.5:1);p.line(x1,y1,x2,y2);
-      // Circle at START position
       p.push();p.translate(x1,y1);
       const sz=highlight?CELL*0.62:CELL*0.38;
       p.noFill();p.stroke(r,g,b,alpha);p.strokeWeight(highlight?2.2:0.8);p.ellipse(0,0,sz,sz);
       p.pop();
-      // Arrowhead at END
+      // Arrowhead at END pointing in final direction
+      const x2=m.toC*CELL+CELL/2,y2=m.toR*CELL+CELL/2;
+      // Determine final direction: last segment direction
+      const lastSeg=seg[seg.length-2]||{r:m.fromR,c:m.fromC};
+      const fdx=(m.toC-lastSeg.c),fdy=(m.toR-lastSeg.r);
+      const adx=fdx===0?0:(fdx>0?1:-1),ady=fdy===0?0:(fdy>0?1:-1);
+      const aLen=highlight?10:6;
       p.push();p.translate(x2,y2);
-      const adx=DC[m.dir],ady=DR[m.dir],aLen=highlight?10:6;
       p.fill(r,g,b,alpha);p.noStroke();
       p.push();p.translate(adx*2,ady*2);p.rotate(Math.atan2(ady,adx));
       p.triangle(aLen,0,-aLen*0.6,aLen*0.7,-aLen*0.6,-aLen*0.7);
@@ -975,6 +1148,7 @@ new p5(function(p){
     }
     if(anyOpen()||solved)return;
     if((p.key==='z'||p.key==='Z')&&(p.keyIsDown(17)||p.keyIsDown(91))){undoMove();return;}// Ctrl+Z / Cmd+Z
+    if(p.key==='n'||p.key==='N'){openNewGame();return;}// N = new game
     const dm={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3,W:0,D:1,S:2,A:3};
     if(['1','2','3','4'].includes(p.key)){selected=+p.key-1;updateInfo();return;}
     if(dm[p.key]!==undefined)moveRobot(selected,dm[p.key]);
