@@ -1,22 +1,71 @@
-
 <aside id="sidebar">
 
-    <h2>Projects</h2>
+    {% if page.collection == "projects" or page.url contains "/projects" %}
 
-    <ul>
+        <h2>Projects</h2>
+        <ul>
+            {% assign items = site.projects | sort: "date" | reverse %}
+            {% for item in items %}
+                <li>
+                    <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
+                        {{ item.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
 
-        {% assign sorted_projects = site.projects | sort: "date" | reverse %}
+    {% elsif page.collection == "games" or page.url contains "/games" %}
 
-        {% for project in sorted_projects %}
+        <h2>Games</h2>
+        <ul>
+            {% assign items = site.games | sort: "date" | reverse %}
+            {% for item in items %}
+                <li>
+                    <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
+                        {{ item.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
 
-        <li>
-            <a href="{{ project.url }}">
-                {{ project.title }}
-            </a>
-        </li>
+    {% else %}
 
-        {% endfor %}
+        <h2>Recent Activity</h2>
+        <ul>
+            {% assign all_items = site.projects | concat: site.games | sort: "date" | reverse %}
+            {% for item in all_items limit:4 %}
+                <li>
+                    <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
+                        {{ item.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
 
-    </ul>
+        <h2>Games</h2>
+        <ul>
+            {% assign items = site.games | sort: "date" | reverse %}
+            {% for item in items %}
+                <li>
+                    <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
+                        {{ item.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Projects</h2>
+        <ul>
+            {% assign items = site.projects | sort: "date" | reverse %}
+            {% for item in items %}
+                <li>
+                    <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
+                        {{ item.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
 
 </aside>

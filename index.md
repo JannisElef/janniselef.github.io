@@ -14,7 +14,9 @@ Hello 2
 
     {% assign sorted_projects = site.projects | sort: "date" | reverse %}
 
-    {% for project in sorted_projects %}
+    {% assign recent_projects = sorted_projects | slice: 0, 4 %}
+
+    {% for project in recent_projects %}
 
         {% include project-card.html project=project %}
 
@@ -23,3 +25,22 @@ Hello 2
 </div>
 
 [-> View all projects](/projects)
+
+
+# Games
+
+<div class="project-grid">
+
+    {% assign sorted_games = site.games | sort: "date" | reverse %}
+
+    {% assign recent_games = sorted_games | slice: 0, 4 %}
+
+    {% for game in recent_games %}
+    
+        {% include project-card.html game=game %}
+
+    {% endfor %}
+
+</div>
+
+[-> View all games](/games)

@@ -6,5 +6,8 @@ collections:
   projects:
     output: true
     permalink: /projects/:name/
+  games:
+    output: true
+    permalink: /games/:name/
 
 markdown: kramdown
