@@ -11,7 +11,7 @@ title: Games
 
     {% for game in sorted_games %}
     
-        {% include project-card.html game=game %}
+        {% include item-card.html game=game %}
 
     {% endfor %}
 

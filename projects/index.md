@@ -11,7 +11,7 @@ title: Projects
 
     {% for project in sorted_projects %}
 
-        {% include project-card.html project=project %}
+        {% include item-card.html project=project %}
         
     {% endfor %}
 

@@ -18,7 +18,7 @@ Hello 2
 
     {% for project in recent_projects %}
 
-        {% include project-card.html project=project %}
+        {% include item-card.html project=project %}
 
     {% endfor %}
 
@@ -37,7 +37,7 @@ Hello 2
 
     {% for game in recent_games %}
     
-        {% include project-card.html game=game %}
+        {% include item-card.html game=game %}
 
     {% endfor %}
 
