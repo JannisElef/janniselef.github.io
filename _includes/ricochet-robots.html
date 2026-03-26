@@ -198,6 +198,7 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     <button class="red" onclick="openShare()" id="tl-share-btn">Share Replay &#10548;</button>
   </div>
 </div>
+<!-- NEW GAME -->
 <div class="overlay" id="ng-overlay" onclick="if(event.target===this)closeNg()">
   <div class="modal" id="ng-modal">
     <button class="modal-close" onclick="closeNg()">&#10005;</button>
@@ -243,6 +244,7 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     </div>
   </div>
 </div>
+<!-- WIN -->
 <div class="overlay" id="win-overlay" onclick="if(event.target===this)closeWin()">
   <div class="modal" id="win-modal">
     <button class="modal-close" onclick="closeWin()">&#10005;</button>
@@ -261,6 +263,7 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     </div>
   </div>
 </div>
+<!-- IMPORT -->
 <div class="overlay" id="import-overlay" onclick="closeImportOvl(event)">
   <div class="modal" style="max-width:460px;">
     <button class="modal-close" onclick="closeImportOvl()">&#10005;</button>
@@ -275,6 +278,7 @@ button.grey:hover:not(:disabled){background:#2e2e44;border-color:#555;color:#bbb
     </div>
   </div>
 </div>
+<!-- SHARE -->
 <div class="overlay" id="share-overlay" onclick="closeShare(event)" style="background:rgba(3,3,9,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)">
   <div class="modal" id="share-modal">
     <button class="modal-close" onclick="closeShare()">&#10005;</button>
@@ -481,15 +485,26 @@ function tokenToMap(tok){
   const seed=parseInt(base.slice(0,8),16),sz=SIZE_DEC[base[8].toUpperCase()]||16,obs=base[9].toUpperCase();
   if(!OBS_MAP[obs])return false;
   COLS=sz;ROWS=sz;CELL=sz===12?56:44;uc();currentSeed=seed;currentObs=obs;
-  const rng=mb32(seed);initWalls(rng,OBS_MAP[obs]);placeRobots(rng);placeTarget(rng);
-  // Parse suffixes
-  diagWalls=new Map();extMode=false;portals=[];portalMode=false;
-  const xm=rest.match(/X([0-9a-f]*)/i);if(xm){hexToDiag(xm[1]);extMode=true;}
-  const pm=rest.match(/P([0-9a-f]*)/i);if(pm){hexToPortals(pm[1]);portalMode=pm[1].length>0;}
+  // Detect modes from suffix flags
+  const xm=rest.match(/X([0-9a-f]*)/i);
+  const pm=rest.match(/P([0-9a-f]*)/i);
+  extMode=!!xm;portalMode=!!(pm&&pm[1].length>0);
+  // MUST replay RNG in the same order as startNewGame to get identical robot/target positions
+  const rng=mb32(seed);
+  initWalls(rng,OBS_MAP[obs]);
+  // Consume the same RNG calls placeDiagWalls would make (even if we override with stored data)
+  if(extMode)placeDiagWalls(rng);else diagWalls=new Map();
+  // Clear portals temporarily so placeRobots has empty portalMap (portals placed after)
+  portals=[];portalMap=new Map();_portalLookup=new Map();
+  placeRobots(rng);placeTarget(rng);
+  // Consume portal RNG calls (same order as startNewGame)
+  if(portalMode)placePortals(rng);else{portals=[];portalMap=new Map();}
   _portalLookup=buildPortalLookup();
+  // Now OVERRIDE diag/portal positions with the exact stored data from the token
+  if(xm)hexToDiag(xm[1]);
+  if(pm&&pm[1].length>0){hexToPortals(pm[1]);_portalLookup=buildPortalLookup();}
   return true;
 }
-
 function makeReplayHex(){
   const nibbles=moveLog.map(m=>(m.ri<<2)|m.dir);const bytes=[];
   for(let i=0;i<nibbles.length;i+=2)bytes.push(i+1<nibbles.length?(nibbles[i]<<4)|nibbles[i+1]:(nibbles[i]<<4)|0xf);
@@ -533,8 +548,9 @@ function simSlide_pos(ri,dir,pos){
   let r=pos[ri].r,c=pos[ri].c,d=dir;
   let safety=0;
   const teleported=new Set();
-  const waypoints=[];// deflection/portal points for path animation
+  const waypoints=[];
   while(safety++<ROWS*COLS*8){
+    // Diagonal mirror check (only after entering a new cell)
     if(extMode&&safety>1){
       const dm=diagWalls.get(`${r},${c}`);
       if(dm&&dm.ri!==ri){
@@ -542,27 +558,22 @@ function simSlide_pos(ri,dir,pos){
         if(nd!==d){waypoints.push({r,c});d=nd;}
       }
     }
-    if (portalMode && safety > 1) {
-      const pe = _portalLookup.get(`${r},${c}`);
-      // Wir prüfen, ob wir gerade erst aus einem Portal gekommen sind, um Endlosschleifen zu vermeiden
-      const lastWP = waypoints.length > 0 ? waypoints[waypoints.length - 1] : null;
-      const justExited = lastWP && lastWP.portal && lastWP.destR === r && lastWP.destC === c;
-
-      if (pe !== undefined && !justExited) {
-          const other = portals[pe.pi][pe.end === 0 ? 1 : 0];
-          // Prüfen, ob der Ausgang frei ist (kein anderer Roboter, keine Wand im Feld)
-          const occupied = pos.some((p, i) => i !== ri && p.r === other.r && p.c === other.c);
-          if (!occupied && !isC(other.r, other.c)) {
-              // Speichere den Sprung als Wegpunkt
-              waypoints.push({ r, c, portal: true, destR: other.r, destC: other.c });
-              // Teleportiere den Roboter "unsichtbar" zum Ausgang
-              r = other.r;
-              c = other.c;
-              // WICHTIG: Kein 'continue' oder 'break'! 
-              // Die Schleife läuft direkt weiter und prüft das nächste Feld in Bewegungsrichtung.
-          }
+    // Portal check (only after entering a new cell)
+    if(portalMode&&safety>1){
+      const pe=_portalLookup.get(`${r},${c}`);
+      if(pe!==undefined){
+        const other=portals[pe.pi][pe.end===0?1:0];
+        const key=`${r},${c}`;
+        if(!teleported.has(key)&&!pos.some((p,i)=>i!==ri&&p.r===other.r&&p.c===other.c)&&!isC(other.r,other.c)){
+          teleported.add(key);teleported.add(`${other.r},${other.c}`);
+          waypoints.push({r,c,portal:true,destR:other.r,destC:other.c});
+          r=other.r;c=other.c;
+          // DO NOT continue — fall through so wall check at exit cell runs immediately
+          // This allows sliding from exit even if it's against a wall (robot stops there)
+        }
       }
     }
+    // Check wall on outgoing side of current cell
     if(walls[r][c]&EX[d])break;
     const nr=r+DR[d],nc=c+DC[d];
     if(nr<0||nr>=ROWS||nc<0||nc>=COLS)break;
@@ -637,9 +648,13 @@ function placeTarget(rng){const used=new Set(robots.map(b=>b.r*COLS+b.c));let r,
 function startNewGame(){
   currentSeed=Math.floor(Math.random()*0xFFFFFFFF);currentObs=ngObs;
   extMode=ngExtMode;portalMode=ngPortalMode;
-  const rng=mb32(currentSeed);initWalls(rng,OBS_MAP[ngObs]);placeRobots(rng);placeTarget(rng);
+  const rng=mb32(currentSeed);initWalls(rng,OBS_MAP[ngObs]);
   if(extMode)placeDiagWalls(rng);else diagWalls=new Map();
-  if(portalMode)placePortals(rng);else portals=[];
+  // Place robots first with just diagWalls populated (portalMap empty is fine — no portals yet)
+  portals=[];portalMap=new Map();_portalLookup=new Map();
+  placeRobots(rng);placeTarget(rng);
+  // Now place portals (uses robots/target to avoid overlap)
+  if(portalMode)placePortals(rng);else{portals=[];portalMap=new Map();}
   _portalLookup=buildPortalLookup();
   selected=0;moves=0;history=[];moveLog=[];solved=false;gameStartTime=new Date();gameEndTime=null;
   setSeedDisp(mapToToken());setMsg('');updateInfo();updateExtBadge();resetAnim();closeTimeline();disableTL();updateShareReplayVisibility();
@@ -686,9 +701,9 @@ function readURLParams(){
 
 // ═══ Movement ═══
 function simSlide(ri,dir,pos){return simSlide_pos(ri,dir,pos);}
-function moveRobot(ri,dir){const pos=robots.map(b=>({r:b.r,c:b.c}));const{r,c,waypoints}=simSlide(ri,dir,pos);if(r===robots[ri].r&&c===robots[ri].c)return false;history.push(pos);moveLog.push({ri,dir,fromR:robots[ri].r,fromC:robots[ri].c,toR:r,toC:c,wp:waypoints||[]});if(animRobots&&animRobots[ri]){animRobots[ri].path=(waypoints||[]).map(w=>({...w}));animRobots[ri].path.push({r:r,c:c});}robots[ri].r=r;robots[ri].c=c;moves++;updateInfo();checkWin();return true;}
+function moveRobot(ri,dir){const pos=robots.map(b=>({r:b.r,c:b.c}));const{r,c,waypoints}=simSlide(ri,dir,pos);if(r===robots[ri].r&&c===robots[ri].c)return false;history.push(pos);const wp=waypoints||[];moveLog.push({ri,dir,fromR:robots[ri].r,fromC:robots[ri].c,toR:r,toC:c,wp});enqueueMove(ri,wp,r,c);robots[ri].r=r;robots[ri].c=c;moves++;updateInfo();checkWin();return true;}
 function checkWin(){const rb=robots[target.robotIdx];if(!solved&&rb.r===target.r&&rb.c===target.c){solved=true;gameEndTime=new Date();setTimeout(()=>openWin(),420);}}
-function undoMove(){if(!history.length)return;const prev=history.pop();moveLog.pop();prev.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;if(animRobots&&animRobots[i])animRobots[i].path=[];});moves=Math.max(0,moves-1);solved=false;setMsg('');updateInfo();}
+function undoMove(){if(!history.length)return;const prev=history.pop();moveLog.pop();prev.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});moves=Math.max(0,moves-1);solved=false;setMsg('');updateInfo();}
 
 // ═══ New game ═══
 let ngSize='12',ngObs='M',_ngTokValid=null;
@@ -796,12 +811,28 @@ function doImport(){const txt=document.getElementById('import-ta').value.trim();
 function tryLoad(txt){if(loadAnyToken(txt.trim())){document.getElementById('import-overlay').classList.remove('open');document.getElementById('import-ta').value='';}else setMsg(t().impErr);}
 function processImportObj(o){
   const b=o.board;COLS=b.cols;ROWS=b.rows;CELL=COLS===12?56:44;uc();currentSeed=b.seed;currentObs=b.obs||'M';
-  const rng=mb32(b.seed);initWalls(rng,OBS_MAP[b.obs]||22);placeRobots(rng);placeTarget(rng);
+  // Load via tokenToMap so RNG order matches startNewGame exactly
+  const mapID=b.mapID||b.mapToken;
+  if(mapID&&tokenToMap(mapID)){
+    // tokenToMap already set up walls, robots, target, diag, portals correctly
+  } else {
+    // Fallback: plain seed reconstruct (no ext/portal modes)
+    const rng=mb32(b.seed);diagWalls=new Map();extMode=false;portals=[];portalMap=new Map();portalMode=false;_portalLookup=new Map();
+    initWalls(rng,OBS_MAP[b.obs]||22);placeRobots(rng);placeTarget(rng);
+  }
   moves=o.game.moves;solved=o.game.solved;
-  moveLog=o.game.moveLog.map(m=>({ri:m.ri!=null?m.ri:m.robot,dir:m.d!=null?m.d:m.dir,fromR:m.fr!=null?m.fr:m.from.r,fromC:m.fc!=null?m.fc:m.from.c,toR:m.tr!=null?m.tr:m.to.r,toC:m.tc!=null?m.tc:m.to.c}));
+  // Replay moves through simSlide_pos so toR/toC and waypoints are always correct
+  const rawLog=o.game.moveLog.map(m=>({ri:m.ri!=null?m.ri:m.robot,dir:m.d!=null?m.d:m.dir}));
+  let pos=robots.map(b=>({r:b.r,c:b.c}));moveLog=[];
+  for(const m of rawLog){
+    const{r,c,waypoints}=simSlide_pos(m.ri,m.dir,pos);
+    if(r===pos[m.ri].r&&c===pos[m.ri].c)continue;
+    moveLog.push({ri:m.ri,dir:m.dir,fromR:pos[m.ri].r,fromC:pos[m.ri].c,toR:r,toC:c,wp:waypoints||[]});
+    pos[m.ri]={r,c};
+  }
+  pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});
   history=[];gameStartTime=o.date?new Date(o.date):null;gameEndTime=o.dateSolved?new Date(o.dateSolved):null;
   if(o.player&&o.player!==T.de.unknown&&o.player!==T.en.unknown)username=o.player;
-  let pos=robots.map(b=>({r:b.r,c:b.c}));for(const m of moveLog)pos[m.ri]={r:m.toR,c:m.toC};pos.forEach((p,i)=>{robots[i].r=p.r;robots[i].c=p.c;});
   setSeedDisp(b.mapID||b.mapToken||mapToToken());
   setMsg(t().impOk);updateInfo();resetAnim();closeTimeline();enableTL();updateShareReplayVisibility();updateExtBadge();
 }
@@ -886,8 +917,37 @@ function computeCell(){
 let annoHoverIdx=-1,annoHoverRobot=-1,showPaths=true;
 
 // ═══ p5 sketch ═══
+// animRobots: current animated position (pixels)
+// animQueues: per-robot array of {x,y,snap} waypoint targets
+// snap=true means teleport instantly (portal jump)
 let animRobots=null;
-function resetAnim(){if(animRobots){if(animRobots.length!==robots.length)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL,path:[]}));else animRobots.forEach((a,i)=>{a.x=robots[i].c*CELL;a.y=robots[i].r*CELL;a.path=[];});}}
+let animQueues=[[],[],[],[]];
+
+function resetAnim(){
+  if(!animRobots)return;
+  if(animRobots.length!==robots.length){
+    animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));
+  } else {
+    animRobots.forEach((a,i)=>{a.x=robots[i].c*CELL;a.y=robots[i].r*CELL;});
+  }
+  animQueues=[[],[],[],[]];
+}
+
+// Called by moveRobot to enqueue a waypointed move for animation
+function enqueueMove(ri,wp,toR,toC){
+  const q=animQueues[ri];
+  // Build queue: from current anim pos → each waypoint → final pos
+  for(const w of wp){
+    if(w.portal){
+      // Slide into portal entry, then snap to exit
+      q.push({x:w.c*CELL,y:w.r*CELL,snap:false});
+      q.push({x:w.destC*CELL,y:w.destR*CELL,snap:true});
+    } else {
+      q.push({x:w.c*CELL,y:w.r*CELL,snap:false});
+    }
+  }
+  q.push({x:toC*CELL,y:toR*CELL,snap:false});
+}
 
 new p5(function(p){
   let lastCols=COLS,lastRows=ROWS,lastInnerW=window.innerWidth;
@@ -902,7 +962,7 @@ new p5(function(p){
     const cnv=p.createCanvas(COLS*CELL,ROWS*CELL);
     cnv.parent('canvas-container');
     if(!readURLParams())startNewGame();
-    animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL,path:[]}));
+    animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));
     // Auto-detect language from browser; fall back to 'en'
     const sysLang=(navigator.language||navigator.userLanguage||'en').slice(0,2).toLowerCase();
     const detectedLang=T[sysLang]?sysLang:'en';
@@ -917,32 +977,33 @@ new p5(function(p){
       CELL=newCell;
       p.resizeCanvas(COLS*CELL,ROWS*CELL);
       lastCols=COLS;lastRows=ROWS;lastInnerW=window.innerWidth;
-      if(animRobots)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL,path:[]}));
+      if(animRobots)animRobots=robots.map(b=>({x:b.c*CELL,y:b.r*CELL}));
     }
     if(!walls||!robots||!animRobots)return;// not yet initialised
     p.background(20,20,32);drawGrid();drawCenter();drawWalls();if(extMode)drawDiagWalls();if(portalMode)drawPortals();drawTarget();
     if(tlOpen&&moveLog.length)drawAnnotations();
-    
+    // Animate robots through waypoint queues
+    // Waypoint animation: robot slides to each segment endpoint before changing direction
+    const LERP=0.32,SNAP_THRESH=0.8;
     for(let i=0;i<4;i++){
-      let ar = animRobots[i];
-      if (ar.path && ar.path.length > 0) {
-        let wp = ar.path[0];
-        let tx = wp.c * CELL;
-        let ty = wp.r * CELL;
-        
-        ar.x += (tx - ar.x) * 0.42;
-        ar.y += (ty - ar.y) * 0.42;
-        
-        if (Math.abs(ar.x - tx) < 2 && Math.abs(ar.y - ty) < 2) {
-          if (wp.portal) { 
-            ar.x = wp.destC * CELL; 
-            ar.y = wp.destR * CELL; 
+      const a=animRobots[i];
+      const q=animQueues[i];
+      if(q.length>0){
+        const target=q[0];
+        if(target.snap){
+          // Portal jump: teleport instantly to exit
+          a.x=target.x;a.y=target.y;q.shift();
+        } else {
+          const dx=target.x-a.x,dy=target.y-a.y;
+          a.x+=dx*LERP;a.y+=dy*LERP;
+          // Only advance to next segment when very close — prevents diagonal shortcuts
+          if(Math.abs(target.x-a.x)<SNAP_THRESH&&Math.abs(target.y-a.y)<SNAP_THRESH){
+            a.x=target.x;a.y=target.y;q.shift();
           }
-          ar.path.shift();
         }
       } else {
-        ar.x += (robots[i].c * CELL - ar.x) * 0.42;
-        ar.y += (robots[i].r * CELL - ar.y) * 0.42;
+        // No pending move: lerp toward logical position (undo/timeline)
+        a.x+=(robots[i].c*CELL-a.x)*LERP;a.y+=(robots[i].r*CELL-a.y)*LERP;
       }
     }
     drawRobots();drawSel();
@@ -978,25 +1039,20 @@ new p5(function(p){
       for(let e=0;e<2;e++){
         const pt=pair[e];
         const cx=pt.c*CELL+CELL/2,cy=pt.r*CELL+CELL/2;
-        // Pulsing outer ring
         p.noFill();p.stroke(rr,gg,bb,50*pulse);p.strokeWeight(1.2);
         p.ellipse(cx,cy,sz*pulse,sz*pulse);
-        // Solid inner ring
         p.stroke(rr,gg,bb,190);p.strokeWeight(2);
         p.ellipse(cx,cy,sz*0.7,sz*0.7);
-        // Center fill
         p.fill(rr,gg,bb,90);p.noStroke();
         p.ellipse(cx,cy,sz*0.38,sz*0.38);
-        // Partner number label
         p.fill(rr,gg,bb,220);p.noStroke();
         p.textAlign(p.CENTER,p.CENTER);p.textSize(Math.max(7,CELL*0.28));
         p.text(String(pi+1),cx,cy);
       }
-      // Line connecting the pair
+      // Faint solid connecting line — no setLineDash for performance
       const ax=pair[0].c*CELL+CELL/2,ay=pair[0].r*CELL+CELL/2;
       const bx=pair[1].c*CELL+CELL/2,by=pair[1].r*CELL+CELL/2;
-      p.stroke(rr,gg,bb,18);p.strokeWeight(1);p.drawingContext.setLineDash([3,5]);
-      p.line(ax,ay,bx,by);p.drawingContext.setLineDash([]);
+      p.stroke(rr,gg,bb,12);p.strokeWeight(0.8);p.line(ax,ay,bx,by);
     }
   }
   function drawTarget(){if(!target)return;const x=target.c*CELL+CELL/2,y=target.r*CELL+CELL/2,s=CELL*0.36;const[r,g,b]=rgb(target.color);p.push();p.translate(x,y);const pulse=0.72+0.28*Math.sin(p.frameCount*0.08);p.noFill();p.stroke(r,g,b,60*pulse);p.strokeWeight(1.5);p.ellipse(0,0,CELL*0.8*pulse,CELL*0.8*pulse);p.stroke(r,g,b);p.strokeWeight(2.5);p.line(-s,0,s,0);p.line(0,-s,0,s);p.fill(r,g,b);p.noStroke();p.ellipse(0,0,7,7);p.pop();}
@@ -1023,20 +1079,21 @@ new p5(function(p){
       let seg=[{r:m.fromR,c:m.fromC}];
       for(const w of(m.wp||[])){
         if(w.portal){
-          // Draw segment up to portal entry
+          // Include the portal entry cell in the segment before drawing
+          seg.push({r:w.r,c:w.c});
+          // Draw solid segment up to and including portal entry
           for(let s=0;s<seg.length-1;s++){
             p.stroke(r,g,b,la);p.strokeWeight(lw);p.strokeCap(p.ROUND);
             p.line(seg[s].c*CELL+CELL/2,seg[s].r*CELL+CELL/2,seg[s+1].c*CELL+CELL/2,seg[s+1].r*CELL+CELL/2);
           }
-          const portalAlpha = highlight ? la * 0.5 : la * 0.2; 
-          if (portalAlpha > 5) { // Performance: Nur zeichnen wenn sichtbar
-              p.drawingContext.setLineDash([4, 4]);
-              p.stroke(r, g, b, portalAlpha);
-              p.strokeWeight(lw * 0.8);
-              p.line(w.c*CELL+CELL/2, w.r*CELL+CELL/2, w.destC*CELL+CELL/2, w.destR*CELL+CELL/2);
-              p.drawingContext.setLineDash([]);
+          // Dotted portal jump line — only when highlighted (expensive setLineDash skipped otherwise)
+          if(highlight){
+            p.drawingContext.setLineDash([3,5]);
+            p.stroke(r,g,b,la*0.6);p.strokeWeight(lw);
+            p.line(w.c*CELL+CELL/2,w.r*CELL+CELL/2,w.destC*CELL+CELL/2,w.destR*CELL+CELL/2);
+            p.drawingContext.setLineDash([]);
           }
-          seg = [{r: w.destR, c: w.destC}];
+          seg=[{r:w.destR,c:w.destC}];
         } else {
           seg.push({r:w.r,c:w.c});
         }
