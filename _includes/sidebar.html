@@ -1,5 +1,19 @@
 <aside id="sidebar">
 
+    <a href="/" style="color: var(--text-color); text-decoration: none;">
+        <h2>Recent Activity</h2>
+    </a>
+    <ul>
+        {% assign all_items = site.projects | concat: site.games | sort: "date" | reverse %}
+        {% for item in all_items limit:4 %}
+            <li>
+                <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
+                    {{ item.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
     {% if page.collection == "projects" or page.url contains "/projects" %}
 
         <h2>Projects</h2>
@@ -30,22 +44,12 @@
 
     {% else %}
 
-        <h2>Recent Activity</h2>
-        <ul>
-            {% assign all_items = site.projects | concat: site.games | sort: "date" | reverse %}
-            {% for item in all_items limit:4 %}
-                <li>
-                    <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
-                        {{ item.title }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Projects</h2>
+        <a href="projects/" style="color: var(--text-color); text-decoration: none;">
+            <h2>Projects</h2>
+        </a>
         <ul>
             {% assign items = site.projects | sort: "date" | reverse %}
-            {% for item in items %}
+            {% for item in items limit:10 %}
             <li>
                 <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
                     {{ item.title }}
@@ -54,10 +58,12 @@
             {% endfor %}
         </ul>
         
-        <h2>Games</h2>
+        <a href="games/" style="color: var(--text-color); text-decoration: none;">
+            <h2>Games</h2>
+        </a>
         <ul>
             {% assign items = site.games | sort: "date" | reverse %}
-            {% for item in items %}
+            {% for item in items limit:10 %}
                 <li>
                     <a href="{{ item.url }}" class="{% if page.url == item.url %}active{% endif %}">
                         {{ item.title }}
