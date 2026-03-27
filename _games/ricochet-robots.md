@@ -19,6 +19,32 @@ date: 2026-03-23
 {%- if page.thumbnail %}
 <meta property="og:image" content="{{ site.url }}{{ page.thumbnail }}">
 {%- endif %}
+
+<link rel="icon" type="image/svg+xml"
+href='data:image/svg+xml;utf8,
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="g" cx="35%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="%23ff6666"/>
+      <stop offset="75%" stop-color="%23ff4d4d"/>
+      <stop offset="100%" stop-color="%23d93636"/>
+    </radialGradient>
+    <radialGradient id="h" cx="28%" cy="28%" r="45%">
+      <stop offset="0%" stop-color="%23ffffff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- größerer Kreis (füllt das Quadrat) -->
+  <circle cx="50" cy="50" r="50" fill="url(%23g)"/>
+  
+  <!-- Highlight -->
+  <circle cx="50" cy="50" r="50" fill="url(%23h)"/>
+
+  <!-- Zentrumspunkt etwas größer für kleine Größen -->
+  <circle cx="50" cy="50" r="10" fill="black"/>
+</svg>'>
+
 <script>
   // Canonical URL for share links — uses Jekyll's site.url + page path.
   // Falls back to current location if RICOCHET_BASE_URL is not set.
