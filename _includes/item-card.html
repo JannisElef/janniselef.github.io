@@ -1,7 +1,7 @@
 
 {% assign item = include.project | default: include.game %}
 
-<a class="project-card" href="{{ item.url }}">
+<a class="item-card" href="{{ item.url }}">
     
     {% if item.repo %}
         {% assign branch = item.branch | default: "main" %}
@@ -29,7 +29,7 @@
     <p>{{ item.description }}</p>
     
     {% if item.date %}
-        <p class="project-date">{{ item.date | date: "%b %-d, %Y" }}</p>
+        <p class="item-date">{{ item.date | date: "%b %-d, %Y" }}</p>
     {% endif %}
     
     <div class="tags">
