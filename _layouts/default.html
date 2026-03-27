@@ -15,8 +15,9 @@
 
         <link rel="icon" type="image/svg+xml" href="/assets/icons/github.svg">
 
-        <!--<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"> -->
-        <link href="https://fonts.googleapis.com/css2?family=Geist&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&family=Geist:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Serif:ital,opsz,wdth,wght,GRAD@0,8..144,50..150,100..900,-50..100;1,8..144,50..150,100..900,-50..100&family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
 
     </head>
 
@@ -36,10 +37,12 @@
 
         </div>
 
+        {% include footer.html %}
+        
         {% include code-highlighter.html %}
-
+        
         <script src="/assets/js/theme.js"></script>
-
+        
     </body>
 
 </html>
