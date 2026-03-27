@@ -1,27 +1,38 @@
-
-const toggle = document.getElementById("themeToggle");
+const toggleButton = document.getElementById("themeToggle");
 
 function applyTheme(theme) {
     document.body.className = theme;
     localStorage.setItem("theme", theme);
-    toggle.checked = (theme === "dark");
+
+    toggleButton.textContent = theme === "dark" ? "☀️" : "🌙";
 }
 
 function systemTheme() {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
 }
 
 function loadTheme() {
     const saved = localStorage.getItem("theme");
-    if(saved){
+
+    if (saved) {
         applyTheme(saved);
     } else {
         applyTheme(systemTheme());
     }
 }
 
-toggle.addEventListener("change", () => {
-    applyTheme(toggle.checked ? "dark" : "light");
+toggleButton.addEventListener("click", () => {
+    const current = document.body.className;
+    const newTheme = current === "dark" ? "light" : "dark";
+    applyTheme(newTheme);
+});
+
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    if (!localStorage.getItem("theme")) {
+        applyTheme(e.matches ? "dark" : "light");
+    }
 });
 
 loadTheme();
