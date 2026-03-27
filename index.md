@@ -8,9 +8,13 @@ title: Home
 Hello 2
 
 
-# Projects
+<h1>
+    <a href="projects/" style="color: var(--text-color); text-decoration: none;">
+        Projects
+    </a>
+</h1>
 
-<div class="project-grid">
+<div class="item-grid">
 
     {% assign sorted_projects = site.projects | sort: "date" | reverse %}
 
@@ -27,9 +31,13 @@ Hello 2
 [-> View all projects](/projects)
 
 
-# Games
+<h1>
+    <a href="games/" style="color: var(--text-color); text-decoration: none;">
+        Games
+    </a>
+</h1>
 
-<div class="project-grid">
+<div class="item-grid">
 
     {% assign sorted_games = site.games | sort: "date" | reverse %}
 
