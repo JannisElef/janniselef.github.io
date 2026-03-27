@@ -1,18 +1,22 @@
 
 body.light {
-  --bg-color: #f1f1f1;          /* Seitenhintergrund */
-  --text-color: #111;           /* Schriftfarbe */
-  --link-color: #0969DA;
+  --page-bg-color: #f1f1f1; /* Seitenhintergrund */
+  --container-color: #f1f1f1;       /* Header, Aside, Main Hintergrund */
+  --container-bg-color: #e8e8e8;    /* Codeblock / STL Viewer Hintergrund */
   --border-color: #bbc1c9;      /* Rahmenfarbe */
-  --container-color: #f1f1f1;   /* Header, Aside, Main Hintergrund */
-  --code-bg-color: #e8e8e8;     /* Codeblock / STL Viewer Hintergrund */
+  --text-color: #111;           /* Schriftfarbe */
+  --text-2-color: #bbc1c9;      /* Rahmenfarbe */
+  --link-color: #0969DA;
+  --link-hover-color: #0969DA;
 }
 
 :root {
-  --bg-color: #161b22;
-  --text-color: #e6edf3;
-  --link-color: #58A6FF;
-  --border-color: #475059;
+  --page-bg-color: #161b22;
   --container-color: #182327;
-  --code-bg-color: #282c34;
+  --container-bg-color: #282c34;
+  --border-color: #475059;
+  --text-color: #e6edf3;
+  --text_2-color: #475059;
+  --link-color: #58A6FF;
+  --link-hover-color: #58A6FF;
 }
