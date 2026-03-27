@@ -3,9 +3,10 @@ layout: default
 title: Games
 ---
 
+
 # Games
 
-<div class="project-grid">
+<div class="item-grid">
 
     {% assign sorted_games = site.games | sort: "date" | reverse %}
 

@@ -3,9 +3,10 @@ layout: default
 title: Projects
 ---
 
+
 # Projects
 
-<div class="project-grid">
+<div class="item-grid">
 
     {% assign sorted_projects = site.projects | sort: "date" | reverse %}
 
