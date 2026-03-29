@@ -4,7 +4,7 @@ title: p5.js Webdemo
 description: Interactive p5.js sketches running in the browser.
 repo: JannisElef/p5js-webdemo
 branch: main
-tags: [Test, Software, p5.js, Active]
+tags: [Test, Software, p5.js, Finished]
 date: 2026-03-22
 ---
 

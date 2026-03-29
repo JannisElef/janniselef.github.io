@@ -1,22 +1,97 @@
-
-body.light {
-  --page-bg-color: #f1f1f1; /* Seitenhintergrund */
-  --container-color: #f1f1f1;       /* Header, Aside, Main Hintergrund */
-  --container-bg-color: #e8e8e8;    /* Codeblock / STL Viewer Hintergrund */
-  --border-color: #bbc1c9;      /* Rahmenfarbe */
-  --text-color: #111;           /* Schriftfarbe */
-  --text-2-color: #bbc1c9;      /* Rahmenfarbe */
-  --link-color: #0969DA;
-  --link-hover-color: #0969DA;
-}
-
+/* =========================
+   DEFAULT (DARK)
+========================= */
 :root {
   --page-bg-color: #161b22;
   --container-color: #182327;
   --container-bg-color: #282c34;
   --border-color: #475059;
   --text-color: #e6edf3;
-  --text_2-color: #475059;
+  --text-2-color: #475059;
   --link-color: #58A6FF;
   --link-hover-color: #58A6FF;
+}
+
+/* =========================
+   LIGHT
+========================= */
+body.light {
+  --page-bg-color: #f1f1f1;
+  --container-color: #f1f1f1;
+  --container-bg-color: #e8e8e8;
+  --border-color: #bbc1c9;
+  --text-color: #111;
+  --text-2-color: #bbc1c9;
+  --link-color: #0969DA;
+  --link-hover-color: #0969DA;
+}
+
+/* =========================
+   DARK (explicit class)
+========================= */
+body.dark {
+  --page-bg-color: #161b22;
+  --container-color: #182327;
+  --container-bg-color: #282c34;
+  --border-color: #475059;
+  --text-color: #e6edf3;
+  --text-2-color: #475059;
+  --link-color: #58A6FF;
+  --link-hover-color: #58A6FF;
+}
+
+/* =========================
+   GREEN (ECO)
+========================= */
+body.green {
+  --page-bg-color: #eaf4ec;
+  --container-color: #dcefe0;
+  --container-bg-color: #cde3d2;
+  --border-color: #7aa889;
+  --text-color: #1f3d2b;
+  --text-2-color: #7aa889;
+  --link-color: #2f8f4e;
+  --link-hover-color: #256f3c;
+}
+
+/* =========================
+   SUNSET
+========================= */
+body.sunset {
+  --page-bg-color: #fff3e8;
+  --container-color: #ffe0cc;
+  --container-bg-color: #ffd1b3;
+  --border-color: #ff9e80;
+  --text-color: #4a2c2a;
+  --text-2-color: #ff9e80;
+  --link-color: #ff6b3d;
+  --link-hover-color: #e85a2f;
+}
+
+/* =========================
+   OCEAN
+========================= */
+body.ocean {
+  --page-bg-color: #e6f4f9;
+  --container-color: #cfe8f3;
+  --container-bg-color: #b5dbea;
+  --border-color: #5fa8d3;
+  --text-color: #0f2a3a;
+  --text-2-color: #5fa8d3;
+  --link-color: #1d6fa5;
+  --link-hover-color: #155d8a;
+}
+
+/* =========================
+   PURPLE
+========================= */
+body.purple {
+  --page-bg-color: #1a1625;
+  --container-color: #221c33;
+  --container-bg-color: #2b2342;
+  --border-color: #6e5aa6;
+  --text-color: #e9e4ff;
+  --text-2-color: #6e5aa6;
+  --link-color: #a78bfa;
+  --link-hover-color: #8b6df0;
 }

@@ -1,10 +1,11 @@
-const toggleButton = document.getElementById("themeToggle");
+const themeSelect = document.getElementById("themeSelect");
 
 function applyTheme(theme) {
-    document.body.className = theme;
-    localStorage.setItem("theme", theme);
+    if (theme === "auto") {
+        theme = systemTheme();
+    }
 
-    toggleButton.textContent = theme === "dark" ? "☀️" : "🌙";
+    document.body.className = theme;
 }
 
 function systemTheme() {
@@ -14,24 +15,20 @@ function systemTheme() {
 }
 
 function loadTheme() {
-    const saved = localStorage.getItem("theme");
-
-    if (saved) {
-        applyTheme(saved);
-    } else {
-        applyTheme(systemTheme());
-    }
+    const saved = localStorage.getItem("theme") || "auto";
+    themeSelect.value = saved;
+    applyTheme(saved);
 }
 
-toggleButton.addEventListener("click", () => {
-    const current = document.body.className;
-    const newTheme = current === "dark" ? "light" : "dark";
-    applyTheme(newTheme);
+themeSelect.addEventListener("change", () => {
+    const selected = themeSelect.value;
+    localStorage.setItem("theme", selected);
+    applyTheme(selected);
 });
 
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-    if (!localStorage.getItem("theme")) {
-        applyTheme(e.matches ? "dark" : "light");
+    if (themeSelect.value === "auto") {
+        applyTheme("auto");
     }
 });
 
