@@ -41,37 +41,9 @@ body.dark {
 }
 
 /* =========================
-   GREEN (ECO)
+   MATCHA
 ========================= */
-body.green {
-  --page-bg-color: #eaf4ec;
-  --container-color: #dcefe0;
-  --container-bg-color: #cde3d2;
-  --border-color: #7aa889;
-  --text-color: #1f3d2b;
-  --text-2-color: #7aa889;
-  --link-color: #2f8f4e;
-  --link-hover-color: #256f3c;
-}
-
-/* =========================
-   SUNSET
-========================= */
-body.sunset {
-  --page-bg-color: #fff3e8;
-  --container-color: #ffe0cc;
-  --container-bg-color: #ffd1b3;
-  --border-color: #ff9e80;
-  --text-color: #4a2c2a;
-  --text-2-color: #ff9e80;
-  --link-color: #ff6b3d;
-  --link-hover-color: #e85a2f;
-}
-
-/* =========================
-   OCEAN
-========================= */
-body.ocean {
+body.matcha {
   --page-bg-color: #e6f4f9;
   --container-color: #cfe8f3;
   --container-bg-color: #b5dbea;
@@ -80,6 +52,20 @@ body.ocean {
   --text-2-color: #5fa8d3;
   --link-color: #1d6fa5;
   --link-hover-color: #155d8a;
+}
+
+/* =========================
+   PEACH
+========================= */
+body.peach {
+  --page-bg-color: #fff3e8;
+  --container-color: #ffe0cc;
+  --container-bg-color: #ffd1b3;
+  --border-color: #ff9e80;
+  --text-color: #4a2c2a;
+  --text-2-color: #ff9e80;
+  --link-color: #ff6b3d;
+  --link-hover-color: #e85a2f;
 }
 
 /* =========================
