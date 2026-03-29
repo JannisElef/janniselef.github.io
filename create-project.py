@@ -95,9 +95,9 @@ def ask_yes_no(question: str, default_yes: bool = True) -> bool:
     o = "n" if default_yes else "y"
     while True:
         a = input(f"{question} [{d}/{o}] ").strip().lower()
-        if a in ("", "y", "yes"):
+        if a in ("y", "yes"):
             return True
-        if a in ("n", "no"):
+        if a in ("", "n", "no"):
             return False
         print("Please answer y/n.")
 
