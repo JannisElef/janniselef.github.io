@@ -41,9 +41,9 @@ body.dark {
 }
 
 /* =========================
-   MATCHA
+   SKY BLUE
 ========================= */
-body.matcha {
+body.sky-blue {
   --page-bg-color: #e6f4f9;
   --container-color: #cfe8f3;
   --container-bg-color: #b5dbea;
@@ -55,7 +55,21 @@ body.matcha {
 }
 
 /* =========================
-   PEACH
+   MATCHA
+========================= */
+body.matcha {
+  --page-bg-color: #eaf4ec;
+  --container-color: #dcefe0;
+  --container-bg-color: #cde3d2;
+  --border-color: #7aa889;
+  --text-color: #1f3d2b;
+  --text-2-color: #7aa889;
+  --link-color: #2f8f4e;
+  --link-hover-color: #256f3c;
+}
+
+/* =========================
+PEACH
 ========================= */
 body.peach {
   --page-bg-color: #fff3e8;
