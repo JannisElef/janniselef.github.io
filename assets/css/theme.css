@@ -41,7 +41,7 @@ body.dark {
 }
 
 /* =========================
-MIDNIGHT
+   MIDNIGHT
 ========================= */
 body.midnight {
   --page-bg-color: #05050f;
@@ -83,7 +83,7 @@ body.matcha {
 }
 
 /* =========================
-PEACH
+   PEACH
 ========================= */
 body.peach {
   --page-bg-color: #fff3e8;
