@@ -44,6 +44,9 @@ body {
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
   background: var(--page-bg-color);
   color: var(--text-color);
+
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 body.dark .nav-icons a::after {
@@ -128,7 +131,7 @@ a:hover {
 }
 
 #themeSelect {
-  background: var(--container-color);
+  background: var(--container-bg-color);
   color: var(--text-color);
   border: 1px solid var(--border-color);
   padding: 5px 10px;
@@ -146,6 +149,7 @@ a:hover {
 }
 .item-card {
   display: block;
+  position: relative;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 20px;
@@ -162,11 +166,44 @@ a:hover {
 .item-card:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  text-decoration: none;
+  color: var(--text-color);
+  text-decoration: none !important;
 }
 .item-date {
   font-size: 12px;
   opacity: 0.5;
+}
+
+.item-card-redirect-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--link-color);
+    color: var(--page-bg-color);
+
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 2;
+
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.item-card-redirect-button:hover {
+    transform: scale(1.1);
+    background: var(--link-hover-color);
+}
+
+.material-symbols-outlined {
+    line-height: 1;
+    display: block;
 }
 
 .tag {
@@ -179,6 +216,9 @@ a:hover {
   margin-right: 5px;
   border-radius: 4px;
 }
+
+
+
 
 
 /* single image */
