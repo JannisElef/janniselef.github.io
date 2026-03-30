@@ -48,6 +48,7 @@ date: 2026-03-14
 {% include stl-viewer.html 
 file="/assets/stl/default_cube.stl"
 id="stl-default_cube"
+filesize="684 Bytes"
 %}
 
 
@@ -55,6 +56,7 @@ id="stl-default_cube"
 
 {% include code-viewer.html 
 file="/src/main.c" 
+filesize="110 Bytes"
 %}
 
 
