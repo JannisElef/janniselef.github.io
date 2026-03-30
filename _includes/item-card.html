@@ -41,7 +41,7 @@
     {% if item.redirect_url %}
     <div 
         class="item-card-redirect-button" 
-        onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.play_url }}', '_blank')">
+        onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.redirect_url }}', '_blank')">
         
         <span class="material-symbols-outlined">
             {% if include.game %}
