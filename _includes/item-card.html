@@ -38,4 +38,20 @@
         {% endfor %}
     </div>
 
+    {% if item.redirect_url %}
+    <div 
+        class="item-card-redirect-button" 
+        onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.play_url }}', '_blank')">
+        
+        <span class="material-symbols-outlined">
+            {% if include.game %}
+                play_arrow
+            {% elsif include.project %}
+                open_in_new
+            {% endif %}
+        </span>
+        
+    </div>
+{% endif %}
+
 </a>
