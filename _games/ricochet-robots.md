@@ -1,69 +1,29 @@
 ---
-layout: none
+layout: default
 title: Ricochet Robots
-description: Ricochet Robots like puzzle - share maps and replays via compact tokens or QR codes.
-# repo: JannisElef/ricochet-robots
+description: Ricochet Robots like puzzle.
+full_description: Ricochet Robots like puzzle - share maps and replays via tokens, links or QR codes.
+repo: JannisElef/ricochet-robots
 branch: main
-tags: [Game, Active]
-date: 2026-03-23
+tags: [Active]
+date: 2026-03-30
 ---
 
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>{{ page.title }}</title>
-<meta name="description" content="{{ page.description }}">
-<meta property="og:title" content="{{ page.title }}">
-<meta property="og:description" content="{{ page.description }}">
-{%- if page.thumbnail %}
-<meta property="og:image" content="{{ site.url }}{{ page.thumbnail }}">
-{%- endif %}
+{% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}
 
-<link rel="icon" type="image/svg+xml"
-href='data:image/svg+xml;utf8,
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <radialGradient id="g" cx="35%" cy="35%" r="70%">
-      <stop offset="0%" stop-color="%23ff6666"/>
-      <stop offset="75%" stop-color="%23ff4d4d"/>
-      <stop offset="100%" stop-color="%23d93636"/>
-    </radialGradient>
-    <radialGradient id="h" cx="28%" cy="28%" r="45%">
-      <stop offset="0%" stop-color="%23ffffff" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
+{% include readme-loader.html %} 
 
-  <!-- größerer Kreis (füllt das Quadrat) -->
-  <circle cx="50" cy="50" r="50" fill="url(%23g)"/>
-  
-  <!-- Highlight -->
-  <circle cx="50" cy="50" r="50" fill="url(%23h)"/>
+---
 
-  <!-- Zentrumspunkt etwas größer für kleine Größen -->
-  <circle cx="50" cy="50" r="10" fill="black"/>
-</svg>'>
+<!-- START --->
 
-<script>
-  // Canonical URL for share links — uses Jekyll's site.url + page path.
-  // Falls back to current location if RICOCHET_BASE_URL is not set.
-  window.RICOCHET_BASE_URL = "{{ site.url }}{{ page.url | remove: 'index.html' | remove: '.html' | append: '/' }}";</script>
-<!-- Game dependencies -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</head>
-<body style="margin:0;padding:0;background:#0d0d18;">
 
-{%- comment -%}
-  Include the game body. The file _includes/ricochet-robots.html
-  contains everything from <style> through the closing </script> tag —
-  i.e. the full ricochet_robots.html minus:
-    - <!DOCTYPE html>, <html>, <head>, <body> wrappers
-    - the two CDN <script> tags (loaded above)
-    - the BASE_URL constant line (window.RICOCHET_BASE_URL is set above instead)
-{%- endcomment -%}
-{% include ricochet-robots.html %}
 
-</body>
-</html>
+
+
+<!-- END --->
+
+---
+{% if page.date %}
+**Published:** {{ page.date | date: "%B %-d, %Y" }}
+{% endif %} [-> View on GitHub](https://github.com/{{ page.repo }})
