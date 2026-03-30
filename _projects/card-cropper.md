@@ -18,6 +18,11 @@ redirect_url: https://janniselef.github.io/card-cropper/
 <!-- START --->
 
 
+{% include image-viewer.html 
+   file="/assets/img/card_result.png" 
+   id="render-01" 
+   filesize="8.98 MB"
+%}
 
 
 
