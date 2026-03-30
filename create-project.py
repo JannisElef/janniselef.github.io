@@ -3,15 +3,12 @@
 Create new project from template – cloned NEXT TO pages repo (../)
 """
 
-
 import re
 import datetime
 import shutil
 import subprocess
 import sys
 from pathlib import Path
-
-
 
 
 def ensure_gh_installed():
@@ -26,6 +23,7 @@ def ensure_gh_installed():
         sys.exit(1)
 
     return install_gh()
+
 
 def install_gh():
     try:
@@ -58,6 +56,7 @@ def install_gh():
     print("✓ GitHub CLI installed successfully")
     return True
 
+
 def ensure_gh_authenticated():
     try:
         subprocess.run(
@@ -74,7 +73,6 @@ def ensure_gh_authenticated():
             subprocess.run(["gh", "auth", "login"], check=True)
         else:
             sys.exit(1)
-
 
 
 def slugify(text: str) -> str:
@@ -95,9 +93,11 @@ def ask_yes_no(question: str, default_yes: bool = True) -> bool:
     o = "n" if default_yes else "y"
     while True:
         a = input(f"{question} [{d}/{o}] ").strip().lower()
+        if not a:
+            return default_yes
         if a in ("y", "yes"):
             return True
-        if a in ("", "n", "no"):
+        if a in ("n", "no"):
             return False
         print("Please answer y/n.")
 
@@ -138,7 +138,11 @@ def main():
         print("Aborted – no name given.")
         return
 
-    desc = input("Description: ").strip() or "No description yet."
+    description = input("Short description (for item-card): ").strip() or "No short description yet."
+    full_description = input("Full description (for repo-About & README): ").strip() or "No full description yet."
+    
+    use_pages_template = ask_yes_no("Should this project use the GitHub Pages template?", default_yes=False)
+    deploy_pages = ask_yes_no("Deploy GitHub Pages for this repository (branch: main, /root)?", default_yes=True)
 
     print("└────────────────────────────────────────────────────┘\n")
 
@@ -149,6 +153,10 @@ def main():
 
     parent_dir = Path.cwd().parent
     repo_path = parent_dir / repo_name
+
+    # URLs
+    repo_pages_url = f"https://{PAGES_DOMAIN}/{repo_name}/"
+    project_site_url = f"https://{PAGES_DOMAIN}/projects/{slug}/"
 
     print(f"\n→ Target path: {repo_path}")
 
@@ -171,30 +179,50 @@ def main():
 
         else:
             print("Creating new repository and cloning...")
+            
+            # Select template based on user input
+            if use_pages_template:
+                template_repo = "JannisElef/pages-project-template"
+            else:
+                template_repo = f"{GITHUB_USERNAME}/project-template"
+                
             run([
                 "gh", "repo", "create", repo_name,
                 "--public",
-                "--template", f"{GITHUB_USERNAME}/project-template",
-                "--description", desc,
+                "--template", template_repo,
+                "--description", full_description,
                 "--clone"
             ], cwd=parent_dir, check=True)
             print(f"\t→ New repository created & cloned: {repo_path}")
 
         
-        # update repo description
+        # update repo description (using full_description)
         run([
             "gh", "repo", "edit", full_repo,
-            "--description", desc
+            "--description", full_description
         ], check=True)
-        print(f"\t→ Description of Repo set to: {desc}")
+        print(f"\t→ Description of Repo set to: {full_description}")
 
-        # set repo homepage-URL
-        homepage_url = f"https://{PAGES_DOMAIN}/projects/{slug}/"
+        # set repo homepage-URL to the REPO's GitHub pages link
         run([
             "gh", "repo", "edit", full_repo,
-            "--homepage", homepage_url
+            "--homepage", repo_pages_url
         ], check=True)
-        print(f"\t→ Website of Repo set to: {homepage_url}")
+        print(f"\t→ Website of Repo set to: {repo_pages_url}")
+
+        # Deploy GitHub pages for the repo if requested
+        if deploy_pages:
+            print("\t→ Configuring GitHub Pages deployment...")
+            try:
+                run([
+                    "gh", "api", "-X", "POST", f"/repos/{full_repo}/pages",
+                    "-f", "source[branch]=main",
+                    "-f", "source[path]=/"
+                ], check=True)
+                print("\t✓ GitHub Pages deployed (main branch, /root)")
+            except subprocess.CalledProcessError as e:
+                print("\t! Failed to configure GitHub Pages via API. You may need to set it manually.")
+
         
     except subprocess.CalledProcessError as e:
         print("Command failed:")
@@ -207,14 +235,16 @@ def main():
         print(e)
         return
 
-    #  README
+    # ── README ────────────────────────────────────
     readme = repo_path / "README.md"
     if readme.is_file():
-        readme_content = f"""# {name}
-
-{desc}
-
-"""
+        readme_content = f"# {name}\n\n{full_description}\n\n"
+        
+        # Append specific links ONLY if it's a pages project
+        if use_pages_template:
+            readme_content += f"Visit the [website]({repo_pages_url}).\n\n"
+            readme_content += f"See more information [here]({project_site_url}).\n"
+            
         readme.write_text(readme_content, encoding="utf-8")
         print("→ README.md updated")
 
@@ -229,13 +259,15 @@ def main():
     content = template.read_text(encoding="utf-8")
     parts = content.split("---", 2)
 
+    # Adding both descriptions to Jekyll frontmatter
     front = f"""---
 layout: default
 title: {name}
-description: {desc}
+description: {description}
+full_description: {full_description}
 repo: {full_repo}
 branch: main
-tags: ["Active"]
+tags: [Active]
 date: {today}
 ---
 """
@@ -246,19 +278,20 @@ date: {today}
 
     print("\n" + "─" * 60 + "\n")
 
-    # commit & push new project
-    if ask_yes_no(f"Commit & push 'Initial commit' in ../{repo_name}?"):
+    # commit & push new project (default is N)
+    if ask_yes_no(f"Commit & push 'Initial commit' in ../{repo_name}?", default_yes=False):
         git_commit_and_push(repo_path, "Initial commit")
 
     print()
 
-    # commit & push github-pages repo
-    if ask_yes_no(f"Commit & push 'Add {slug}' to pages repo?"):
+    # commit & push github-pages repo (default is N)
+    if ask_yes_no(f"Commit & push 'Add {slug}' to pages repo?", default_yes=False):
         git_commit_and_push(Path("."), f"Add {slug}")
 
     print("\nDone.\n")
-    print(f"Project website:")
-    print(f"  → {homepage_url}\n")
+    print("Project Links:")
+    print(f"  → Project Page:  {project_site_url}\n")
+    print(f"  → Online Website: {repo_pages_url}")
 
 
 if __name__ == "__main__":
