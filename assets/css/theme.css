@@ -27,17 +27,31 @@ body.light {
 }
 
 /* =========================
-   DARK (explicit class)
+   DARK
 ========================= */
 body.dark {
-  --page-bg-color: #161b22;
-  --container-color: #182327;
-  --container-bg-color: #282c34;
-  --border-color: #475059;
+  --page-bg-color: #0d1117;
+  --container-color: #161b22;
+  --container-bg-color: #21262d;
+  --border-color: #30363d;
   --text-color: #e6edf3;
-  --text-2-color: #475059;
-  --link-color: #58A6FF;
-  --link-hover-color: #58A6FF;
+  --text-2-color: #8b949e;
+  --link-color: #58a6ff;
+  --link-hover-color: #8bb9ff;
+}
+
+/* =========================
+MIDNIGHT
+========================= */
+body.midnight {
+  --page-bg-color: #05050f;
+  --container-color: #0d0d1a;
+  --container-bg-color: #161625;
+  --border-color: #404066;
+  --text-color: #e6e6ff;
+  --text-2-color: #9e9ed6;
+  --link-color: #6c7ff9;
+  --link-hover-color: #a0b3ff;
 }
 
 /* =========================
@@ -60,7 +74,7 @@ body.sky-blue {
 body.matcha {
   --page-bg-color: #eaf4ec;
   --container-color: #dcefe0;
-  --container-bg-color: #cde3d2;
+  --container-bg-color: #d3edd9;
   --border-color: #7aa889;
   --text-color: #1f3d2b;
   --text-2-color: #7aa889;
