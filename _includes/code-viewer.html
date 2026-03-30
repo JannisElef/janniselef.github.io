@@ -1,76 +1,124 @@
 
-<div class="content-wrapper" id="content-wrapper-{{ include.file | replace:'/','-' | replace:'.','-' }}">
+<div class="code-loader-container" style="margin-bottom: 20px;">
+  <div class="content-wrapper" id="wrapper-{{ include.file | replace:'/','-' | replace:'.','-' }}">
+    
     <div class="content-header">
-        <a class="content-filename" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
-            🔗 {{include.file | split: "/" | last }}
+      <div class="header-left" style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+        <span class="material-icons">code</span>
+        <a class="content-filename" 
+           href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" 
+           target="_blank" rel="noopener noreferrer"
+           style="text-decoration: none; color: inherit;">
+           {{ include.file | split: "/" | last }}
         </a>
-        <button class="content-copy" id="copy-{{ include.file | replace:'/','-' | replace:'.','-' }}">⧉ Copy</button>
+        
+        <div class="header-meta" style="display: flex; gap: 4px; opacity: 0.5; font-size: 0.75rem;">
+          {% if include.filesize %}
+            <span class="filesize-badge">({{ include.filesize }}</span>
+          {% endif %}
+          
+          <span id="line-count-{{ include.file | replace:'/','-' | replace:'.','-' }}"></span>
+          
+          {% if include.filesize %}<span>)</span>{% endif %}
+        </div>
+      </div>
+
+      <div class="content-buttons">
+        <button id="copy-{{ include.file | replace:'/','-' | replace:'.','-' }}" title="Copy Code">
+          <span class="material-icons">content_copy</span>
+          <span class="btn-text">Copy</span>
+        </button>
+
+        <a href="{{ cdn }}{{ include.file }}" download="{{ include.file | split: '/' | last }}" style="text-decoration: none;">
+          <button type="button" title="Download File">
+            <span class="material-icons">file_download</span>
+          </button>
+        </a>
+      </div>
     </div>
 
-    <pre class="highlight">
-        <code id="content-block-{{ include.file | replace:'/','-' | replace:'.','-' }}"></code>
-    </pre>
+    <div class="code-viewport" style="background: var(--container-bg-color); border-radius: 0 0 8px 8px; overflow: hidden; border: 1px solid var(--border-color); border-top: none;">
+        <pre class="highlight" style="margin: 0; padding: 1rem; max-height: 500px; overflow: auto;">
+            <code id="content-block-{{ include.file | replace:'/','-' | replace:'.','-' }}">Loading code...</code>
+        </pre>
+    </div>
+  </div>
 </div>
 
 <script>
-    (async function(){
+(async function(){
     const url = "{{ cdn }}{{ include.file }}";
     const safeId = "{{ include.file | replace:'/','-' | replace:'.','-' }}";
     const block = document.getElementById("content-block-" + safeId);
+    const lineCountSpan = document.getElementById("line-count-" + safeId);
     const copyBtn = document.getElementById("copy-" + safeId);
+    const copyIcon = copyBtn.querySelector('.material-icons');
+    const copyText = copyBtn.querySelector('.btn-text');
 
     let loaded = false;
+    let rawText = "";
+
     async function loadCode(){
         if(loaded) return;
         loaded = true;
 
-        const res = await fetch(url);
-        const text = await res.text();
-        block.textContent = text.trim();
+        try {
+            const res = await fetch(url);
+            rawText = await res.text();
+            const trimmedText = rawText.trim();
+            block.textContent = trimmedText;
 
-        // Langauge from extension
-        const ext = url.split('.').pop().toLowerCase();
-        const langMap = {
-        c:"c", cpp:"cpp", h:"c", hpp:"cpp", js:"javascript", ts:"typescript",
-        py:"python", json:"json", html:"xml", css:"css", sh:"bash", yml:"yaml", yaml:"yaml"
-        };
-        if(langMap[ext]) block.classList.add("language-" + langMap[ext]);
+            // Automatische Zeilenberechnung
+            const lines = trimmedText.split('\n').length;
+            const sizeExists = "{{ include.filesize }}" !== "";
+            lineCountSpan.textContent = (sizeExists ? " • " : "(" ) + lines + " lines" + (sizeExists ? "" : ")");
 
-        // Highlight.js
-        async function initHLJS(){
-        if(!window.hljs){
-            await new Promise(res=>{
-            const s = document.createElement('script');
-            s.src = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js";
-            s.onload = res;
-            document.head.appendChild(s);
-            });
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css";
-            document.head.appendChild(link);
+            // Language Mapping
+            const ext = url.split('.').pop().toLowerCase();
+            const langMap = {
+                c:"c", cpp:"cpp", h:"c", hpp:"cpp", js:"javascript", ts:"typescript",
+                py:"python", json:"json", html:"xml", css:"css", sh:"bash", yml:"yaml", yaml:"yaml"
+            };
+            if(langMap[ext]) block.classList.add("language-" + langMap[ext]);
+
+            // Highlight.js
+            if(!window.hljs){
+                await new Promise(res=>{
+                    const s = document.createElement('script');
+                    s.src = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js";
+                    s.onload = res;
+                    document.head.appendChild(s);
+                });
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github-dark.min.css";
+                document.head.appendChild(link);
+            }
+            hljs.highlightElement(block);
+        } catch (e) {
+            block.textContent = "Error loading code.";
         }
-        hljs.highlightElement(block);
-        }
-        await initHLJS();
-
-        // Copy-Button
-        copyBtn.onclick = async ()=>{
-        await navigator.clipboard.writeText(text);
-        copyBtn.textContent='Copied!';
-        setTimeout(()=>copyBtn.textContent='Copy',1500);
-        };
     }
 
-    // Lazy load
+    copyBtn.onclick = async ()=>{
+        if(!rawText) return;
+        await navigator.clipboard.writeText(rawText);
+        copyIcon.textContent = 'check';
+        copyText.textContent = 'Copied!';
+        setTimeout(()=>{
+            copyIcon.textContent = 'content_copy';
+            copyText.textContent = 'Copy';
+        }, 2000);
+    };
+
     const observer = new IntersectionObserver(entries=>{
         entries.forEach(entry=>{
-        if(entry.isIntersecting){
-            loadCode();
-            observer.disconnect();
-        }
+            if(entry.isIntersecting){
+                loadCode();
+                observer.disconnect();
+            }
         });
     });
     observer.observe(block.parentNode);
-    })();
+})();
 </script>

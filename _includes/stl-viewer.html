@@ -1,21 +1,45 @@
 
-<div class="stl-container" style="position: relative;">
-
-  <div class="content-wrapper" id="content-wrapper-{{ include.file | replace:'/','-' | replace:'.','-' }}">
+<div class="stl-container" style="position: relative; margin-bottom: 20px;">
+  <div class="content-wrapper" id="wrapper-{{ include.id }}">
+    
     <div class="content-header">
-      <a class="content-filename" href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" target="_blank" rel="noopener noreferrer">
-        🔗 {{include.file | split: "/" | last }}
-      </a>
+      <div class="header-left" style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+        <span class="material-icons">view_in_ar</span>
+        <a class="content-filename" 
+           href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" 
+           target="_blank" rel="noopener noreferrer"
+           style="text-decoration: none; color: inherit;">
+           {{ include.file | split: "/" | last }}
+        </a>
+        {% if include.filesize %}
+          <span class="filesize-badge" style="opacity: 0.5; font-size: 0.75rem;">({{ include.filesize }})</span>
+        {% endif %}
+      </div>
+
       <div class="content-buttons">
-        <button id="load-stl-{{ include.id }}">👁 View</button>
-        <button id="download-stl-{{ include.id }}" class="stl-download">⭳ Download</button>
+        <button id="reset-stl-{{ include.id }}" style="display: none;" title="Reset View">
+          <span class="material-icons">restart_alt</span>
+        </button>
+
+        <button id="load-stl-{{ include.id }}">
+          <span class="material-icons">visibility</span>
+          <span>View</span>
+        </button>
+
+        <a href="{{ cdn }}{{ include.file }}" download="{{ include.file | split: '/' | last }}" style="text-decoration: none;">
+          <button type="button" title="Download STL">
+            <span class="material-icons">file_download</span>
+          </button>
+        </a>
+
+        <button id="close-stl-{{ include.id }}" style="display: none;" title="Close Viewer">
+          <span class="material-icons">close</span>
+        </button>
       </div>
     </div>
 
-    <div id="stl-viewer-{{ include.id }}" style="width:100%; height:300px; display:none; position:relative;"></div>
-
+    <div id="stl-viewer-{{ include.id }}" style="width:100%; height:400px; display:none; position:relative; background: var(--container-bg-color); border-radius: 0 0 8px 8px;"></div>
   </div>
-  
 </div>
 
 <script type="importmap">
@@ -27,139 +51,102 @@
 </script>
 
 <script type="module">
-
 import * as THREE from "three";
 import { STLLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
 
-const btn = document.getElementById("load-stl-{{ include.id }}");
-const container = document.getElementById("stl-viewer-{{ include.id }}");
-const downloadBtn = document.getElementById("download-stl-{{ include.id }}");
+(function() {
+  const id = "{{ include.id }}";
+  const stlUrl = "{{ cdn }}{{ include.file }}";
+  
+  const loadBtn = document.getElementById(`load-stl-${id}`);
+  const resetBtn = document.getElementById(`reset-stl-${id}`);
+  const closeBtn = document.getElementById(`close-stl-${id}`);
+  const container = document.getElementById(`stl-viewer-${id}`);
 
-btn.addEventListener("click", () => {
+  let scene, camera, renderer, controls, mesh, edgeLines, animationId, rotationTimeout;
+  let isInteracting = false;
 
-  btn.style.display = "none";
-  container.style.display = "block";
-
-  const scene = new THREE.Scene();
-
-  const camera = new THREE.PerspectiveCamera(
-    75,
-    container.clientWidth / container.clientHeight,
-    0.1,
-    1000
-  );
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.domElement.style.borderRadius = "8px";
-  renderer.domElement.style.border = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim()}`;
-  container.appendChild(renderer.domElement);
-
-  const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  keyLight.position.set(5,5,5);
-  scene.add(keyLight);
-
-  const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
-  backLight.position.set(-5,3,-5);
-  scene.add(backLight);
-
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x888888, 0.8);
-  scene.add(hemi);
-
-  const loader = new STLLoader();
-
-  let mesh = null;
-  let edgeLines = null;
-
-  // Auto-Rotation
-  let autoRotate = true;
-  let resumeTimeout = null;
-  const resumeDelay = 5000;
-
-  function stopAutoRotateTemporarily() {
-    autoRotate = false;
-
-    if (resumeTimeout) clearTimeout(resumeTimeout);
-
-    resumeTimeout = setTimeout(() => {
-      autoRotate = true;
-    }, resumeDelay);
+  if (loadBtn) {
+    loadBtn.onclick = () => {
+      loadBtn.style.display = "none";
+      resetBtn.style.display = "flex";
+      closeBtn.style.display = "flex";
+      container.style.display = "block";
+      initSTLViewer();
+    };
   }
 
-  loader.load("{{ cdn }}{{ include.file }}", (geometry) => {
+  function initSTLViewer() {
+    scene = new THREE.Scene();
+    const style = getComputedStyle(document.body);
+    const bgColor = style.getPropertyValue('--container-bg-color').trim() || '#282c34';
+    const edgeColor = style.getPropertyValue('--border-color').trim() || '#475059';
+    scene.background = new THREE.Color(bgColor);
 
-    geometry.computeBoundingSphere();
-    geometry.center();
-
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.4,
-      metalness: 0.1
-    });
-
-    mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-
-    const edges = new THREE.EdgesGeometry(geometry);
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x2e2e2e });
-    edgeLines = new THREE.LineSegments(edges, lineMaterial);
-    scene.add(edgeLines);
-
-    const radius = geometry.boundingSphere.radius;
-    camera.position.set(radius * 1.5, radius * 1.5, radius * 1.5);
-    camera.lookAt(geometry.boundingSphere.center);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-
-    // Interaction (Rotate/Pan)
-    renderer.domElement.addEventListener("pointerdown", (e) => {
-      if (e.button === 0 || e.button === 2) {
-        stopAutoRotateTemporarily();
-      }
-    });
-
-    renderer.domElement.addEventListener("touchstart", () => {
-      stopAutoRotateTemporarily();
-    });
-
-    function animate(){
-      requestAnimationFrame(animate);
-
-      if (autoRotate && mesh) {
-        mesh.rotation.y += 0.005;
-        edgeLines.rotation.y += 0.005;
-      }
-
-      controls.update();
-      renderer.render(scene, camera);
-
-      if(document.body.classList.contains("dark")){
-        scene.background = new THREE.Color(0x282c34);
-      }else{
-        scene.background = new THREE.Color(0xe8e8e8);
-      }
-    }
-    animate();
-
-  });
-
-  window.addEventListener("resize", () => {
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
-  });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
 
-});
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    light1.position.set(1, 1, 1);
+    scene.add(light1);
+    const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+    light2.position.set(-1, 0.5, -1);
+    scene.add(light2);
 
-downloadBtn.addEventListener("click", () => {
-  const link = document.createElement("a");
-  link.href = "{{ cdn }}{{ include.file }}";
-  link.download = "{{ include.file | split: '/' | last }}";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-});
+    const loader = new STLLoader();
+    loader.load(stlUrl, (geometry) => {
+      geometry.center();
+      geometry.computeBoundingSphere();
+      const material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.1 });
+      mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
 
+      const edges = new THREE.EdgesGeometry(geometry);
+      edgeLines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: new THREE.Color(edgeColor) }));
+      scene.add(edgeLines);
+
+      const radius = geometry.boundingSphere.radius;
+      camera.position.set(radius * 1.6, radius * 1.2, radius * 1.6);
+      
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 2.0;
+
+      container.addEventListener('mousedown', () => { isInteracting = true; controls.autoRotate = false; clearTimeout(rotationTimeout); });
+      container.addEventListener('touchstart', () => { isInteracting = true; controls.autoRotate = false; clearTimeout(rotationTimeout); });
+      window.addEventListener('mouseup', () => { if (isInteracting) { isInteracting = false; rotationTimeout = setTimeout(() => { controls.autoRotate = true; }, 5000); } });
+      window.addEventListener('touchend', () => { if (isInteracting) { isInteracting = false; rotationTimeout = setTimeout(() => { controls.autoRotate = true; }, 5000); } });
+
+      function animate() {
+        animationId = requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      container.style.display = "none";
+      resetBtn.style.display = "none";
+      closeBtn.style.display = "none";
+      loadBtn.style.display = "flex";
+      clearTimeout(rotationTimeout);
+      if (animationId) cancelAnimationFrame(animationId);
+      if (renderer) { renderer.dispose(); if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement); }
+      scene = null; renderer = null;
+    };
+  }
+
+  if (resetBtn) {
+    resetBtn.onclick = () => { if (controls) { controls.reset(); controls.autoRotate = true; } };
+  }
+})();
 </script>

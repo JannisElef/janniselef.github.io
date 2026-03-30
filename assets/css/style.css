@@ -201,9 +201,8 @@ a:hover {
     background: var(--link-hover-color);
 }
 
-.material-symbols-outlined {
-    line-height: 1;
-    display: block;
+.material-icons {
+    font-family: 'Material Icons'; 
 }
 
 .tag {
@@ -217,8 +216,13 @@ a:hover {
   border-radius: 4px;
 }
 
-
-
+.content-buttons .material-icons {
+    font-size: inherit !important; 
+    width: auto;
+    height: auto;
+    display: inline-block;
+    vertical-align: middle;
+}
 
 
 /* single image */
