@@ -7,6 +7,7 @@ repo: JannisElef/ricochet-robots
 branch: main
 tags: [Active]
 date: 2026-03-30
+redirect_url: https://janniselef.github.io/ricochet-robots/
 ---
 
 {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}

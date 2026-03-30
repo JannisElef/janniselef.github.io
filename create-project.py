@@ -269,6 +269,7 @@ repo: {full_repo}
 branch: main
 tags: [Active]
 date: {today}
+redirect_url: {repo_pages_url}
 ---
 """
 
