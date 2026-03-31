@@ -5,7 +5,7 @@ description: Ricochet Robots like puzzle.
 full_description: Ricochet Robots like puzzle - share maps and replays via tokens, links or QR codes.
 repo: JannisElef/ricochet-robots
 branch: main
-tags: [Active]
+tags: [Game, Active]
 date: 2026-03-30
 redirect_url: https://janniselef.github.io/ricochet-robots/
 ---

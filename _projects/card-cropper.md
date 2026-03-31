@@ -4,7 +4,7 @@ title: Card Cropper
 description: Online-Tool for editing scanned boardgame cards.
 repo: JannisElef/card-cropper
 branch: main
-tags: [Tool, Active]
+tags: [Website, Active]
 date: 2026-03-29
 redirect_url: https://janniselef.github.io/card-cropper/
 ---
