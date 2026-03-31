@@ -8,7 +8,8 @@
         <a class="content-filename" 
            href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" 
            target="_blank" rel="noopener noreferrer"
-           style="text-decoration: none; color: inherit;">
+           style="text-decoration: none; color: inherit;" 
+           title="Open GitHub source">
            {{ include.file | split: "/" | last }}
         </a>
         {% if include.filesize %}
@@ -32,7 +33,7 @@
           </button>
         </a>
 
-        <button id="close-stl-{{ include.id }}" style="display: none;" title="Close Viewer">
+        <button id="close-stl-{{ include.id }}" style="display: none;" title="Close View">
           <span class="material-icons">close</span>
         </button>
       </div>

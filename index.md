@@ -9,7 +9,7 @@ Hello 2
 
 
 <h1>
-    <a href="projects/" style="color: var(--text-color); text-decoration: none;">
+    <a href="projects/" style="color: var(--text-color); text-decoration: none;" title="View all projects">
         Projects
     </a>
 </h1>
@@ -32,7 +32,7 @@ Hello 2
 
 
 <h1>
-    <a href="games/" style="color: var(--text-color); text-decoration: none;">
+    <a href="games/" style="color: var(--text-color); text-decoration: none;" title="View all games">
         Games
     </a>
 </h1>

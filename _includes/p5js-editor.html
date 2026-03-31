@@ -31,7 +31,8 @@
         <a class="content-filename"
            href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ _file }}"
            target="_blank" rel="noopener noreferrer"
-           style="text-decoration: none; color: inherit;">
+           style="text-decoration: none; color: inherit;" 
+           title="Open GitHub source">
           {{ _file | split: "/" | last }}
         </a>
       {% else %}

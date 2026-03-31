@@ -1,7 +1,7 @@
 
 {% assign item = include.project | default: include.game %}
 
-<a class="item-card" href="{{ item.url }}">
+<a class="item-card" href="{{ item.url }}" title="Open">
     
     {% if item.repo %}
         {% assign branch = item.branch | default: "main" %}
@@ -39,7 +39,7 @@
     </div>
 
     {% if item.redirect_url %}
-    <div class="item-card-redirect-button" 
+    <div class="item-card-redirect-button" title="Open in new Tab"
         onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.redirect_url }}', '_blank')">
         <span class="material-icons">
             {% if include.game %}play_arrow{% elsif include.project %}open_in_new{% endif %}
