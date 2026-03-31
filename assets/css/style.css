@@ -26,6 +26,10 @@ header {
   padding: 1rem 1rem 1rem 1rem;
   gap: 2rem;
   flex-wrap: wrap;
+
+  position: sticky;
+  top: 20px;
+  z-index: 100;
 }
 
 header h1 {
@@ -47,6 +51,17 @@ body {
 
   max-width: 1600px;
   margin: 0 auto;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px; 
+  background: var(--page-bg-color);
+  z-index: 99;
 }
 
 body.dark .nav-icons a::after {
@@ -120,15 +135,13 @@ a:hover {
 .nav { 
   display: flex;
   align-items: center;
-  gap: 2.5rem;
   flex-wrap: wrap; 
 }
+
 .nav-left a {
   margin-right: 20px;
 }
-.nav-right {
-  gap: 1.5rem;
-}
+
 
 #themeSelect {
   background: var(--container-bg-color);
@@ -275,7 +288,7 @@ footer {
   display: flex;
   justify-content: center; 
   align-items: center; 
-  margin: 0px 20px 20px 20px;
+  margin: 0px 20px 10px 20px;
 }
 
 
