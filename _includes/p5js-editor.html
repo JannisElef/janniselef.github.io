@@ -24,30 +24,47 @@
 
 <div class="content-wrapper p5-editor-wrapper" id="p5-editor-{{ _id }}">
 
-  <!-- Header bar -->
   <div class="content-header">
-    {% if _file != '' %}
-      <a class="content-filename"
-         href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ _file }}"
-         target="_blank" rel="noopener noreferrer">
-        🔗 {{ _file | split: "/" | last }}
-      </a>
-    {% else %}
-      <span class="content-filename">p5.js sketch</span>
-    {% endif %}
+    <div class="header-left" style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+      <span class="material-icons">code</span>
+      {% if _file != '' %}
+        <a class="content-filename"
+           href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ _file }}"
+           target="_blank" rel="noopener noreferrer"
+           style="text-decoration: none; color: inherit;">
+          {{ _file | split: "/" | last }}
+        </a>
+      {% else %}
+        <span class="content-filename">p5.js sketch</span>
+      {% endif %}
+    </div>
+
     <div class="content-buttons">
-      <button class="p5-btn-run"   data-target="{{ _id }}">▶ &nbsp; Run</button>
-      <button class="p5-btn-stop"  data-target="{{ _id }}" style="display:none">■ Stop</button>
-      <button class="p5-btn-reset" data-target="{{ _id }}">↺ &nbsp; Reset</button>
-      <button class="p5-btn-copy"  data-target="{{ _id }}">⧉ Copy</button>
-      <button class="p5-btn-save"  data-target="{{ _id }}" style="display:none">⭳ Save</button>
+      <button class="p5-btn-run" data-target="{{ _id }}" title="Run Sketch">
+        <span class="material-icons">play_arrow</span>
+        <span class="btn-text">Run</span>
+      </button>
+      <button class="p5-btn-stop" data-target="{{ _id }}" style="display:none" title="Stop Sketch">
+        <span class="material-icons">stop</span>
+        <span class="btn-text">Stop</span>
+      </button>
+      <button class="p5-btn-reset" data-target="{{ _id }}" title="Reset Sketch">
+        <span class="material-icons">refresh</span>
+        <span class="btn-text">Reset</span>
+      </button>
+      <button class="p5-btn-copy" data-target="{{ _id }}" title="Copy Code">
+        <span class="material-icons">content_copy</span>
+        <span class="btn-text">Copy</span>
+      </button>
+      <button class="p5-btn-save" data-target="{{ _id }}" style="display:none" title="Download Image">
+        <span class="material-icons">file_download</span>
+        <span class="btn-text">Save</span>
+      </button>
     </div>
   </div>
 
-  <!-- Editor + Preview -->
   <div class="p5-body" data-height="{{ _height }}" style="height:340px">
 
-    <!-- Code editor (textarea + highlight overlay) -->
     <div class="p5-editor-pane">
       <div class="p5-editor-inner">
         <pre class="p5-highlight" id="p5-hl-{{ _id }}" aria-hidden="true"><code class="language-javascript"></code></pre>
@@ -73,16 +90,12 @@ function draw() {
       </div>
     </div>
 
-    <!-- Resize handle -->
     <div class="p5-resize-handle" data-target="{{ _id }}"></div>
 
-    <!-- Preview pane -->
     <div class="p5-preview-pane" id="p5-preview-{{ _id }}">
       <div class="p5-placeholder">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35">
-          <polygon points="5 3 19 12 5 21 5 3"/>
-        </svg>
-        <span>Press <strong>▶ &nbsp; Run</strong> to start</span>
+        <span class="material-icons" style="font-size: 32px; opacity: 0.5;">play_circle_outline</span>
+        <span>Press <strong>Run</strong> to start</span>
       </div>
     </div>
 
@@ -93,6 +106,9 @@ function draw() {
 <style id="p5-editor-style">
 .p5-editor-wrapper .content-header button {
   color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .p5-body {
@@ -120,7 +136,6 @@ function draw() {
 /* ── Overlay: pre and textarea share IDENTICAL metrics ── */
 .p5-highlight,
 .p5-code {
-  /* identical box model */
   position: absolute;
   inset: 0;
   margin: 0;
@@ -129,23 +144,20 @@ function draw() {
   width: 100%;
   height: 100%;
 
-  /* identical typography — must match pixel-for-pixel */
   font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
-  font-size: 13.5px;          /* px not rem — avoids sub-pixel differences */
-  line-height: 21px;          /* px not em */
+  font-size: 13.5px;
+  line-height: 21px;
   letter-spacing: 0;
   tab-size: 2;
   -moz-tab-size: 2;
 
-  /* identical wrapping */
   white-space: pre;
   word-wrap: normal;
   overflow-wrap: normal;
 }
 
-/* Highlight layer — behind, never interactive */
 .p5-highlight {
-  overflow: hidden;           /* scrolled via JS mirror */
+  overflow: hidden;
   pointer-events: none;
   border: none;
   background: transparent !important;
@@ -164,7 +176,6 @@ function draw() {
   margin: 0;
 }
 
-/* Textarea — on top, text invisible so highlight shows */
 .p5-code {
   overflow-y: scroll;
   overflow-x: auto;
@@ -178,13 +189,11 @@ function draw() {
   z-index: 1;
 }
 
-/* Single styled scrollbar */
 .p5-code::-webkit-scrollbar         { width: 8px; height: 8px; }
 .p5-code::-webkit-scrollbar-track   { background: transparent; }
 .p5-code::-webkit-scrollbar-thumb   { background: var(--border-color); border-radius: 4px; }
 .p5-code::-webkit-scrollbar-thumb:hover { background: rgba(180,180,180,.6); cursor: auto; }
 
-/* Resize handle */
 .p5-resize-handle {
   width: 5px;
   background: var(--border-color);
@@ -196,7 +205,6 @@ function draw() {
 .p5-resize-handle:hover,
 .p5-resize-handle.dragging { background: rgba(180,180,180,.6); }
 
-/* Preview pane */
 .p5-preview-pane {
   flex: 1 1 50%;
   min-width: 80px;
@@ -208,7 +216,6 @@ function draw() {
 
 .p5-preview-pane canvas { display: block; }
 
-/* Placeholder */
 .p5-placeholder {
   position: absolute;
   inset: 0;
@@ -252,18 +259,15 @@ function draw() {
     const code = pre.querySelector('code');
     if (!code) return;
 
-    // Mirror scroll
     pre.scrollTop  = ta.scrollTop;
     pre.scrollLeft = ta.scrollLeft;
 
-    // Use hljs.highlight() — never mutates inline styles
     if (window.hljs) {
       code.innerHTML = hljs.highlight(ta.value, { language: 'javascript', ignoreIllegals: true }).value;
     } else {
       code.textContent = ta.value;
     }
 
-    // Hard-reset any background hljs might inject via classes
     pre.style.cssText  = 'background:transparent!important;box-shadow:none;padding:14px 16px;';
     code.style.cssText = 'background:transparent!important;padding:0;';
   }
@@ -278,18 +282,16 @@ function draw() {
       if (pre) { pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; }
     });
 
-    // Poll until hljs ready, then highlight
     (function tryInit() {
       if (window.hljs) syncHighlight(id);
       else setTimeout(tryInit, 80);
     })();
 
-    // Re-highlight after theme toggle — wait for new hljs stylesheet to load
     new MutationObserver(() => {
       const link = document.getElementById('hljs-theme');
       if (link) {
         link.addEventListener('load', () => syncHighlight(id), { once: true });
-        setTimeout(() => syncHighlight(id), 300); // fallback
+        setTimeout(() => syncHighlight(id), 300);
       } else {
         setTimeout(() => syncHighlight(id), 100);
       }
@@ -328,7 +330,6 @@ function draw() {
 
     inst.resizeCanvas(capW, newH);
 
-    // Snap editor width so scrollbar sits flush with canvas edge
     const body       = preview.closest('.p5-body');
     const editorPane = body && body.querySelector('.p5-editor-pane');
     if (body && editorPane) {
@@ -339,14 +340,13 @@ function draw() {
         preview.style.flex     = 'none';
         preview.style.width    = capW + 'px';
       }
-      // Adjust body height so square canvas stays square
       body.style.height = newH + 'px';
     }
   }
 
   /* ── Sketch control ──────────────────────────────────────────────────── */
   function stopSketch(id) {
-    if (instances[id]) instances[id].noLoop(); // keep last frame
+    if (instances[id]) instances[id].noLoop();
     const w = document.getElementById('p5-editor-' + id);
     if (w) {
       w.querySelector('.p5-btn-run').style.display  = '';
@@ -390,8 +390,8 @@ function draw() {
     if (preview) {
       preview.innerHTML =
         '<div class="p5-placeholder">'
-        + '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
-        + '<span>Press <strong>&#9654; Run</strong> to start</span></div>';
+        + '<span class="material-icons" style="font-size: 32px; opacity: 0.5;">play_circle_outline</span>'
+        + '<span>Press <strong>Run</strong> to start</span></div>';
     }
     const w = document.getElementById('p5-editor-' + id);
     if (w) {
@@ -451,12 +451,10 @@ function draw() {
 
   /* ── Init ────────────────────────────────────────────────────────────── */
   async function initAll() {
-    // Apply heights
     document.querySelectorAll('.p5-body[data-height]').forEach(el => {
       el.style.height = el.dataset.height + 'px';
     });
 
-    // Init editors
     for (const ta of document.querySelectorAll('.p5-code')) {
       enableTab(ta);
       const id = ta.id.replace('p5-code-', '');
@@ -468,7 +466,6 @@ function draw() {
 
     document.querySelectorAll('.p5-resize-handle').forEach(enableResize);
 
-    // Button delegation
     document.addEventListener('click', e => {
       const btn = e.target.closest('button[data-target]');
       if (!btn) return;
@@ -481,9 +478,16 @@ function draw() {
         const ta = getTextarea(id);
         if (!ta) return;
         navigator.clipboard.writeText(ta.value).then(() => {
-          const orig = btn.textContent;
-          btn.textContent = 'Copied!';
-          setTimeout(() => btn.textContent = orig, 1400);
+          const iconSpan = btn.querySelector('.material-icons');
+          const textSpan = btn.querySelector('.btn-text');
+          
+          if (iconSpan) iconSpan.textContent = 'check';
+          if (textSpan) textSpan.textContent = 'Copied!';
+          
+          setTimeout(() => {
+            if (iconSpan) iconSpan.textContent = 'content_copy';
+            if (textSpan) textSpan.textContent = 'Copy';
+          }, 1400);
         });
         return;
       }
@@ -510,7 +514,6 @@ function draw() {
       }
     });
 
-    // Ctrl/Cmd+Enter to run
     document.addEventListener('keydown', e => {
       if (!(e.ctrlKey || e.metaKey) || e.key !== 'Enter') return;
       const ta = e.target.closest('.p5-code');
