@@ -15,9 +15,9 @@ date: 2026-03-14
 
 ---
 
-## Table of contents
-* TOC
-{:toc}
+{% include table-of-contents.html %}
+
+---
 
 
 <!-- START --->
