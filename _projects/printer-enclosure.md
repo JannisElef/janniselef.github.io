@@ -15,45 +15,20 @@ date: 2026-03-15
 
 ---
 
+{% include table-of-contents.html %}
+
+---
+
+
 <!-- START --->
 
 ## Circuit Diagram
 
-<a href="{{ cdn }}/assets/img/schematic.png" class="img-preview">
-  <img src="{{ cdn }}/assets/img/schematic.png" alt="Circuit Diagram">
-</a>
-
-## STL Viewer
-
-{% assign stl = cdn | append: "/assets/stl/default_cube.stl" %}
-
-{% include stl-viewer.html 
-file="/assets/stl/default_cube.stl"
-id="default_cube"
+{% include image-viewer.html 
+   image="/assets/img/schematic.png" 
+   id="schematic" 
+   filesize="89.8 KB"
 %}
-
-
-
-## Code Block
-
-```c
-// C code
-#include <stdio.h>
-
-int main() {
-    printf("Hello, User!\n");
-    return 0;
-}
-```
-
-```json
-{
-  "firstName": "Jannis",
-  "lastName": "Elef",
-  "age": 20
-}
-```
-
 
 
 <!-- END --->

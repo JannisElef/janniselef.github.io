@@ -7,12 +7,18 @@ branch: main
 tags: [3D-Print, Finished]
 date: 2026-03-16
 ---
-        
+
+
 {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}
 
 {% include readme-loader.html %} 
 
 ---
+
+{% include table-of-contents.html %}
+
+---
+
 
 <!-- START --->
 
@@ -36,6 +42,7 @@ The tile for making the classic Catan border is three segments wide, six of them
 {% include stl-viewer.html 
 file="/assets/stl/Catan Border-Tiles Three_Angled.stl"
 id="stl-three_angled"
+filesize="15.5 KB"
 %}
 
 ## My Version
@@ -46,10 +53,13 @@ The two tiles are interchangeable with the other tiles.
 {% include stl-viewer.html 
 file="/assets/stl/Catan Border-Tiles Two_Angled.stl"
 id="stl-two_angled"
+filesize="14.7 KB"
 %}
+
 {% include stl-viewer.html 
 file="/assets/stl/Catan Border-Tiles One_Flat.stl"
 id="stl-one_flat"
+filesize="14.5 KB"
 %}
 
 [-> View all Tiles](https://github.com/{{ page.repo }}/tree/main/assets/stl)

@@ -9,18 +9,24 @@ date: 2026-03-29
 redirect_url: https://janniselef.github.io/card-cropper/
 ---
 
+
 {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}
 
 {% include readme-loader.html %} 
 
 ---
 
+{% include table-of-contents.html %}
+
+---
+
+
 <!-- START --->
 
 
 {% include image-viewer.html 
-   file="/assets/img/card_result.png" 
-   id="render-01" 
+   image="/assets/img/card_result.png" 
+   id="card_result" 
    filesize="8.98 MB"
 %}
 
