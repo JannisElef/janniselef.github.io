@@ -11,3 +11,5 @@ collections:
     permalink: /games/:name/
 
 markdown: kramdown
+kramdown:
+  toc_levels: 1..3
