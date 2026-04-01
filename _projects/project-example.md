@@ -19,24 +19,14 @@ date: 2026-03-14
 
 ## Image Test from [Repository](https://github.com/{{ page.repo }})
 
-<div class="image-grid">
-  {% assign images = 
-    "
-    /assets/img/thumbnail.png,
-    /assets/img/thumbnail.png,
-    /assets/img/thumbnail.png,
-    /assets/img/thumbnail.png
-    "
-    | split: "," %}
-
-  {% for img in images %}
-    <a href="{{ cdn }}{{ img | strip }}" 
-      class="image-item"
-      title="View">
-      <img src="{{ cdn }}{{ img | strip }}" alt="{{ img | split: '/' | last }}">
-    </a>
-  {% endfor %}
-</div>
+{% include image-grid.html 
+images="
+  /assets/img/thumbnail.png,
+  /assets/img/thumbnail.png,
+  /assets/img/thumbnail.png,
+  /assets/img/thumbnail.png
+"
+%}
 
 ## List
 

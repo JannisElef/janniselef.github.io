@@ -18,23 +18,15 @@ date: 2026-03-16
 
 ## Example Images
 
-<div class="image-grid">
-  {% assign images = 
-    "
-    /assets/img/thumbnail.jpg,
-    /assets/img/Catan Border-Tiles_Base.jpg,
-    /assets/img/Catan Border-Tiles_Seafarers.jpg,
-    /assets/img/Catan Border-Tiles_closeup1.jpg,
-    /assets/img/Catan Border-Tiles_closeup2.jpg
-    "
-    | split: "," %}
-
-  {% for img in images %}
-    <a href="{{ cdn }}{{ img | strip }}" class="image-item">
-      <img src="{{ cdn }}{{ img | strip }}" alt="{{ img | split: '/' | last }}">
-    </a>
-  {% endfor %}
-</div>
+{% include image-grid.html 
+images="
+  /assets/img/thumbnail.jpg,
+  /assets/img/Catan Border-Tiles_Base.jpg,
+  /assets/img/Catan Border-Tiles_Seafarers.jpg,
+  /assets/img/Catan Border-Tiles_closeup1.jpg,
+  /assets/img/Catan Border-Tiles_closeup2.jpg
+"
+%}
 
 
 ## Main Tile
