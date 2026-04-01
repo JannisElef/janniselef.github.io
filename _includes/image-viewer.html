@@ -6,11 +6,11 @@
       <div class="header-left" style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
         <span class="material-icons">image</span>
         <a class="content-filename" 
-          href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.file }}" 
+          href="https://github.com/{{ page.repo }}/blob/{{ page.branch }}{{ include.image }}" 
           target="_blank" rel="noopener noreferrer"
           style="text-decoration: none; color: inherit;" 
           title="Open GitHub source">
-          {{ include.file | split: "/" | last }}
+          {{ include.image | split: "/" | last }}
         </a>
         {% if include.filesize %}
           <span class="filesize-badge" style="opacity: 0.5; font-size: 0.75rem;">({{ include.filesize }})</span>
@@ -31,7 +31,7 @@
           <span class="material-icons">file_download</span>
         </button>
 
-        <a href="{{ cdn }}{{ include.file }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+        <a href="{{ cdn }}{{ include.image }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
           <button type="button" title="Open in new Tab">
             <span class="material-icons">open_in_new</span>
           </button>
@@ -45,7 +45,7 @@
 
     <div id="image-viewer-{{ include.id }}" style="display: none; width: 100%; height: 450px; background: var(--container-bg-color); overflow: hidden; cursor: grab; position: relative; touch-action: none;">
         <div id="panzoom-parent-{{ include.id }}" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-            <img id="target-img-{{ include.id }}" src="{{ cdn }}{{ include.file }}" 
+            <img id="target-img-{{ include.id }}" src="{{ cdn }}{{ include.image }}" 
                  style="width: 100%; height: 100%; object-fit: contain; display: block; transform-origin: center;">
         </div>
     </div>
@@ -113,8 +113,8 @@
 
   if (downloadBtn) {
     downloadBtn.addEventListener("click", async () => {
-      const imageUrl = "{{ cdn }}{{ include.file }}";
-      const fileName = "{{ include.file | split: '/' | last }}";
+      const imageUrl = "{{ cdn }}{{ include.image }}";
+      const fileName = "{{ include.image | split: '/' | last }}";
       try {
         const response = await fetch(imageUrl);
         const blob = await response.blob();
