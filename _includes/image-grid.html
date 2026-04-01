@@ -1,0 +1,12 @@
+
+<div class="image-grid">
+  {% assign images = include.images | split: "," %}
+  {% for img in images %}
+    {% assign img_path = img | strip %}
+    <a href="{{ cdn }}{{ img_path }}" 
+       class="image-item"
+       title="View {{ img_path | split: '/' | last }}">
+      <img src="{{ cdn }}{{ img_path }}" alt="{{ img_path | split: '/' | last }}">
+    </a>
+  {% endfor %}
+</div>
