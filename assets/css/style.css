@@ -1,12 +1,17 @@
-
-
 /* mobile */
 @media (max-width: 768px) {
 
-  .container { flex-direction: column; }
-  #sidebar {display: none; }
+  .container {
+    flex-direction: column;
+  }
 
-  .nav-icons { display: none; }
+  #sidebar {
+    display: none;
+  }
+
+  .nav-icons {
+    display: none;
+  }
 
 }
 
@@ -14,13 +19,15 @@ html {
   scroll-behavior: smooth;
 }
 
-header, aside, main {
+header,
+aside,
+main {
   background: var(--container-color);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0px 20px 20px 20px;
   margin: 20px 20px 0px 20px;
-  
+
 }
 
 header {
@@ -38,7 +45,7 @@ header {
 
 header h1 {
   margin: 0;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 header a {
@@ -63,13 +70,13 @@ body::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 32px; 
+  height: 32px;
   background: var(--page-bg-color);
   z-index: 99;
 }
 
 body.dark .nav-icons a::after {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 
@@ -94,7 +101,7 @@ button {
   background: var(--container-color);
   color: var(--text-color);
 
-  transition: 
+  transition:
     opacity 0.15s ease,
     background 0.15s ease,
     border-color 0.15s ease,
@@ -114,14 +121,17 @@ hr {
 }
 
 
-h1, h2 {
+h1,
+h2 {
   font-family: "Domine", serif;
+  scroll-margin-top: 170px;
 }
 
 a {
   color: var(--link-color);
   text-decoration: none;
 }
+
 a:hover {
   opacity: 0.8;
   color: var(--link-hover-color);
@@ -135,10 +145,10 @@ a:hover {
 }
 
 /* Navigation */
-.nav { 
+.nav {
   display: flex;
   align-items: center;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
 }
 
 .nav-left a {
@@ -160,9 +170,10 @@ a:hover {
 /* Item Cards */
 .item-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
 }
+
 .item-card {
   display: block;
   position: relative;
@@ -173,52 +184,55 @@ a:hover {
   color: inherit;
   transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .item-card img {
   width: 100%;
   height: 180px;
   object-fit: cover;
   border-radius: 6px;
 }
+
 .item-card:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   color: var(--text-color);
   text-decoration: none !important;
 }
+
 .item-date {
   font-size: 12px;
   opacity: 0.5;
 }
 
 .item-card-redirect-button {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
 
-    width: 44px;
-    height: 44px;
+  width: 44px;
+  height: 44px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    background: var(--link-color);
-    color: var(--page-bg-color);
+  background: var(--link-color);
+  color: var(--page-bg-color);
 
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 2;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
 
-    transition: transform 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .item-card-redirect-button:hover {
-    transform: scale(1.1);
-    background: var(--link-hover-color);
+  transform: scale(1.1);
+  background: var(--link-hover-color);
 }
 
 .material-icons {
-    font-family: 'Material Icons'; 
+  font-family: 'Material Icons';
 }
 
 .tag {
@@ -233,11 +247,11 @@ a:hover {
 }
 
 .content-buttons .material-icons {
-    font-size: inherit !important; 
-    width: auto;
-    height: auto;
-    display: inline-block;
-    vertical-align: middle;
+  font-size: inherit !important;
+  width: auto;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 
@@ -262,7 +276,7 @@ a:hover {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   margin: 20px 0px 40px 0px;
-  
+
 }
 
 .image-item {
@@ -289,8 +303,8 @@ a:hover {
 
 footer {
   display: flex;
-  justify-content: center; 
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
   margin: 0px 20px 10px 20px;
 }
 
