@@ -6,6 +6,8 @@ repo: JannisElef/catan-border-tiles
 branch: main
 tags: [3D-Print, Finished]
 date: 2026-03-16
+
+image: /assets/img/thumbnail.jpg # if thumbnail is a jpg
 ---
 
 
