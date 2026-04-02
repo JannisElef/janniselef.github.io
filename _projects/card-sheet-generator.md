@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Card Sheet Generator
-description: Online-Tool for preparing print sheets for playingcards, refining scans, organizing and slicing them.
+description: Online-Tool for preparing print sheets for playing cards, refining scans, organizing and slicing them.
 repo: JannisElef/card-sheet-generator
 branch: main
 tags: [Website, Active]
@@ -25,7 +25,7 @@ redirect_url: https://janniselef.github.io/card-sheet-generator/
 
 ## From spreadsheet to printable cards
 
-Be it a digital spreadsheet you found online or a scan you've made: you can export the cards as PDF ready for convenient printing or as images for other usecases. 
+Be it a digital spreadsheet you found online or a scan you've made: you can export the cards as PDFs ready for convenient printing or as images for other use cases. 
 
 With the PDF export you can also use double sided printing with each cards backside automatically aligned, no need for manual alignment and testing hell!
 
@@ -39,9 +39,9 @@ images="
 %}
 
 
-## Preparing Cardsheets: Cropping
+## Preparing cardsheets: Cropping
 
-Sometimes reference sheets have wasteful padding, just crop it out. Maybe you only want a few cards; select the ones you'd like to print and continue without wasting precious ink on cards you don't need.
+Sometimes reference sheets have blocking/annoying padding - just crop it out. Maybe you only want a few cards; select the ones you'd like to print and continue without wasting precious ink on cards you don't need.
 
 
 {% include image-grid.html 
@@ -52,9 +52,9 @@ images="
 %}
 
 
-## View and finalize your selected Cards
+## View and finalize your selected cards
 
-Because not everything is perfect, you can edit your cards individually; crop out the small white edges, rename important cards or make copies of them, Carcassonne uses some tiles more often than others!
+Because not everything is perfect, you can edit your cards individually; crop out small white edges, rename important cards or make copies of them, Carcassonne uses some tiles more often than others!
 
 {% include image-grid.html 
 images="
@@ -67,9 +67,9 @@ images="
 
 ## Review and export your cards
 
-Now you've edited and copied your cards to completion. Before cluttering your disk with downloads you can preview the export PDF or simply download your card images in a zip archive.
+Now you've finished editing and duplicating your cards to completion. Before cluttering your disk with downloads you can preview the PDF or simply download your card images in a ZIP archive.
 
-Here you can also select which card is supposed to be the backprint of your other cards (see the Shuffle Forest example).
+Here you can also select which card should be used as the back print of your other cards (see the Shuffle Forest example).
 
 {% include image-grid.html 
 images="
@@ -81,7 +81,7 @@ images="
 "
 %}
 
-After using the zip Download option you can see a summary text file of the operations you did to the set of cards:
+After using the ZIP Download option you can see a summary text file of the operations you performed on the set of cards:
 
 ```text
 Card Grid Splitter — Export Summary
@@ -134,11 +134,11 @@ Corner Rad.:  3 mm
 023. Carcassonne_023.png (×4 copies)
 024. Carcassonne_024.png
 
-
 ```
 
+Optionally, you can also append this information to the PDF.
 
-With the PDF export, you don't have to worry about the output size of the cards being off after printing, you only have to declare the card's size once in the beginning.
+With the PDF export, you don't have to worry about the output size of the cards being incorrect after printing, you only have to declare the card size once at the beginning.
 
 {% include image-grid.html 
 images="
@@ -149,16 +149,16 @@ images="
 
 ## Example results
 
-Below are some results from scanned cards after using an old scanner with a 600 DPI setting.
+Below are some results from scanned cards using an old scanner at 600 DPI.
 
 
 
 ### Fixing scanned colors
 
-Scanning over-exposes your cards to pick up as much detail as possible. This results in the colors being off.
-With the tool you can minimize the scanner's effect on the colors by doing simple colorgrading.
+Scanning over-exposes your cards to pick up as much detail as possible. This causes the colors to be inaccurate.
+With the tool you can minimize the scanner's effect on the colors by doing simple color grading.
 
-In the example below I've used a raw scan of the german 1995 version of Catan's resource and development cards, you can see them being severly over-exposed. The other image is from an older version of the tool where I've tried mitigating/reversing the scanner's effect on the colors.
+In the example below I've used a raw scan of the German 1995 version of Catan's resource and development cards, you can see them being severely over-exposed. The other image is from an older version of the tool where I've tried mitigating or reversing the scanner's effect on the colors.
 
 {% include image-grid.html 
 images="
@@ -173,7 +173,7 @@ images="
 Scanning printed cards leads to the print pattern being picked up by the scanner, not just the color.
 One could use an AI image denoiser to try and smooth it for a cleaner reprint of the card.
 
-The first image is before and the second is after using an AI denoiser (in this case I've used the Nero AI image Denoiser with the anime preset). Note these cards aren't printed.
+The first image is before and the second is after using an AI denoiser (in this case I've used the Nero AI image denoiser with the anime preset). Note that these cards are not printed.
 
 {% include image-grid.html 
 images="
@@ -182,13 +182,14 @@ images="
 "
 %}
 
-I must say, the print pattern does look cool, maybe not for printing them out again though. Here's another one from "Cartographers" (Der Kartograph):
+I must say, the print pattern does look cool, maybe not ideal for printing them again, though. Here's another one from "Cartographers" (Der Kartograph):
 
-{% include image-viewer.html 
-   image="/assets/img/card_result_closeup.png" 
-   id="card_resul_closeupt" 
-   filesize="2.94 MB"
+{% include image-grid.html 
+images="
+  /assets/img/card_result_closeup.png
+"
 %}
+
 
 
 <!-- END --->
