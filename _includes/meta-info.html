@@ -1,0 +1,29 @@
+
+{% assign branch = page.branch | default: "main" %}
+
+{% if page.repo %}
+    {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: branch %}
+{% endif %}
+
+{% comment %}
+Priorität:
+1. page.image (manuell gesetzt)
+2. repo thumbnail.png (stabil)
+3. fallback lokal
+{% endcomment %}
+
+{% if page.image %}
+    {% assign meta_image = page.image %}
+{% elsif page.repo %}
+    {% assign meta_image = cdn | append: "/assets/img/thumbnail.png" %}
+{% else %}
+    {% assign meta_image = "/assets/img/patterns/Taieri.svg" %}
+{% endif %}
+
+<meta property="og:title" content="{{ page.title }}">
+<meta property="og:description" content="{{ page.description }}">
+<meta property="og:image" content="{{ meta_image | absolute_url }}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:type" content="article">
+
+<meta name="description" content="{{ page.description }}">
