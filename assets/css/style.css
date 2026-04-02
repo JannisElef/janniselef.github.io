@@ -130,7 +130,8 @@ hr {
 
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: "Domine", serif;
   scroll-margin-top: 170px;
 }
