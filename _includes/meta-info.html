@@ -13,7 +13,7 @@ Priorität:
 {% endcomment %}
 
 {% if page.image %}
-    {% assign meta_image = page.image %}
+    {% assign meta_image = cdn | append: page.image %}
 {% elsif page.repo %}
     {% assign meta_image = cdn | append: "/assets/img/thumbnail.png" %}
 {% else %}
