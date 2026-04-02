@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
       const fileName = document.createElement('span');
       fileName.className = 'content-filename';
-      fileName.textContent = block.dataset.filename || 'Code';
+      fileName.textContent = block.dataset.filename || 'Text';
       header.appendChild(fileName);
 
       const copyBtn = document.createElement('button');
