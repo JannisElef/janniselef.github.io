@@ -269,7 +269,9 @@ repo: {full_repo}
 branch: main
 tags: [Active]
 date: {today}
-redirect_url: {repo_pages_url}
+
+# redirect_url: {repo_pages_url} # if project has it's own website
+# image: /assets/img/thumbnail.jpg # if thumbnail is a jpg
 ---
 """
 
