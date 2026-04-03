@@ -11,17 +11,38 @@
 
 <script>
 
-  const readmeURL = "{{ cdn }}/README.md";
+    const readmeURL = "{{ cdn }}/README.md";
 
-  fetch(readmeURL)
+    fetch(readmeURL)
     .then(response => response.text())
     .then(md => {
-        document.getElementById("readme-container").innerHTML =
-            marked.parse(md);
+        let htmlContent = marked.parse(md);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+
+        const images = tempDiv.querySelectorAll('img');
+        images.forEach(img => {
+        const link = document.createElement('a');
+        link.href = img.src;
+        link.className = 'image-item';
+        link.target = '_blank';
+        link.title = `View ${img.src.split('/').pop()}`;
+        
+        img.parentNode.insertBefore(link, img);
+        link.appendChild(img);
+        img.style.maxHeight = "40vh";
+        });
+
+        document.getElementById("readme-container").innerHTML = tempDiv.innerHTML;
+
+        document.querySelectorAll('#readme-container p').forEach(p => {
+        if (p.querySelectorAll('img').length > 1) {
+            p.classList.add('image-grid');
+        }
+        });
     })
     .catch(() => {
-        document.getElementById("readme-container").innerHTML =
-            "README could not be loaded.";
+        document.getElementById("readme-container").innerHTML = "README could not be loaded.";
     });
 
 </script>
