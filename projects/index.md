@@ -6,7 +6,14 @@ title: Projects
 
 # Projects
 
-<div class="item-grid">
+
+{% include item-filter.html
+   grid_id="projects-grid"
+   placeholder="Search projects…"
+%}
+
+
+<div class="item-grid" id="projects-grid">
 
     {% assign sorted_projects = site.projects | sort: "date" | reverse %}
 

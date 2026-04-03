@@ -6,7 +6,14 @@ title: Games
 
 # Games
 
-<div class="item-grid">
+
+{% include item-filter.html
+   grid_id="games-grid"
+   placeholder="Search games..."
+%}
+
+
+<div class="item-grid" id="games-grid">
 
     {% assign sorted_games = site.games | sort: "date" | reverse %}
 

@@ -1,0 +1,204 @@
+
+/* ── Bar ── */
+.psf-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: nowrap;   /* stay on one line on mobile */
+}
+
+.psf-spacer { flex: 1; }
+
+/* ── Search input ── */
+.psf-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.psf-search-icon {
+  position: absolute;
+  left: 8px;
+  font-size: 16px;
+  color: var(--text-2-color);
+  pointer-events: none;
+}
+
+.psf-input {
+  background: var(--container-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 10px 6px 30px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  width: 200px;
+  min-width: 0;        /* allow shrinking on mobile */
+  max-width: 100%;
+  outline: none;
+  transition: border-color 0.2s, width 0.2s;
+}
+
+@media (max-width: 480px) {
+  .psf-input        { width: 100%; }
+  .psf-input:focus  { width: 100%; }
+  .psf-search-wrapper { flex: 1; }
+}
+
+.psf-input::placeholder {
+  color: var(--text-2-color);
+}
+
+.psf-input:focus {
+  border-color: var(--link-color);
+  width: 240px;
+}
+
+/* ── Filter button ── */
+.psf-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.psf-filter-btn .material-icons { font-size: 14px; }
+
+.psf-filter-btn.psf-active {
+  border-color: var(--link-color);
+  color: var(--link-color);
+}
+
+/* ── Panel ── */
+.psf-panel {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  background: var(--container-color);
+  animation: psf-slide-down 0.15s ease;
+}
+
+/* hide via [hidden] attribute — animation only plays on show */
+.psf-panel[hidden] { display: none; }
+
+@keyframes psf-slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Family columns ── */
+.psf-families {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.psf-family-label {
+  margin: 0 0 10px 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-2-color);
+  font-family: 'Geist', monospace;
+}
+
+.psf-family-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Children indent (e.g. C / Python under Software) */
+.psf-children {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 14px;
+  border-left: 1px solid var(--border-color);
+}
+
+/* ── Tag buttons ── */
+.psf-tag-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  color: var(--text-color);
+  font-size: 0.78rem;
+  font-family: inherit;
+  padding: 4px 10px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s, background 0.15s, opacity 0.15s;
+}
+
+.psf-tag-btn:hover {
+  opacity: 1;
+  border-color: var(--link-color);
+  color: var(--link-color);
+}
+
+.psf-tag-btn.psf-selected {
+  background: var(--link-color);
+  border-color: var(--link-color);
+  color: var(--page-bg-color);
+}
+
+.psf-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.psf-tag-btn.psf-selected .psf-dot { opacity: 1; }
+
+/* ── Panel header (title row with Clear all top-right) ── */
+.psf-panel-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+#psf-clear-btn {
+  font-size: 0.75rem;
+  color: var(--text-2-color);
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+  opacity: 0.8;
+}
+
+#psf-clear-btn:hover {
+  opacity: 1;
+  color: var(--link-color);
+}
+
+#psf-count {
+  font-size: 0.7rem;
+  color: var(--text-2-color);
+}
+
+/* ── No results ── */
+.psf-no-results {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-2-color);
+  font-size: 0.9rem;
+}
+
+.psf-no-results[hidden] { display: none; }

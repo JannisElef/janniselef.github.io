@@ -1,0 +1,161 @@
+{% comment %}
+  _includes/project-search-bar.html
+
+  Usage in projects.md:
+    {% include project-search-bar.html
+       grid_id="projects-grid"
+       placeholder="Search projects…"
+    %}
+
+  Params:
+    grid_id     — id of the .item-grid to filter (default: "projects-grid")
+    placeholder — input placeholder text      (default: "Search…")
+{% endcomment %}
+
+{% assign _grid_id     = include.grid_id     | default: "projects-grid" %}
+{% assign _placeholder = include.placeholder | default: "Search…" %}
+
+<link rel="stylesheet" href="/assets/css/item-filter.css">
+
+<div class="psf-bar">
+  <div class="psf-spacer"></div>
+
+  <div class="psf-search-wrapper">
+    <span class="material-icons psf-search-icon">search</span>
+    <input
+      type="text"
+      id="psf-input"
+      class="psf-input"
+      placeholder="{{ _placeholder }}"
+      autocomplete="off"
+      data-grid="{{ _grid_id }}"
+    >
+  </div>
+
+  <button id="psf-filter-btn" class="psf-filter-btn" aria-expanded="false">
+    <span class="material-icons">tune</span>
+    Filter
+  </button>
+</div>
+
+<div id="psf-panel" class="psf-panel" hidden>
+  <div class="psf-panel-header">
+    <button id="psf-clear-btn">Clear all</button>
+    <span id="psf-count"></span>
+  </div>
+  <div class="psf-families">
+
+    {% for family in site.data.tags %}
+      {% assign family_data = family[1] %}
+      <div class="psf-family">
+        <h4 class="psf-family-label">{{ family_data.label }}</h4>
+        <div class="psf-family-tags">
+          {% for tag in family_data.tags %}
+            {% assign tag_key = tag[0] %}
+            {% assign tag_val = tag[1] %}
+
+            {% if tag_val.children %}
+              <button class="psf-tag-btn" data-tag="{{ tag_key }}">
+                <span class="psf-dot"></span>{{ tag_key }}
+              </button>
+              <div class="psf-children">
+                {% for child in tag_val.children %}
+                  <button class="psf-tag-btn" data-tag="{{ child[0] }}">
+                    <span class="psf-dot"></span>{{ child[0] }}
+                  </button>
+                {% endfor %}
+              </div>
+
+            {% else %}
+              <button class="psf-tag-btn" data-tag="{{ tag_key }}">
+                <span class="psf-dot"></span>{{ tag_key }}
+              </button>
+            {% endif %}
+
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+
+</div>
+
+<p id="psf-no-results" class="psf-no-results" hidden>No projects match your search.</p>
+
+<script>
+(function () {
+  document.addEventListener('DOMContentLoaded', function () {
+
+    var input     = document.getElementById('psf-input');
+    var filterBtn = document.getElementById('psf-filter-btn');
+    var panel     = document.getElementById('psf-panel');
+    var tagBtns   = document.querySelectorAll('.psf-tag-btn');
+    var clearBtn  = document.getElementById('psf-clear-btn');
+    var countLbl  = document.getElementById('psf-count');
+    var noResults = document.getElementById('psf-no-results');
+
+    var grid = document.getElementById(input ? input.dataset.grid : 'projects-grid');
+    if (!input || !grid) return;
+
+    var cards    = Array.from(grid.querySelectorAll('.item-card'));
+    var selected = [];
+
+    /* panel toggle */
+    filterBtn.addEventListener('click', function () {
+      var nowOpen = panel.hidden;
+      panel.hidden = !nowOpen;
+      filterBtn.setAttribute('aria-expanded', String(nowOpen));
+      filterBtn.classList.toggle('psf-active', nowOpen || selected.length > 0);
+    });
+
+    /* tag toggle */
+    tagBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var tag = btn.dataset.tag;
+        var idx = selected.indexOf(tag);
+        if (idx === -1) { selected.push(tag); btn.classList.add('psf-selected'); }
+        else            { selected.splice(idx, 1); btn.classList.remove('psf-selected'); }
+        sync(); filter();
+      });
+    });
+
+    /* clear */
+    clearBtn.addEventListener('click', function () {
+      selected = [];
+      tagBtns.forEach(function (b) { b.classList.remove('psf-selected'); });
+      sync(); filter();
+    });
+
+    /* live search — every keystroke */
+    input.addEventListener('input', filter);
+
+    function sync() {
+      countLbl.textContent = selected.length > 0 ? selected.length + ' active' : '';
+      filterBtn.classList.toggle('psf-active', !panel.hidden || selected.length > 0);
+    }
+
+    function filter() {
+      var q = input.value.trim().toLowerCase();
+      var n = 0;
+
+      cards.forEach(function (card) {
+        var title = (card.querySelector('h2') || {}).textContent || '';
+        var desc  = (card.querySelector('p')  || {}).textContent || '';
+        var tags  = Array.from(card.querySelectorAll('.tag')).map(function (t) {
+          return t.textContent.trim();
+        });
+
+        var okSearch = !q || title.toLowerCase().indexOf(q) !== -1 || desc.toLowerCase().indexOf(q) !== -1;
+        var okTags   = selected.length === 0 || selected.every(function (t) { return tags.indexOf(t) !== -1; });
+
+        card.style.display = (okSearch && okTags) ? '' : 'none';
+        if (okSearch && okTags) n++;
+      });
+
+      noResults.hidden = n > 0;
+    }
+
+  });
+})();
+</script>
