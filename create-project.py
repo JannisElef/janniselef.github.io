@@ -271,7 +271,7 @@ tags: [Active]
 date: {today}
 
 # redirect_url: {repo_pages_url} # if project has it's own website
-# image: /assets/img/thumbnail.jpg # if thumbnail is a jpg
+# thumbnail: /assets/img/thumbnail.gif # if thumbnail is a gif
 ---
 """
 
