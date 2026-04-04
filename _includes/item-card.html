@@ -6,13 +6,23 @@
     {% if item.repo %}
         {% assign branch = item.branch | default: "main" %}
         {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: item.repo | append: "@" | append: branch %}
-        {% assign preview = cdn | append: "/assets/img/thumbnail.jpg" %}
+        
+        {% comment %} Prüfen, ob ein benutzerdefiniertes Thumbnail definiert wurde {% endcomment %}
+        {% if item.thumbnail %}
+            {% if item.thumbnail contains "://" %}
+                {% assign preview = item.thumbnail %}
+            {% else %}
+                {% assign preview = cdn | append: item.thumbnail %}
+            {% endif %}
+        {% else %}
+            {% assign preview = cdn | append: "/assets/img/thumbnail.jpg" %}
+        {% endif %}
 
         <img 
             src="{{ preview }}" 
             alt="{{ item.title }}"
             onerror="
-            if (this.src.endsWith('thumbnail.jpg')) {
+            if (this.src.endsWith('thumbnail.jpg') && '{{ item.thumbnail }}' == '') {
                 this.src = '{{ cdn }}/assets/img/thumbnail.png';
             } else {
                 this.onerror = null;
@@ -21,7 +31,12 @@
         ">
 
     {% else %}
-        <img src="/assets/img/patterns/Inn.svg" alt="{{ item.title }}">
+        {% comment %} Fallback für Projekte ohne Repo, aber mit definiertem Thumbnail {% endcomment %}
+        {% if item.thumbnail %}
+            <img src="{{ item.thumbnail }}" alt="{{ item.title }}">
+        {% else %}
+            <img src="/assets/img/patterns/Inn.svg" alt="{{ item.title }}">
+        {% endif %}
     {% endif %}
     
     <h2>{{ item.title }}</h2>
