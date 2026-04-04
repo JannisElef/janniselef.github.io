@@ -1,13 +1,12 @@
 ---
 layout: default
-title: cyber snake
-description: Classic snake with a new coating.
-full_description: Classic snake with a new coating - bonus food, ramping up speeds and a new cyber themed environment.
+title: Cyber-Snake
+description: Classic snake with a new coating - eat food, get larger, get faster, get stronger!
+full_description: Classic snake with a new coating - eat food, get larger, get faster, get stronger! Collect bonus foods, hit crazy combos and share your highscores or replays.
 repo: JannisElef/cyber-snake
 branch: main
 tags: [Game, Active]
 date: 2026-04-04
-
 redirect_url: https://janniselef.github.io/cyber-snake/ # if project has it's own website
 # image: /assets/img/thumbnail.jpg # if thumbnail is a jpg
 ---

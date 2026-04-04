@@ -1,8 +1,8 @@
 ---
 layout: default
 title: Ricochet Robots
-description: Ricochet Robots like puzzle.
-full_description: Ricochet Robots like puzzle - share maps and replays via tokens, links or QR codes.
+description: A solo puzzle similar to Ricochet Robots - slide your robot into the goal!
+full_description: A solo puzzle similar to Ricochet Robots - slide your robot into the goal! Share maps and replays via tokens, links or QR codes - challenge your friends!
 repo: JannisElef/ricochet-robots
 branch: main
 tags: [Game, Active]
