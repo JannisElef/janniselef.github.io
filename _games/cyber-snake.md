@@ -1,8 +1,8 @@
 ---
 layout: default
 title: Cyber-Snake
-description: Classic snake with a new coating - eat food, get larger, get faster, get stronger!
-full_description: Classic snake with a new coating - eat food, get larger, get faster, get stronger! Collect bonus foods, hit crazy combos and share your highscores or replays.
+description: Classic snake with a new theme - eat food, get larger, get faster, get stronger!
+full_description: Classic snake with a new theme - eat food, get larger, get faster, get stronger! Collect bonus foods, hit crazy combos and share your highscores or replays.
 repo: JannisElef/cyber-snake
 branch: main
 tags: [Game, Active]
