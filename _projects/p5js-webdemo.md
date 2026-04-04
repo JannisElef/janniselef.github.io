@@ -6,8 +6,6 @@ repo: JannisElef/p5js-webdemo
 branch: main
 tags: [Test, Software, p5.js, Finished]
 date: 2026-03-22
-
-image: /assets/img/thumbnail.jpg # if thumbnail is a jpg
 ---
 
 

@@ -6,8 +6,6 @@ repo: JannisElef/project-template
 branch: main
 tags: [Test, Finished]
 date: 2026-03-09
-
-# image: /assets/img/thumbnail.jpg # if thumbnail is a jpg
 ---
 
 
