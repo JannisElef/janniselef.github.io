@@ -20,6 +20,7 @@ category:
   label: Category
   tags:
     3D-Print:    "3D printing project"
+    Blender:      "Blender project"
     Electronics: "Electronics / hardware project"
     Software:
       description: "Software project"
