@@ -14,11 +14,9 @@ redirect_url: https://janniselef.github.io/blender-render-bot/ # if project has 
 
 {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: page.repo | append: "@" | append: page.branch %}
 
+ --- ! rendered best on [GitHub](https://github.com/{{ page.repo }}) ! ---
+
 {% include readme-loader.html %} 
-
----
-
-{% include table-of-contents.html %}
 
 ---
 
