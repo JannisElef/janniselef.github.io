@@ -44,15 +44,13 @@ Can't beat a map? Share the map-ID and see how your friends do it.
 Once the goal is reached, the player can share a replay of their game, there you can see and analyze each one of their moves. 
 
 
-You can do this by link or QR-Code, try it yourself! 
+You can do this by [link](https://janniselef.github.io/ricochet-robots/?r=b6b9c14dCMX0310013f0a50P090505090a02020a09010308_064a616e6e6973c370ca001e89_e4654ba98f) or QR-Code, try it yourself! 
 
 {% include image-grid.html 
 images="
   /assets/img/ricochet-robots_example-replay.png
 "
 %}
-
-
 
 
 <!-- END --->
