@@ -2,6 +2,7 @@
 source "https://rubygems.org"
 
 gem "jekyll"
+gem "jekyll-sitemap"
 gem "webrick"
 
 gem 'wdm', '>= 0.1.0'

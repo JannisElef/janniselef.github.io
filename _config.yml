@@ -1,7 +1,8 @@
 
 title: My Portfolio
 description: Portfolio for my projects and other miscellaneous things.
-
+url: https://janniselef.github.io
+baseurl: ""
 author: JannisElef
 
 
@@ -16,3 +17,9 @@ collections:
 markdown: kramdown
 kramdown:
   toc_levels: 1..3
+
+plugins:
+  - jekyll-sitemap
+
+exclude:
+  - README.md
