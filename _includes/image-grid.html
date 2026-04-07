@@ -1,12 +1,18 @@
-
 <div class="image-grid">
   {% assign images = include.images | split: "," %}
   {% for img in images %}
     {% assign img_path = img | strip %}
+    
+    {% comment %} Dynamically generate the web version of the image {% endcomment %}
+    {% assign filename_with_ext = img_path | split: '/' | last %}
+    {% assign filename_no_ext = filename_with_ext | split: '.' | first %}
+    {% assign web_filename = "web/" | append: filename_no_ext | append: "-web.jpg" %}
+    {% assign web_img_path = img_path | replace: filename_with_ext, web_filename %}
+
     <a href="{{ cdn }}{{ img_path }}" 
        class="image-item"
-       title="View {{ img_path | split: '/' | last }}">
-      <img src="{{ cdn }}{{ img_path }}" style="max-height: 650px; max-width: 650px;" alt="{{ img_path | split: '/' | last }}">
+       title="View {{ filename_with_ext }}">
+      <img src="{{ cdn }}{{ web_img_path }}" style="max-height: 650px; max-width: 650px;" alt="{{ filename_with_ext }}">
     </a>
   {% endfor %}
 </div>

@@ -1,77 +1,85 @@
-
 {% assign item = include.project | default: include.game %}
 
 <a class="item-card" href="{{ item.url }}" title="Open {{ item.title }}">
-    
+
     {% if item.repo %}
         {% assign branch = item.branch | default: "main" %}
         {% assign cdn = "https://cdn.jsdelivr.net/gh/" | append: item.repo | append: "@" | append: branch %}
-        
-        {% comment %} Prüfen, ob ein benutzerdefiniertes Thumbnail definiert wurde {% endcomment %}
+
+        {% comment %} Check if a custom thumbnail is defined {% endcomment %}
         {% if item.thumbnail %}
             {% if item.thumbnail contains "://" %}
                 {% assign preview = item.thumbnail %}
             {% else %}
-                {% assign preview = cdn | append: item.thumbnail %}
+                {% comment %} Generate path for the web version {% endcomment %}
+                {% assign filename_with_ext = item.thumbnail | split: '/' | last %}
+                {% assign filename_no_ext = filename_with_ext | split: '.' | first %}
+                {% assign web_filename = "web/" | append: filename_no_ext | append: "-web.jpg" %}
+                {% assign web_thumbnail_path = item.thumbnail | replace: filename_with_ext, web_filename %}
+                {% assign preview = cdn | append: web_thumbnail_path %}
             {% endif %}
         {% else %}
-            {% assign preview = cdn | append: "/assets/img/thumbnail.jpg" %}
+            {% assign preview = cdn | append: "/assets/img/web/thumbnail-web.jpg" %}
         {% endif %}
 
-        <img 
-            src="{{ preview }}" 
-            alt="{{ item.title }}"
-            onerror="
-            if (this.src.endsWith('thumbnail.jpg') && '{{ item.thumbnail }}' == '') {
-                this.src = '{{ cdn }}/assets/img/thumbnail.png';
-            } else {
-                this.onerror = null;
-                this.src = '/assets/img/patterns/Taieri.svg';
-            }
-        ">
+            <img src="{{ preview }}" alt="{{ item.title }}" onerror="
+                if (this.getAttribute('data-retry') !== 'true') {
+                    this.setAttribute('data-retry', 'true');
+                    this.src = '{{ fallback_src }}';
+                } else {
+                    this.onerror = null;
+                    this.src = '/assets/img/patterns/Taieri.svg';
+                }
+            ">
 
-    {% else %}
-        {% comment %} Fallback für Projekte ohne Repo, aber mit definiertem Thumbnail {% endcomment %}
-        {% if item.thumbnail %}
-            <img src="{{ item.thumbnail }}" alt="{{ item.title }}">
         {% else %}
+            {% comment %} Fallback for projects without a repo but with a defined thumbnail {% endcomment %}
+            {% if item.thumbnail %}
+                {% if item.thumbnail contains "://" %}
+                    <img src="{{ item.thumbnail }}" alt="{{ item.title }}">
+                {% else %}
+                    {% assign filename_with_ext = item.thumbnail | split: '/' | last %}
+                    {% assign filename_no_ext = filename_with_ext | split: '.' | first %}
+                    {% assign web_filename = "web/" | append: filename_no_ext | append: "-web.jpg" %}
+                    {% assign web_thumbnail_path = item.thumbnail | replace: filename_with_ext, web_filename %}
+                    <img src="{{ web_thumbnail_path }}" alt="{{ item.title }}">
+                {% endif %}
+            {% else %}
             <img src="/assets/img/patterns/Inn.svg" alt="{{ item.title }}">
         {% endif %}
     {% endif %}
-    
+
     <h2>{{ item.title }}</h2>
-    
+
     <p>{{ item.description }}</p>
-    
+
     {% if item.date %}
-        <p class="item-date">{{ item.date | date: "%b %-d, %Y" }}</p>
+    <p class="item-date">{{ item.date | date: "%b %-d, %Y" }}</p>
     {% endif %}
-    
+
     <div class="tags">
         {% for tag in item.tags %}
-            <span class="tag">{{ tag }}</span>
+        <span class="tag">{{ tag }}</span>
         {% endfor %}
     </div>
 
     {% if item.redirect_url %}
-        {% if include.game %}
-            <div class="item-card-redirect-button"
-            title="Play {{ item.title }}"
-            onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.redirect_url }}', '_blank')">
-                <span class="material-icons">
-                    play_arrow
-                </span>
-            </div>
-        {% elsif include.project %}
-            <div class="item-card-redirect-button"
-            title="Open {{ item.title }} in new Tab"
-            onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.redirect_url }}', '_blank')">
-                <span class="material-icons">
-                    open_in_new
-                </span>
-            </div>
-        {% endif %}
-    
+    {% if include.game %}
+    <div class="item-card-redirect-button" title="Play {{ item.title }}"
+        onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.redirect_url }}', '_blank')">
+        <span class="material-icons">
+            play_arrow
+        </span>
+    </div>
+    {% elsif include.project %}
+    <div class="item-card-redirect-button" title="Open {{ item.title }} in new Tab"
+        onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ item.redirect_url }}', '_blank')">
+        <span class="material-icons">
+            open_in_new
+        </span>
+    </div>
+    {% endif %}
+
     {% endif %}
 
 </a>

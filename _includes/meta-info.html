@@ -1,4 +1,3 @@
-
 {% assign branch = page.branch | default: "main" %}
 
 {% if page.repo %}
@@ -6,16 +5,24 @@
 {% endif %}
 
 {% comment %}
-Priorität:
-1. page.image (manuell gesetzt)
-2. repo thumbnail.png (stabil)
-3. fallback lokal
+Priority:
+1. page.image Web-Version (manually set)
+2. repo thumbnail-web.jpg (stable)
+3. local fallback
 {% endcomment %}
 
 {% if page.image %}
-    {% assign meta_image = cdn | append: page.image %}
+    {% if page.image contains "://" %}
+        {% assign meta_image = page.image %}
+    {% else %}
+        {% assign filename_with_ext = page.image | split: '/' | last %}
+        {% assign filename_no_ext = filename_with_ext | split: '.' | first %}
+        {% assign web_filename = "web/" | append: filename_no_ext | append: "-web.jpg" %}
+        {% assign web_meta_image_path = page.image | replace: filename_with_ext, web_filename %}
+        {% assign meta_image = cdn | append: web_meta_image_path %}
+    {% endif %}
 {% elsif page.repo %}
-    {% assign meta_image = cdn | append: "/assets/img/thumbnail.png" %}
+    {% assign meta_image = cdn | append: "/assets/img/web/thumbnail-web.jpg" %}
 {% else %}
     {% assign meta_image = "/assets/img/patterns/Taieri.svg" %}
 {% endif %}
