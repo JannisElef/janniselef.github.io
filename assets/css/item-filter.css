@@ -1,26 +1,24 @@
-
-/* ── Bar ── */
 .psf-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 20px;
-  flex-wrap: nowrap;   /* stay on one line on mobile */
+  flex-wrap: wrap;
 }
 
 .psf-spacer { flex: 1; }
 
-/* ── Search input ── */
 .psf-search-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  min-width: 200px;
 }
 
 .psf-search-icon {
   position: absolute;
-  left: 8px;
-  font-size: 16px;
+  left: 10px;
+  font-size: 18px;
   color: var(--text-2-color);
   pointer-events: none;
 }
@@ -29,158 +27,71 @@
   background: var(--container-color);
   color: var(--text-color);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 6px 10px 6px 30px;
-  font-size: 0.85rem;
-  font-family: inherit;
-  width: 200px;
-  min-width: 0;        /* allow shrinking on mobile */
-  max-width: 100%;
-  outline: none;
-  transition: border-color 0.2s, width 0.2s;
-}
-
-@media (max-width: 480px) {
-  .psf-input        { width: 100%; }
-  .psf-input:focus  { width: 100%; }
-  .psf-search-wrapper { flex: 1; }
-}
-
-.psf-input::placeholder {
-  color: var(--text-2-color);
-}
-
-.psf-input:focus {
-  border-color: var(--link-color);
+  border-radius: 8px;
+  padding: 8px 12px 8px 34px;
+  font-size: 0.9rem;
   width: 240px;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-/* ── Filter button ── */
+.psf-select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--container-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 32px 8px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color-scheme: dark;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+
 .psf-filter-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.8rem;
-  padding: 6px 12px;
-  transition: border-color 0.2s, color 0.2s;
-}
-
-.psf-filter-btn .material-icons { font-size: 14px; }
-
-.psf-filter-btn.psf-active {
-  border-color: var(--link-color);
-  color: var(--link-color);
-}
-
-/* ── Panel ── */
-.psf-panel {
+  gap: 6px;
+  background: var(--container-color);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  background: var(--container-color);
-  animation: psf-slide-down 0.15s ease;
+  color: var(--text-color);
+  padding: 8px 14px;
+  cursor: pointer;
 }
 
-/* hide via [hidden] attribute — animation only plays on show */
+.psf-panel {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  background: var(--container-color);
+}
+
 .psf-panel[hidden] { display: none; }
 
-@keyframes psf-slide-down {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-/* ── Family columns ── */
-.psf-families {
-  display: flex;
-  gap: 32px;
-  flex-wrap: wrap;
-}
-
-.psf-family-label {
-  margin: 0 0 10px 0;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-2-color);
-  font-family: 'Geist', monospace;
-}
-
-.psf-family-tags {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Children indent (e.g. C / Python under Software) */
-.psf-children {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-left: 14px;
-  border-left: 1px solid var(--border-color);
-}
-
-/* ── Tag buttons ── */
-.psf-tag-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  color: var(--text-color);
-  font-size: 0.78rem;
-  font-family: inherit;
-  padding: 4px 10px;
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-  transition: border-color 0.15s, color 0.15s, background 0.15s, opacity 0.15s;
-}
-
-.psf-tag-btn:hover {
-  opacity: 1;
-  border-color: var(--link-color);
-  color: var(--link-color);
-}
-
-.psf-tag-btn.psf-selected {
-  background: var(--link-color);
-  border-color: var(--link-color);
-  color: var(--page-bg-color);
-}
-
-.psf-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.5;
-  flex-shrink: 0;
-}
-
-.psf-tag-btn.psf-selected .psf-dot { opacity: 1; }
-
-/* ── Panel header (title row with Clear all top-right) ── */
 .psf-panel-header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 12px; 
+  height: 0.75rem; 
 }
 
 #psf-clear-btn {
-  font-size: 0.75rem;
-  color: var(--text-2-color);
-  background: transparent;
+  background: none;
   border: none;
-  padding: 2px 0;
+  color: var(--text-2-color);
   cursor: pointer;
   text-decoration: underline;
-  font-family: inherit;
-  opacity: 0.8;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  padding: 0;
 }
 
 #psf-clear-btn:hover {
@@ -189,16 +100,56 @@
 }
 
 #psf-count {
-  font-size: 0.7rem;
-  color: var(--text-2-color);
+  font-size: 0.75rem;
+  color: var(--link-color);
+  font-weight: bold;
 }
 
-/* ── No results ── */
-.psf-no-results {
-  text-align: center;
-  padding: 40px 0;
-  color: var(--text-2-color);
-  font-size: 0.9rem;
+.psf-tag-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-color);
+  padding: 5px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.psf-tag-btn.psf-selected {
+  background: var(--link-color);
+  border-color: var(--link-color);
+  color: #fff;
+}
+
+.psf-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.psf-no-results { text-align: center; padding: 40px; color: var(--text-2-color); }
 .psf-no-results[hidden] { display: none; }
+
+.item-wrapper {
+  display: contents;
+}
+
+@media (max-width: 768px) {
+  .psf-bar {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .psf-search-wrapper {
+    width: 100%;
+  }
+  .psf-input {
+    width: 100%;
+  }
+  .psf-spacer {
+    display: none;
+  }
+}
