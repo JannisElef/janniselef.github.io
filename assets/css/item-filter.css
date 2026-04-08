@@ -140,7 +140,6 @@
 
 @media (max-width: 768px) {
   .psf-bar {
-    flex-direction: column;
     align-items: flex-end;
   }
   .psf-search-wrapper {
