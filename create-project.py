@@ -139,7 +139,7 @@ def main():
         return
 
     description = input("Short description (for item-card): ").strip() or "No short description yet."
-    full_description = input("Full description (for repo-About & README): ").strip() or "No full description yet."
+    full_description = input("Full description (for repo-About & README): ").strip() or description
     
     use_pages_template = ask_yes_no("Should this project use the GitHub Pages template?", default_yes=False)
     deploy_pages = ask_yes_no("Deploy GitHub Pages for this repository (branch: main, /root)?", default_yes=True)
@@ -238,13 +238,15 @@ def main():
     # ── README ────────────────────────────────────
     readme = repo_path / "README.md"
     if readme.is_file():
-        readme_content = f"# {name}\n\n{full_description}\n\n"
+        readme_content = f"# {name}\n\n"
         
         # Append specific links ONLY if it's a pages project
         if use_pages_template:
-            readme_content += f"Visit the [website]({repo_pages_url}).\n\n"
-            readme_content += f"See more information [here]({project_site_url}).\n"
+            readme_content += f"[website]({repo_pages_url})"
+            readme_content += f" · [more information]({project_site_url}).\n\n"
             
+        readme_content += f"{full_description}\n\n"
+
         readme.write_text(readme_content, encoding="utf-8")
         print("→ README.md updated")
 
