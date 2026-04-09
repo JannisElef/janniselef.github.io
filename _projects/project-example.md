@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Example Project
+author: JannisElef
 description: Example Project for GitHub Pages.
 repo: JannisElef/project-example
 branch: main

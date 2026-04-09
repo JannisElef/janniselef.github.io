@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Minesweeper
+author: JannisElef
 description: Classic Minesweeper with a new theme - reveal the map but not the mines!
 full_description: Classic Minesweeper with a new theme - reveal the map but not the mines!
 repo: JannisElef/minesweeper

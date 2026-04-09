@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Template Project
+author: JannisElef
 description: Template for a Project
 repo: JannisElef/project-template
 branch: main

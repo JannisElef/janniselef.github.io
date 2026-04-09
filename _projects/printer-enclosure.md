@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Printer Enclosure Control
+author: JannisElef
 description: Files and Documentation
 repo: JannisElef/printer-enclosure
 branch: main

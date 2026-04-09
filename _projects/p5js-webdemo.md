@@ -1,6 +1,7 @@
 ---
 layout: default
 title: p5.js Webdemo
+author: JannisElef
 description: Interactive p5.js sketches running in the browser.
 repo: JannisElef/p5js-webdemo
 branch: main

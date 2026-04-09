@@ -265,6 +265,7 @@ def main():
     front = f"""---
 layout: default
 title: {name}
+author: {GITHUB_USERNAME}
 description: {description}
 full_description: {full_description}
 repo: {full_repo}

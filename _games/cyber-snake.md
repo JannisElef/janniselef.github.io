@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Cyber-Snake
+author: JannisElef
 description: Classic snake with a new theme - eat food, get larger, get faster, get stronger!
 full_description: Classic snake with a new theme - eat food, get larger, get faster, get stronger! Collect bonus foods, hit crazy combos and share your highscores or replays.
 repo: JannisElef/cyber-snake

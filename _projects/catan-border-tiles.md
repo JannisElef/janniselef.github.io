@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Catan Border-Tiles
+author: JannisElef
 description: Border-Tiles for the old version of Catan
 repo: JannisElef/catan-border-tiles
 branch: main
