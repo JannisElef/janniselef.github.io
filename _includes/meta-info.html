@@ -33,6 +33,8 @@ Image Priority:
 {% assign meta_description = page.description | default: page.excerpt | default: site.description %}
 
 <!-- Basic SEO -->
+
+<title>{{ meta_title }}</title>
 <meta name="description" content="{{ meta_description }}">
 <link rel="canonical" href="{{ page.url | absolute_url }}">
 
