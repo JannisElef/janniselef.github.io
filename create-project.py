@@ -181,9 +181,6 @@ full_description: {full_description}
 repo: {full_repo}
 branch: main
 date: {today}
-
-# redirect_url: {repo_pages_url} # if project has its own website
-# thumbnail: /assets/img/thumbnail.gif # if thumbnail is a gif
 ---
 """
 
