@@ -1,3 +1,17 @@
+{% comment %}
+
+Usage:
+
+{% include image-grid.html 
+images="
+  /assets/img/img1.png,
+  /assets/img/img2.png
+"
+%}
+
+
+{% endcomment %}
+
 <div class="image-grid">
   {% assign images = include.images | split: "," %}
   {% for img in images %}
