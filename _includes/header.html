@@ -1,7 +1,7 @@
 <header class="header">
 
   <a href="/" style="color: var(--text-color); text-decoration: none;" title="Go to main page">
-      <h1>{{ site.title }}</h1>
+    <h1>{{ site.title }}</h1>
   </a>
 
   <nav class="nav">
@@ -23,8 +23,32 @@
         <option value="peach">Peach</option>
         <option value="purple">Purple</option>
       </select>
+
+      <button id="nav-burger" title="Menu" onclick="document.getElementById('mobile-nav').classList.toggle('open')" style="display: none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
     </div>
 
   </nav>
 
+  <div id="mobile-nav">
+    <a href="/">Home</a>
+    <a href="/projects">Projects</a>
+    <a href="/games">Games</a>
+  </div>
+
 </header>
+
+<script>
+  document.addEventListener('click', function(e) {
+    const burger = document.getElementById('nav-burger');
+    const mobileNav = document.getElementById('mobile-nav');
+    if (!burger.contains(e.target) && !mobileNav.contains(e.target)) {
+      mobileNav.classList.remove('open');
+    }
+  });
+</script>
