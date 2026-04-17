@@ -1,0 +1,229 @@
+{% comment %}
+
+Usage:
+
+{% include stl-viewer-multi.html 
+  id="my-table"
+  label="Tabel complete"
+  files="
+    /assets/stl/tabletop.stl:#FF0000,
+    /assets/stl/legs.stl:#00FF00
+  "
+  filesize="10.0 KB"
+%}
+
+
+{% endcomment %}
+
+<div class="stl-container" style="position: relative; margin-bottom: 20px;">
+  <div class="content-wrapper" id="wrapper-{{ include.id }}">
+    
+    <div class="content-header">
+      <div class="header-left" style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+        <span class="material-icons">view_in_ar</span>
+        <span class="content-filename" style="color: inherit;">
+          {{ include.label | default: include.files | split: "," | first | split: "/" | last }}
+        </span>
+        {% if include.filesize %}
+          <span class="filesize-badge" style="opacity: 0.5; font-size: 0.75rem;">({{ include.filesize }})</span>
+        {% endif %}
+      </div>
+
+      <div class="content-buttons">
+        <button id="reset-stl-{{ include.id }}" style="display: none;" title="Reset View">
+          <span class="material-icons">restart_alt</span>
+        </button>
+
+        <button id="load-stl-{{ include.id }}">
+          <span class="material-icons">visibility</span>
+          <span>View</span>
+        </button>
+
+        <button id="close-stl-{{ include.id }}" style="display: none;" title="Close View">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="stl-viewer-{{ include.id }}" style="width:100%; height:400px; display:none; position:relative; background: var(--container-bg-color); border-radius: 0 0 8px 8px;"></div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { STLLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+
+(function() {
+  const id = "{{ include.id }}";
+  const cdn = "{{ cdn }}";
+
+  // Parse "file1.stl:color1, file2.stl:color2" — color is optional, defaults to white
+  // Collapse all whitespace/newlines Liquid may inject into a single space, then split
+  const rawFiles = `{{ include.files }}`.replace(/[\r\n\t]+/g, " ").split(",").map(s => s.trim()).filter(Boolean);
+  const models = rawFiles.map(entry => {
+    const colonIdx = entry.lastIndexOf(":");
+    // A colon is only a color separator if it's followed by a # or a letter (CSS color)
+    const hasColor = colonIdx > 0 && /[#a-zA-Z]/.test(entry[colonIdx + 1] || "");
+    const file  = hasColor ? entry.slice(0, colonIdx).trim() : entry.trim();
+    const color = hasColor ? entry.slice(colonIdx + 1).trim() : "#ffffff";
+    return { url: cdn + file, color };
+  });
+
+  const loadBtn   = document.getElementById(`load-stl-${id}`);
+  const resetBtn  = document.getElementById(`reset-stl-${id}`);
+  const closeBtn  = document.getElementById(`close-stl-${id}`);
+  const container = document.getElementById(`stl-viewer-${id}`);
+
+  let scene, camera, renderer, controls, group, animationId, rotationTimeout;
+  let isInteracting = false;
+
+  if (loadBtn) {
+    loadBtn.onclick = () => {
+      loadBtn.style.display  = "none";
+      resetBtn.style.display = "flex";
+      closeBtn.style.display = "flex";
+      container.style.display = "block";
+      initSTLViewer();
+    };
+  }
+
+  function initSTLViewer() {
+    scene = new THREE.Scene();
+    const style    = getComputedStyle(document.body);
+    const bgColor  = style.getPropertyValue('--container-bg-color').trim() || '#282c34';
+    const edgeColor = style.getPropertyValue('--border-color').trim() || '#475059';
+    scene.background = new THREE.Color(bgColor);
+
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    light1.position.set(1, 1, 1);
+    scene.add(light1);
+    const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+    light2.position.set(-1, 0.5, -1);
+    scene.add(light2);
+
+    // Group holds all meshes — we center THIS group, not individual meshes
+    group = new THREE.Group();
+    scene.add(group);
+
+    const loader = new STLLoader();
+    let loadedCount = 0;
+
+    models.forEach(({ url, color }) => {
+      loader.load(url, (geometry) => {
+        // NO geometry.center() — preserve Blender positions!
+        geometry.computeBoundingSphere();
+        geometry.computeBoundingBox();
+
+        const material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(color),
+          roughness: 0.5,
+          metalness: 0.1
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        const edges = new THREE.EdgesGeometry(geometry);
+        const edgeLines = new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({ color: new THREE.Color(edgeColor) })
+        );
+
+        group.add(mesh);
+        group.add(edgeLines);
+
+        loadedCount++;
+        if (loadedCount === models.length) {
+          onAllLoaded();
+        }
+      });
+    });
+
+    function onAllLoaded() {
+      // Compute bounding box of the whole group
+      const box = new THREE.Box3().setFromObject(group);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+
+      // Shift group so its collective center is at world origin
+      group.position.sub(center);
+
+      // Fit camera to the bounding sphere of the whole assembly
+      const radius = size.length() / 2;
+      camera.position.set(radius * 1.6, radius * 1.2, radius * 1.6);
+      camera.near = radius * 0.01;
+      camera.far  = radius * 100;
+      camera.updateProjectionMatrix();
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.target.set(0, 0, 0);
+      controls.enableDamping  = true;
+      controls.autoRotate     = true;
+      controls.autoRotateSpeed = 2.0;
+      controls.update();
+
+      container.addEventListener('mousedown',  onStart);
+      container.addEventListener('touchstart', onStart, { passive: true });
+      window.addEventListener('mouseup',  onEnd);
+      window.addEventListener('touchend', onEnd);
+
+      function animate() {
+        animationId = requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    function onStart() {
+      isInteracting = true;
+      controls.autoRotate = false;
+      clearTimeout(rotationTimeout);
+    }
+    function onEnd() {
+      if (isInteracting) {
+        isInteracting = false;
+        rotationTimeout = setTimeout(() => { controls.autoRotate = true; }, 5000);
+      }
+    }
+  }
+
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      container.style.display = "none";
+      resetBtn.style.display  = "none";
+      closeBtn.style.display  = "none";
+      loadBtn.style.display   = "flex";
+      clearTimeout(rotationTimeout);
+      if (animationId) cancelAnimationFrame(animationId);
+      if (renderer) {
+        renderer.dispose();
+        if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
+      }
+      scene = null; renderer = null; group = null;
+    };
+  }
+
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      if (controls) { controls.reset(); controls.autoRotate = true; }
+    };
+  }
+})();
+</script>
