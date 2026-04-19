@@ -1,0 +1,57 @@
+{% assign _grid_id = include.grid_id | default: "gallery-grid" %}
+<link rel="stylesheet" href="/assets/css/item-filter.css">
+
+<div class="psf-bar">
+  <div class="psf-search-wrapper">
+    <span class="material-icons psf-search-icon">search</span>
+    <input type="text" id="psf-input" class="psf-input"
+           placeholder="{{ include.placeholder | default: 'Search images…' }}"
+           autocomplete="off" data-grid="{{ _grid_id }}">
+  </div>
+  <div class="psf-spacer"></div>
+  <button id="gallery-shuffle-btn" class="psf-filter-btn" title="Randomize order">
+    <span class="material-icons" style="font-size:1rem;">shuffle</span> Shuffle
+  </button>
+  <select id="gallery-source-filter" class="psf-select">
+    <option value="all">All Images</option>
+    <option value="thumbnail">Thumbnails only</option>
+    <option value="gallery">Gallery only</option>
+  </select>
+  <select id="psf-sort" class="psf-select">
+    <option value="random">Random</option>
+    <option value="desc">Newest First</option>
+    <option value="asc">Oldest First</option>
+  </select>
+  <select id="psf-year-filter" class="psf-select"><option value="all">All Years</option></select>
+  <button id="psf-filter-btn" class="psf-filter-btn">
+    <span class="material-icons" style="font-size:1rem;">tune</span> Tags
+  </button>
+</div>
+
+<div id="psf-panel" class="psf-panel" hidden>
+  <div class="psf-panel-header">
+    <span id="psf-count"></span>
+    <button id="psf-clear-btn">Clear all</button>
+  </div>
+  <div class="psf-families" style="display:flex; gap:30px; flex-wrap:wrap;">
+    {% for family in site.data.tags %}
+      <div class="psf-family">
+        <h4 style="font-size:0.7rem; color:var(--text-2-color); text-transform:uppercase; margin-bottom:10px; line-height:1;">{{ family[1].label }}</h4>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          {% for tag in family[1].tags %}
+            <button class="psf-tag-btn" data-tag="{{ tag[0] }}"><span class="psf-dot"></span>{{ tag[0] }}</button>
+            {% if tag[1].children %}
+              <div style="padding-left:12px; border-left:1px solid var(--border-color); display:flex; flex-direction:column; gap:6px; margin-top:4px;">
+                {% for child in tag[1].children %}
+                  <button class="psf-tag-btn" data-tag="{{ child[0] }}"><span class="psf-dot"></span>{{ child[0] }}</button>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<p id="psf-no-results" class="psf-no-results" hidden>No images match your search.</p>

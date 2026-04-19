@@ -1,0 +1,101 @@
+
+.gallery-header { margin: 20px 0 2rem; }
+.gallery-header h1 { margin: 0 0 0.2rem; }
+.gallery-header p  { margin: 0; font-size: 0.85rem; color: var(--text-2-color); }
+
+/* ── Masonry ── */
+.gallery-grid {
+  columns: 4 220px;
+  column-gap: 12px;
+}
+@media (max-width: 900px) { .gallery-grid { columns: 3 180px; } }
+@media (max-width: 600px) { .gallery-grid { columns: 2 140px; } }
+
+.gallery-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  background: var(--container-color);
+  border: 1px solid var(--border-color);
+  display: block;
+}
+
+.gallery-item a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* ── Hover overlay ── */
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.82) 0%,
+    rgba(0,0,0,0.38) 50%,
+    rgba(0,0,0,0.00) 100%);
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.gallery-item:hover .gallery-overlay { opacity: 1; }
+.gallery-item:hover img {
+  transform: scale(1.03);
+  filter: brightness(0.75);
+}
+
+.gallery-overlay-content {
+  padding: 12px;
+  color: #fff;
+}
+
+.gallery-overlay-content h3 {
+  margin: 0 0 3px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  font-family: "Domine", serif;
+}
+
+.gallery-overlay-content p {
+  margin: 0 0 7px;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  line-height: 1.4;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* reuse .tag but force white palette on dark overlay */
+.gallery-overlay-content .tag {
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(4px);
+}
+
+/* ── Fade-in ── */
+@keyframes galleryFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gallery-item.gf-visible {
+  animation: galleryFadeIn 0.28s ease forwards;
+}
