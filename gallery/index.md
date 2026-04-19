@@ -10,7 +10,7 @@ date: 2026-04-19
 
 <div class="gallery-header">
   <h1>Gallery</h1>
-  <p>Visual archive across all my published projects.</p>
+  <p>Visual archive across all projects</p>
 </div>
 
 {% include gallery-filter.html
@@ -47,8 +47,7 @@ date: 2026-04-19
              data-year="{{ item.date | date: '%Y' }}"
              data-tags="{{ item.tags | join: ',' | escape }}">
           <a href="{{ item.url }}" title="Open {{ item.title }}">
-            <img src="{{ img_src }}" alt="{{ item.title }}" loading="lazy"
-                 onerror="this.onerror=null;this.src='/assets/img/patterns/Taieri.svg';">
+            <img data-src="{{ img_src }}" src="" alt="{{ item.title }}" onerror="this.onerror=null;this.src='/assets/img/patterns/Taieri.svg';">
             <div class="gallery-overlay"><div class="gallery-overlay-content">
               <h3>{{ item.title }}</h3>
               <p>{{ item.description }}</p>
@@ -79,8 +78,7 @@ date: 2026-04-19
            data-year="{{ item.date | date: '%Y' }}"
            data-tags="{{ item.tags | join: ',' | escape }}">
         <a href="{{ item.url }}" title="Open {{ item.title }}">
-          <img src="{{ thumb_src }}" alt="{{ item.title }}" loading="lazy"
-               onerror="this.onerror=null;this.src='/assets/img/patterns/Inn.svg';">
+          <img data-src="{{ thumb_src }}" src="" alt="{{ item.title }}" onerror="this.onerror=null;this.src='/assets/img/patterns/Inn.svg';">
           <div class="gallery-overlay"><div class="gallery-overlay-content">
             <h3>{{ item.title }}</h3>
             <p>{{ item.description }}</p>
@@ -111,8 +109,7 @@ date: 2026-04-19
            data-year="{{ item.date | date: '%Y' }}"
            data-tags="{{ item.tags | join: ',' | escape }}">
         <a href="{{ item.url }}" title="Open {{ item.title }}">
-          <img src="{{ img_src }}" alt="{{ item.title }}" loading="lazy"
-               onerror="this.onerror=null;this.src='/assets/img/patterns/Inn.svg';">
+          <img data-src="{{ img_src }}" src="" alt="{{ item.title }}" onerror="this.onerror=null;this.src='/assets/img/patterns/Taieri.svg';">
           <div class="gallery-overlay"><div class="gallery-overlay-content">
             <h3>{{ item.title }}</h3>
             <p>{{ item.description }}</p>

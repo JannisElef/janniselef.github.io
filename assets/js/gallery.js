@@ -15,13 +15,18 @@
     items.forEach(function (it) { it._w = Math.random(); });
   }
 
-  // Preload images for a slice of items, resolve when all done (or errored)
-  function preloadImages(items, from, to, cb) {
+  // Set src from data-src (triggers actual network load) for a slice of items,
+  // then call cb when all images are loaded or errored.
+  function loadImages(items, from, to, cb) {
     var slice = items.slice(from, to);
     var pending = 0;
     slice.forEach(function (it) {
       var img = it.querySelector('img');
       if (!img) return;
+      // Set src from data-src if not already done
+      if (img.dataset.src && img.src !== img.dataset.src) {
+        img.src = img.dataset.src;
+      }
       if (img.complete && img.naturalHeight > 0) return; // already loaded
       pending++;
       function done() { if (--pending === 0) cb(); }
@@ -123,7 +128,7 @@
           it.style.visibility = 'hidden'; // in DOM but invisible during preload
         });
 
-        preloadImages(currentMatched, from, to, function () {
+        loadImages(currentMatched, from, to, function () {
           currentMatched.slice(from, to).forEach(function (it) {
             it.style.visibility = '';
           });
@@ -197,7 +202,7 @@
       });
 
       // Wait for first-page images to load, then layout
-      preloadImages(currentMatched, 0, visibleCount, function () {
+      loadImages(currentMatched, 0, visibleCount, function () {
         currentMatched.slice(0, visibleCount).forEach(function (it) {
           it.style.visibility = '';
         });
