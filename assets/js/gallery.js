@@ -1,9 +1,15 @@
 (function () {
   'use strict';
 
-  var ITEMS_PER_PAGE = 20;
   var COL_WIDTH      = 220; // min column width px
   var GAP            = 12;
+
+  function itemsPerPage() {
+    var w = window.innerWidth;
+    if (w < 600)  return 8;   // mobile: 2 cols
+    if (w < 900)  return 12;  // tablet: 3 cols
+    return 20;                // desktop: 4+ cols
+  }
 
   function assignWeights(items) {
     items.forEach(function (it) { it._w = Math.random(); });
@@ -30,7 +36,7 @@
     var grid           = document.getElementById(input.dataset.grid);
     var items          = Array.from(grid.querySelectorAll('.gallery-item'));
     var selected       = [];
-    var visibleCount   = ITEMS_PER_PAGE;
+    var visibleCount   = itemsPerPage();
     var currentMatched = [];
     var colHeights     = []; // tracks height of each column
 
@@ -94,7 +100,7 @@
       loadMoreBtn.addEventListener('click', function (e) {
         e.preventDefault();
         var from = visibleCount;
-        visibleCount += ITEMS_PER_PAGE;
+        visibleCount += itemsPerPage();
         placeItems(from, visibleCount);
         updateLoadMore();
         // scroll to first new item
@@ -113,7 +119,7 @@
 
     // ── reset: refilter, resort, full relayout from scratch ───────────────
     function reset() {
-      visibleCount = ITEMS_PER_PAGE;
+      visibleCount = itemsPerPage();
 
       var q   = input.value.toLowerCase().trim();
       var yS  = yearSelect.value;
@@ -171,6 +177,7 @@
         }
       });
 
+      fillLastRow();
       setGridHeight();
       updateLoadMore();
       noResults.hidden = currentMatched.length > 0;
@@ -198,7 +205,53 @@
         it.classList.add('gf-visible');
       }
 
+      fillLastRow();
       setGridHeight();
+    }
+
+    // ── fillLastRow: keep adding items until all cols are within GAP*3 of tallest ──
+    function fillLastRow() {
+      if (currentMatched.length <= visibleCount) return; // nothing left to add
+      var maxH = Math.max.apply(null, colHeights);
+      var threshold = maxH - (COL_WIDTH * 0.5); // within half a col-width of tallest
+      var allClose = colHeights.every(function (h) { return h >= threshold; });
+      if (allClose) return;
+
+      // Find how many more items we need to roughly level the bottom
+      var extras = 0;
+      var tmpHeights = colHeights.slice();
+      var cols = tmpHeights.length;
+      var colW  = (grid.clientWidth - (cols - 1) * GAP) / cols;
+
+      for (var i = visibleCount; i < currentMatched.length; i++) {
+        var minH   = tmpHeights[0], minCol = 0;
+        for (var c = 1; c < cols; c++) {
+          if (tmpHeights[c] < minH) { minH = tmpHeights[c]; minCol = c; }
+        }
+        var curMax = Math.max.apply(null, tmpHeights);
+        var curMin = Math.min.apply(null, tmpHeights);
+        if (curMax - curMin < colW * 0.4) break; // close enough, stop
+
+        // estimate item height
+        var img = currentMatched[i].querySelector('img');
+        var estH = img && img.naturalWidth > 0
+          ? Math.round(colW * img.naturalHeight / img.naturalWidth)
+          : Math.round(colW * 0.75);
+        tmpHeights[minCol] += estH + GAP;
+        extras++;
+      }
+
+      if (extras > 0) {
+        var from = visibleCount;
+        visibleCount += extras;
+        var cols2 = calcCols();
+        var colW2 = (grid.clientWidth - (cols2 - 1) * GAP) / cols2;
+        for (var j = from; j < Math.min(visibleCount, currentMatched.length); j++) {
+          var it = currentMatched[j];
+          it.style.display = 'block';
+          placeOne(it, colW2);
+        }
+      }
     }
 
     // ── placeOne: find shortest column, position item there ───────────────
