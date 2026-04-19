@@ -6,7 +6,7 @@ description: Classic snake with a new theme - eat food, get larger, get faster, 
 full_description: Classic snake with a new theme - eat food, get larger, get faster, get stronger! Collect bonus foods, hit crazy combos and share your highscores or replays.
 repo: JannisElef/cyber-snake
 branch: main
-tags: [Game, Active]
+tags: [Game, Finished]
 date: 2026-04-04
 redirect_url: https://janniselef.github.io/cyber-snake/ # if project has it's own website
 # image: /assets/img/thumbnail.jpg # if thumbnail is a jpg
