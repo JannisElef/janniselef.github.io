@@ -8,6 +8,27 @@ branch: main
 tags: [Website, Active]
 date: 2026-03-29
 redirect_url: https://janniselef.github.io/card-sheet-generator/
+gallery:
+  - /assets/img/card_demo_1.jpg
+  - /assets/img/card_demo-result_1.jpg
+  - /assets/img/card_demo_2.jpg
+  - /assets/img/card_demo-result_2.png
+  - /assets/img/card_padding.jpg
+  - /assets/img/card_select.jpg
+  - /assets/img/card_refine-1.jpg
+  - /assets/img/card_refine-2.jpg
+  - /assets/img/card_refine-3.jpg
+  - /assets/img/card_copies.jpg
+  - /assets/img/card_pdf-preview.jpg
+  - /assets/img/card_zip-export.jpg
+  - /assets/img/card_pdf-backside.jpg
+  - /assets/img/card_pdf-backside_result.jpg
+  - /assets/img/card_pdf-measure.jpg
+  - /assets/img/catan-cards_input.jpg
+  - /assets/img/catan-cards_colorgrading_old.jpg
+  - /assets/img/card_closeup_1.jpg
+  - /assets/img/card_closeup_2.jpg
+  - /assets/img/card_result_closeup.png
 ---
 
 

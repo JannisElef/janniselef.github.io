@@ -1,3 +1,4 @@
+{% comment %}
 ---
 layout: default
 title: Example Project
@@ -76,3 +77,6 @@ filesize="110 Bytes"
 {% if page.date %}
 **Published:** {{ page.date | date: "%B %-d, %Y" }}
 {% endif %} [-> View on GitHub](https://github.com/{{ page.repo }})
+
+
+{% endcomment %}

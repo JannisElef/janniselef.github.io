@@ -7,6 +7,12 @@ repo: JannisElef/catan-border-tiles
 branch: main
 tags: [3D-Print, Finished]
 date: 2026-03-16
+gallery:
+  - /assets/img/thumbnail.jpg
+  - /assets/img/Catan Border-Tiles_Base.jpg
+  - /assets/img/Catan Border-Tiles_Seafarers.jpg
+  - /assets/img/Catan Border-Tiles_closeup1.jpg
+  - /assets/img/Catan Border-Tiles_closeup2.jpg
 ---
 
 
