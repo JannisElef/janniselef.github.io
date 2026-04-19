@@ -1,18 +1,34 @@
 (function () {
   'use strict';
 
-  var COL_WIDTH      = 220; // min column width px
-  var GAP            = 12;
+  var COL_WIDTH = 220;
+  var GAP       = 12;
 
   function itemsPerPage() {
     var w = window.innerWidth;
-    if (w < 600)  return 8;   // mobile: 2 cols
-    if (w < 900)  return 12;  // tablet: 3 cols
-    return 20;                // desktop: 4+ cols
+    if (w < 600) return 8;
+    if (w < 900) return 12;
+    return 20;
   }
 
   function assignWeights(items) {
     items.forEach(function (it) { it._w = Math.random(); });
+  }
+
+  // Preload images for a slice of items, resolve when all done (or errored)
+  function preloadImages(items, from, to, cb) {
+    var slice = items.slice(from, to);
+    var pending = 0;
+    slice.forEach(function (it) {
+      var img = it.querySelector('img');
+      if (!img) return;
+      if (img.complete && img.naturalHeight > 0) return; // already loaded
+      pending++;
+      function done() { if (--pending === 0) cb(); }
+      img.addEventListener('load',  done, { once: true });
+      img.addEventListener('error', done, { once: true });
+    });
+    if (pending === 0) cb();
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -38,11 +54,9 @@
     var selected       = [];
     var visibleCount   = itemsPerPage();
     var currentMatched = [];
-    var colHeights     = []; // tracks height of each column
+    var colHeights     = [];
 
     assignWeights(items);
-
-    // ── Grid must be position:relative for absolute children ─────────────
     grid.style.position = 'relative';
 
     // ── Year options ──────────────────────────────────────────────────────
@@ -89,35 +103,50 @@
       reset();
     });
 
-    // ── Controls ──────────────────────────────────────────────────────────
     input.addEventListener('input', reset);
     sortSelect.addEventListener('change', reset);
     yearSelect.addEventListener('change', reset);
     sourceSelect.addEventListener('change', reset);
 
-    // ── Load more — append only new items below existing layout ───────────
+    // ── Load more ─────────────────────────────────────────────────────────
     if (loadMoreBtn) {
       loadMoreBtn.addEventListener('click', function (e) {
         e.preventDefault();
         var from = visibleCount;
-        visibleCount += itemsPerPage();
-        placeItems(from, visibleCount);
-        updateLoadMore();
-        // scroll to first new item
-        if (currentMatched[from]) {
-          currentMatched[from].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+        var to   = from + itemsPerPage();
+
+        // Show items immediately (hidden, display:block so they have dimensions)
+        currentMatched.slice(from, to).forEach(function (it) {
+          it.style.display  = 'block';
+          it.style.position = 'absolute';
+          it.style.width    = calcColW(calcCols()) + 'px';
+          it.style.visibility = 'hidden'; // in DOM but invisible during preload
+        });
+
+        preloadImages(currentMatched, from, to, function () {
+          currentMatched.slice(from, to).forEach(function (it) {
+            it.style.visibility = '';
+          });
+          visibleCount = to;
+          placeRange(from, visibleCount, true);
+          fillLastRow();
+          setGridHeight();
+          updateLoadMore();
+          if (currentMatched[from]) {
+            currentMatched[from].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
       });
     }
 
-    // ── Resize: full relayout ─────────────────────────────────────────────
+    // ── Resize ────────────────────────────────────────────────────────────
     var resizeTimer;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function () { relayout(); }, 120);
+      resizeTimer = setTimeout(relayout, 120);
     });
 
-    // ── reset: refilter, resort, full relayout from scratch ───────────────
+    // ── reset ─────────────────────────────────────────────────────────────
     function reset() {
       visibleCount = itemsPerPage();
 
@@ -145,7 +174,43 @@
         currentMatched.sort(function (a, b) { return (b.dataset.date || 0) - (a.dataset.date || 0); });
       }
 
-      // hide all, reset positions
+      // Hide all and clear positions
+      items.forEach(function (it) {
+        it.style.display    = 'none';
+        it.style.visibility = '';
+        it.style.position   = '';
+        it.style.top        = '';
+        it.style.left       = '';
+        it.style.width      = '';
+        it.classList.remove('gf-visible');
+      });
+      grid.style.height = '0';
+      colHeights = [];
+
+      // Show first-page items as hidden blocks so browser can measure them
+      var colW = calcColW(calcCols());
+      currentMatched.slice(0, visibleCount).forEach(function (it) {
+        it.style.display    = 'block';
+        it.style.position   = 'absolute';
+        it.style.width      = colW + 'px';
+        it.style.visibility = 'hidden';
+      });
+
+      // Wait for first-page images to load, then layout
+      preloadImages(currentMatched, 0, visibleCount, function () {
+        currentMatched.slice(0, visibleCount).forEach(function (it) {
+          it.style.visibility = '';
+        });
+        relayout();
+      });
+    }
+
+    // ── relayout: place ALL visible items from scratch ────────────────────
+    function relayout() {
+      var cols = calcCols();
+      var colW = calcColW(cols);
+      colHeights = new Array(cols).fill(0);
+
       items.forEach(function (it) {
         it.style.display  = 'none';
         it.style.position = '';
@@ -154,27 +219,10 @@
         it.style.width    = '';
         it.classList.remove('gf-visible');
       });
-      grid.style.height = '';
 
-      relayout();
-    }
-
-    // ── relayout: place all currently visible items from scratch ──────────
-    function relayout() {
-      var cols   = calcCols();
-      var colW   = (grid.clientWidth - (cols - 1) * GAP) / cols;
-      colHeights = [];
-      for (var c = 0; c < cols; c++) colHeights.push(0);
-
-      // re-place all already visible items (0..visibleCount)
-      var toPlace = Math.min(visibleCount, currentMatched.length);
-      currentMatched.forEach(function (it, i) {
-        if (i < toPlace) {
-          it.style.display = 'block';
-          placeOne(it, colW);
-        } else {
-          it.style.display = 'none';
-        }
+      currentMatched.slice(0, visibleCount).forEach(function (it) {
+        it.style.display = 'block';
+        placeOne(it, colW);
       });
 
       fillLastRow();
@@ -183,136 +231,76 @@
       noResults.hidden = currentMatched.length > 0;
     }
 
-    // ── placeItems: place items from index `from` up to `to` ─────────────
-    // Called by load more — existing items are NOT touched
-    function placeItems(from, to) {
-      // Make sure cols/colW match current state
+    // ── placeRange: place items [from, to) without touching earlier items ─
+    function placeRange(from, to, animate) {
       var cols = calcCols();
-      var colW = (grid.clientWidth - (cols - 1) * GAP) / cols;
-
-      // If colHeights length doesn't match cols (e.g. after resize between clicks), relayout
-      if (colHeights.length !== cols) {
-        relayout();
-        return;
-      }
+      var colW = calcColW(cols);
+      if (colHeights.length !== cols) { relayout(); return; }
 
       for (var i = from; i < Math.min(to, currentMatched.length); i++) {
         var it = currentMatched[i];
         it.style.display = 'block';
         placeOne(it, colW);
-        it.classList.remove('gf-visible');
-        void it.offsetWidth;
-        it.classList.add('gf-visible');
-      }
-
-      fillLastRow();
-      setGridHeight();
-    }
-
-    // ── fillLastRow: keep adding items until all cols are within GAP*3 of tallest ──
-    function fillLastRow() {
-      if (currentMatched.length <= visibleCount) return; // nothing left to add
-      var maxH = Math.max.apply(null, colHeights);
-      var threshold = maxH - (COL_WIDTH * 0.5); // within half a col-width of tallest
-      var allClose = colHeights.every(function (h) { return h >= threshold; });
-      if (allClose) return;
-
-      // Find how many more items we need to roughly level the bottom
-      var extras = 0;
-      var tmpHeights = colHeights.slice();
-      var cols = tmpHeights.length;
-      var colW  = (grid.clientWidth - (cols - 1) * GAP) / cols;
-
-      for (var i = visibleCount; i < currentMatched.length; i++) {
-        var minH   = tmpHeights[0], minCol = 0;
-        for (var c = 1; c < cols; c++) {
-          if (tmpHeights[c] < minH) { minH = tmpHeights[c]; minCol = c; }
-        }
-        var curMax = Math.max.apply(null, tmpHeights);
-        var curMin = Math.min.apply(null, tmpHeights);
-        if (curMax - curMin < colW * 0.4) break; // close enough, stop
-
-        // estimate item height
-        var img = currentMatched[i].querySelector('img');
-        var estH = img && img.naturalWidth > 0
-          ? Math.round(colW * img.naturalHeight / img.naturalWidth)
-          : Math.round(colW * 0.75);
-        tmpHeights[minCol] += estH + GAP;
-        extras++;
-      }
-
-      if (extras > 0) {
-        var from = visibleCount;
-        visibleCount += extras;
-        var cols2 = calcCols();
-        var colW2 = (grid.clientWidth - (cols2 - 1) * GAP) / cols2;
-        for (var j = from; j < Math.min(visibleCount, currentMatched.length); j++) {
-          var it = currentMatched[j];
-          it.style.display = 'block';
-          placeOne(it, colW2);
+        if (animate) {
+          it.classList.remove('gf-visible');
+          void it.offsetWidth;
+          it.classList.add('gf-visible');
         }
       }
     }
 
-    // ── placeOne: find shortest column, position item there ───────────────
+    // ── placeOne: measure actual offsetHeight, place in shortest col ──────
     function placeOne(el, colW) {
       el.style.position = 'absolute';
       el.style.width    = colW + 'px';
-      el.style.left     = '';
-      el.style.top      = '';
+      el.style.top      = '0px'; // temporarily position for measurement
+      el.style.left     = '0px';
 
-      // Find shortest column
-      var minH   = colHeights[0];
-      var minCol = 0;
+      // shortest column
+      var minH = colHeights[0], minCol = 0;
       for (var c = 1; c < colHeights.length; c++) {
         if (colHeights[c] < minH) { minH = colHeights[c]; minCol = c; }
       }
 
-      var leftPx = minCol * (colW + GAP);
-      var topPx  = minH;
+      el.style.left = (minCol * (colW + GAP)) + 'px';
+      el.style.top  = minH + 'px';
 
-      el.style.left = leftPx + 'px';
-      el.style.top  = topPx  + 'px';
-
-      // Item height — use naturalHeight ratio if image not yet loaded
-      var img = el.querySelector('img');
-      var elH;
-      if (img && img.complete && img.naturalHeight > 0) {
-        // Image loaded: measure actual rendered height
-        elH = el.offsetHeight;
-      } else {
-        // Image not yet loaded: estimate from natural dimensions or default
-        elH = img && img.naturalWidth > 0
-          ? Math.round(colW * img.naturalHeight / img.naturalWidth)
-          : Math.round(colW * 0.75);
-        // When image loads, update the column height
-        if (img && !img.complete) {
-          (function (element, col) {
-            img.addEventListener('load', function () {
-              var newH = element.offsetHeight;
-              // patch: extend grid if needed
-              if (newH > 0) {
-                colHeights[col] = (colHeights[col] || 0) + newH + GAP;
-                setGridHeight();
-              }
-            }, { once: true });
-          }(el, minCol));
-          // Use estimated height for column accounting now
-          elH = Math.round(colW * (img.naturalHeight || colW * 0.75) / (img.naturalWidth || colW));
-        }
-      }
-
-      colHeights[minCol] = topPx + elH + GAP;
+      // offsetHeight is reliable now because images are preloaded
+      var h = el.offsetHeight;
+      if (h < 4) h = Math.round(colW * 0.75); // last-resort fallback
+      colHeights[minCol] = minH + h + GAP;
     }
 
+    // ── fillLastRow ───────────────────────────────────────────────────────
+    function fillLastRow() {
+      if (currentMatched.length <= visibleCount) return;
+      var cols      = colHeights.length || calcCols();
+      var colW      = calcColW(cols);
+      var maxH      = Math.max.apply(null, colHeights);
+      var threshold = maxH - colW * 0.5;
+      var from      = visibleCount;
+
+      for (var i = from; i < currentMatched.length; i++) {
+        if (Math.min.apply(null, colHeights) >= threshold) break;
+        var it = currentMatched[i];
+        it.style.display = 'block';
+        placeOne(it, colW);
+        visibleCount++;
+      }
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────
     function setGridHeight() {
-      var maxH = colHeights.reduce(function (m, h) { return Math.max(m, h); }, 0);
-      grid.style.height = maxH + 'px';
+      var maxH = colHeights.length ? Math.max.apply(null, colHeights) : 0;
+      grid.style.height = Math.max(maxH, 0) + 'px';
     }
 
     function calcCols() {
-      var w = grid.clientWidth;
-      return Math.max(2, Math.floor((w + GAP) / (COL_WIDTH + GAP)));
+      return Math.max(2, Math.floor((grid.clientWidth + GAP) / (COL_WIDTH + GAP)));
+    }
+
+    function calcColW(cols) {
+      return (grid.clientWidth - (cols - 1) * GAP) / cols;
     }
 
     function updateLoadMore() {
