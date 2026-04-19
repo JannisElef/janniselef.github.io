@@ -1,3 +1,6 @@
+
+{% comment %}
+
 ---
 layout: default
 title: Printer Enclosure Control
@@ -38,3 +41,5 @@ date: 2026-03-15
 {% if page.date %}
 **Published:** {{ page.date | date: "%B %-d, %Y" }}
 {% endif %} [-> View on GitHub](https://github.com/{{ page.repo }})
+
+{% endcomment %}
