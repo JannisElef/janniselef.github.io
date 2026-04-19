@@ -1,25 +1,23 @@
+/* Gallery — only what psf and style.css don't already cover */
 
 .gallery-header { margin: 20px 0 2rem; }
 .gallery-header h1 { margin: 0 0 0.2rem; }
 .gallery-header p  { margin: 0; font-size: 0.85rem; color: var(--text-2-color); }
 
-/* ── Masonry ── */
+/* ── Masonry — JS absolute positioning ── */
 .gallery-grid {
-  columns: 4 220px;
-  column-gap: 12px;
+  position: relative; /* set by JS too, belt-and-suspenders */
+  width: 100%;
 }
-@media (max-width: 900px) { .gallery-grid { columns: 3 180px; } }
-@media (max-width: 600px) { .gallery-grid { columns: 2 140px; } }
 
 .gallery-item {
-  break-inside: avoid;
-  margin-bottom: 12px;
+  box-sizing: border-box;
   border-radius: 8px;
   overflow: hidden;
-  position: relative;
   background: var(--container-color);
   border: 1px solid var(--border-color);
   display: block;
+  /* position/top/left/width set by JS */
 }
 
 .gallery-item a {
