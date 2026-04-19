@@ -47,7 +47,7 @@ date: 2026-04-19
              data-year="{{ item.date | date: '%Y' }}"
              data-tags="{{ item.tags | join: ',' | escape }}">
           <a href="{{ item.url }}" title="Open {{ item.title }}">
-            <img data-src="{{ img_src }}" src="" alt="{{ item.title }}" onerror="this.onerror=null;this.src='/assets/img/patterns/Taieri.svg';">
+            <img data-src="{{ img_src }}" alt="{{ item.title }}">
             <div class="gallery-overlay"><div class="gallery-overlay-content">
               <h3>{{ item.title }}</h3>
               <p>{{ item.description }}</p>
@@ -78,7 +78,7 @@ date: 2026-04-19
            data-year="{{ item.date | date: '%Y' }}"
            data-tags="{{ item.tags | join: ',' | escape }}">
         <a href="{{ item.url }}" title="Open {{ item.title }}">
-          <img data-src="{{ thumb_src }}" src="" alt="{{ item.title }}" onerror="this.onerror=null;this.src='/assets/img/patterns/Inn.svg';">
+          <img data-src="{{ thumb_src }}" alt="{{ item.title }}">
           <div class="gallery-overlay"><div class="gallery-overlay-content">
             <h3>{{ item.title }}</h3>
             <p>{{ item.description }}</p>
@@ -109,7 +109,7 @@ date: 2026-04-19
            data-year="{{ item.date | date: '%Y' }}"
            data-tags="{{ item.tags | join: ',' | escape }}">
         <a href="{{ item.url }}" title="Open {{ item.title }}">
-          <img data-src="{{ img_src }}" src="" alt="{{ item.title }}" onerror="this.onerror=null;this.src='/assets/img/patterns/Taieri.svg';">
+          <img data-src="{{ img_src }}" alt="{{ item.title }}">
           <div class="gallery-overlay"><div class="gallery-overlay-content">
             <h3>{{ item.title }}</h3>
             <p>{{ item.description }}</p>

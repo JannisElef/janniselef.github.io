@@ -15,24 +15,56 @@
     items.forEach(function (it) { it._w = Math.random(); });
   }
 
-  // Set src from data-src (triggers actual network load) for a slice of items,
-  // then call cb when all images are loaded or errored.
+  // Load images for a slice: set src from data-src, retry once on error,
+  // call cb when all are settled (loaded or permanently failed).
   function loadImages(items, from, to, cb) {
-    var slice = items.slice(from, to);
+    var slice   = items.slice(from, to);
     var pending = 0;
+
+    function checkDone() { if (--pending === 0) cb(); }
+
     slice.forEach(function (it) {
       var img = it.querySelector('img');
-      if (!img) return;
-      // Set src from data-src if not already done
-      if (img.dataset.src && img.src !== img.dataset.src) {
-        img.src = img.dataset.src;
-      }
-      if (img.complete && img.naturalHeight > 0) return; // already loaded
+      if (!img || !img.dataset.src) return;
+
+      var target = img.dataset.src;
+
+      // Already loaded correctly — skip
+      if (img.src === target && img.complete && img.naturalHeight > 0) return;
+
       pending++;
-      function done() { if (--pending === 0) cb(); }
-      img.addEventListener('load',  done, { once: true });
-      img.addEventListener('error', done, { once: true });
+
+      // Remove any old listeners before attaching new ones
+      var newImg = img.cloneNode(false);
+      img.parentNode.replaceChild(newImg, img);
+      img = newImg;
+
+      var retried = false;
+
+      img.addEventListener('load', function () {
+        checkDone();
+      }, { once: true });
+
+      function onError() {
+        if (!retried) {
+          retried = true;
+          // Wait 800ms and retry once (handles transient CDN/network hiccups)
+          setTimeout(function () {
+            img.addEventListener('load',  function () { checkDone(); }, { once: true });
+            img.addEventListener('error', function () {
+              img.src = '/assets/img/patterns/Taieri.svg';
+              checkDone();
+            }, { once: true });
+            img.src = '';
+            img.src = target;
+          }, 800);
+        }
+      }
+      img.addEventListener('error', onError, { once: true });
+
+      img.src = target;
     });
+
     if (pending === 0) cb();
   }
 
