@@ -161,6 +161,8 @@ import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/exampl
       const size = new THREE.Vector3();
       box.getSize(size);
 
+      group.rotation.x = -Math.PI / 2;
+
       // Shift group so its collective center is at world origin
       group.position.sub(center);
 

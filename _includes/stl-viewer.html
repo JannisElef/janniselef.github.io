@@ -123,6 +123,9 @@ import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/exampl
       edgeLines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: new THREE.Color(edgeColor) }));
       scene.add(edgeLines);
 
+      mesh.rotation.x = -Math.PI / 2;
+      edgeLines.rotation.x = -Math.PI / 2;
+
       const radius = geometry.boundingSphere.radius;
       camera.position.set(radius * 1.6, radius * 1.2, radius * 1.6);
       
