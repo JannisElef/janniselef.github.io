@@ -103,8 +103,8 @@ import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/exampl
     renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+    const light1 = new THREE.DirectionalLight(0xffffff, 1.2);
     light1.position.set(1, 1, 1);
     scene.add(light1);
     const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
