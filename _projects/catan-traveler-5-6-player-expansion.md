@@ -29,7 +29,7 @@ gallery:
 
 # Model Preview
 
-The frame sits on top of the normal ressource plates provided by the base game.
+The frame sits on top of the normal resource plates provided by the base game.
 Here's a small cutout of the final playing area:
 
 {% include stl-viewer-multi.html 
@@ -55,8 +55,8 @@ Here's a small cutout of the final playing area:
 # Expansion Components
 
 The frame forms a ring around the main island expanding it by 18 hex tiles.
-Traditionally the 5-6 Player Expansion only adds [11 hex tiles](#the-map-classic-5-6-player-and-custom). 
-For additional detail about the ressource types and number tokens result to the [List of Components](#list-of-components) below.
+Traditionally the 5-6 Player Expansion only adds [11 hex tiles](#the-map-classic-5-6-player). 
+For additional detail about the resource types and number tokens result to the [List of Components](#list-of-components) below.
 
 
 ## List of Components
@@ -65,7 +65,19 @@ For additional detail about the ressource types and number tokens result to the 
 src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTbzZHtwSfRhKjTt6309HIwnlXNs_4tvlnr3aTTg4CgCJNPYMFgYa06k-wyRkvjIcADuIGYXCqcRtuP/pubhtml?widget=true&amp;headers=false"></iframe>
 
 
-## The Map: Classic 5-6 Player and custom
+## Resource Tiles and Number Tokens
+
+In the CATAN-Traveler version the resource tiles are printed on the 6 plates that fit in the playing area
+This reduces the number of possible games to be played by a lot.
+Same with the number tokens being fixed in place.
+
+To restore some randomness I've made the resources and number tokens interchangeable between the frames.
+They're now colored resource inlays you can snap in the frames and fit the number tokens into.
+See the [preview](#model-preview) on how they look like or how the resource inlays are [colored](#list-of-components) between their two types: Corner and edge inlays.
+
+
+
+## The Map: Classic 5-6 Player
 
 If you want to play the classic 5-6 Player expansion with only 11 additional tiles use the following arrangement:
 
@@ -90,9 +102,9 @@ This is fixed by the 7 additional tiles, the more space the better I've figured.
 
 # Fitting everything into the box
 
-The two new sets of figures, the frame pieces and the number tokens fit neatly into the sliders of two players.
+The two new sets of figures, the frame pieces, resource inlays and the number tokens fit neatly into the sliders of two players.
 The other two sliders are packed with the card trays like before.
-Some frame pieces can be stored in the playing area like the other ressource plates.
+Some frame pieces can be stored in the playing area like the other resource plates.
 
 {% include image-grid.html 
 images="
@@ -103,7 +115,7 @@ images="
 
 # Version History
 
-Here are the older versions, test prints and fit tests that were created along the way.
+Here are the older versions, test prints and test fits that were created along the way.
 
 {% include image-grid.html 
 images="
