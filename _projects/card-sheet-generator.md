@@ -2,7 +2,7 @@
 layout: default
 title: Card Sheet Generator
 author: JannisElef
-description: Online-Tool for preparing print sheets for playing cards, refining scans, organizing and slicing them.
+description: Online-Tool for preparing print sheets for playing cards.
 repo: JannisElef/card-sheet-generator
 branch: main
 tags: [Website, Active]
