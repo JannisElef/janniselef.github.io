@@ -67,7 +67,7 @@ src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTbzZHtwSfRhKjTt6309HIwnlXN
 
 ## Resource Tiles and Number Tokens
 
-In the CATAN-Traveler version the resource tiles are printed on the 6 plates that fit in the playing area
+In the CATAN-Traveler version the resource tiles are printed on the 6 plates that fit in the playing area.
 This reduces the number of possible games to be played by a lot.
 Same with the number tokens being fixed in place.
 
@@ -75,11 +75,15 @@ To restore some randomness I've made the resources and number tokens interchange
 They're now colored resource inlays you can snap in the frames and fit the number tokens into.
 See the [preview](#model-preview) on how they look like or how the resource inlays are [colored](#list-of-components) between their two types: Corner and edge inlays.
 
+The inlays are made to snap so they hold themselves on the board to not get shook apart incase something bumps the game.
+This follows the Traveler-Edition's goal of being sturdy for outdoors or a car trip where things can get shaky.
+That's also the reason why the figures are press-fit into their place when placed to hold themselves and the resource plates beneath in position.
+
 
 
 ## The Map: Classic 5-6 Player
 
-If you want to play the classic 5-6 Player expansion with only 11 additional tiles use the following arrangement:
+If you want to play the classic 5-6 Player expansion with only 11 additional tiles, use the following arrangement:
 
 - three 3-piece frame tiles
 - two 1-piece frame tiles
@@ -97,14 +101,16 @@ If you want to play the classic 5-6 Player expansion with only 11 additional til
 
 
 Because of the game's playing area border the hex tiles are cut flat on one side, resulting in one road and settlement/city position being lost for every tile.
-This is fixed by the 7 additional tiles, the more space the better I've figured.
+This is fixed by the 7 additional tiles to complete the ring, the more space the better I've figured.
 
 
-# Fitting everything into the box
+# Storage Box Tetris 
 
-The two new sets of figures, the frame pieces, resource inlays and the number tokens fit neatly into the sliders of two players.
+The two new sets of figures, the frame pieces, resource inlays and the number tokens fit neatly into the component sliders of two players.
 The other two sliders are packed with the card trays like before.
 Some frame pieces can be stored in the playing area like the other resource plates.
+
+This means the 5-6 Player Expansion utilizes the last bit of unused space of the box. No additional storage solutions are required, it's ready to be taken and played everywhere!
 
 {% include image-grid.html 
 images="
@@ -115,7 +121,7 @@ images="
 
 # Version History
 
-Here are the older versions, test prints and test fits that were created along the way.
+Here are the older versions, test prints and test fits that were created along the way. Especially the figures' print orientation and the strength of their press-fit was a tedious process...
 
 {% include image-grid.html 
 images="
