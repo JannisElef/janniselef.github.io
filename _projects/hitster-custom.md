@@ -1,9 +1,9 @@
 ---
 layout: default
-title: HITSTER CUSTOM
+title: Hitster Custom
 author: JannisElef
-description: Create your own HITSTER Card Deck.
-full_description: Create a custom HITSTER Card Deck to play with your favorite playlist.
+description: Create your own Hitster Card Deck.
+full_description: Create a custom Hitster Card Deck to play with your favorite playlist.
 repo: JannisElef/hitster-custom
 branch: main
 tags: [Active]
