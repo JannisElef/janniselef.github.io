@@ -6,7 +6,7 @@ description: Remote Blender rendering manager using git.
 full_description: Remote Blender rendering manager using git. Configure a render job, set defaults and parameters, push it with your .blend source-file and let a remote PC render and push the output back to your git.
 repo: JannisElef/blender-render-bot
 branch: main
-tags: [Blender, Active]
+tags: [Blender, Finished]
 date: 2026-04-06
 
 redirect_url: https://janniselef.github.io/blender-render-bot/ # if project has it's own website

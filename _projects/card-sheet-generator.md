@@ -5,7 +5,7 @@ author: JannisElef
 description: Online-Tool for preparing print sheets for playing cards.
 repo: JannisElef/card-sheet-generator
 branch: main
-tags: [Website, Active]
+tags: [Website, Finished]
 date: 2026-03-29
 redirect_url: https://janniselef.github.io/card-sheet-generator/
 gallery:

@@ -6,12 +6,12 @@ description: Custom 5-6 Player Expansion for CATAN-Traveler.
 full_description: Custom 5-6 Player Expansion for CATAN-Traveler - additional figures and frame to extend the main island.
 repo: JannisElef/catan-traveler-5-6-player-expansion
 branch: main
-tags: [3D-Print, Active]
+tags: [3D-Print, Finished]
 date: 2026-04-22
 gallery:
   - /assets/img/CATAN-Traveler_packaging.jpg
-  - /assets/img/CATAN-Traveler_versions.jpg,
-  - /assets/img/CATAN-Traveler_test-1.jpg,
+  - /assets/img/CATAN-Traveler_versions.jpg
+  - /assets/img/CATAN-Traveler_test-1.jpg
   - /assets/img/CATAN-Traveler_test-frame.jpg
 ---
 
