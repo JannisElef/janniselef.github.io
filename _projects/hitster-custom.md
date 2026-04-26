@@ -67,7 +67,7 @@ Before generating the PDF you can provide your `.txt` to an AI Agent and let it 
 
 > *You can use the following prompt with your `.txt` provided as context by file or copy/paste:*
 
-> ```check the whole list's tracks: their release year and titles, correct the wrong years, remove clutter like "- remaster" etc. from the title and provide the whole file/output formatted as code, one line per track.```
+> ```check the whole list's tracks: their release year and titles, correct the wrong years, remove clutter like "- remaster" etc. from the title and provide the whole file/output formatted as code, one line per track, formatted as: <Artist|Title|Year|URL> .```
  
 
 Using Agents like Gemini which can search the web tends to provide the best results. This way you can get a quality data set from your tracks fast.
