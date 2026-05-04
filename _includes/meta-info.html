@@ -19,7 +19,7 @@ Image Priority:
 {% else %}
 {% assign filename_with_ext = page.image | split: '/' | last %}
 {% assign filename_no_ext = filename_with_ext | split: '.' | first %}
-{% assign web_filename = "web/" | append: filename_no_ext | append: "-web.jpg" %}
+{% assign web_filename = "web/webp/" | append: filename_no_ext | append: "-webp.webp" %}
 {% assign web_meta_image_path = page.image | replace: filename_with_ext, web_filename %}
 {% assign meta_image = cdn | append: web_meta_image_path %}
 {% endif %}

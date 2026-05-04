@@ -14,7 +14,7 @@
                 {% comment %} Generate path for the web version {% endcomment %}
                 {% assign filename_with_ext = item.thumbnail | split: '/' | last %}
                 {% assign filename_no_ext = filename_with_ext | split: '.' | first %}
-                {% assign web_filename = "web/" | append: filename_no_ext | append: "-web.jpg" %}
+                {% assign web_filename = "web/webp/" | append: filename_no_ext | append: "-webp.webp" %}
                 {% assign web_thumbnail_path = item.thumbnail | replace: filename_with_ext, web_filename %}
                 {% assign preview = cdn | append: web_thumbnail_path %}
             {% endif %}

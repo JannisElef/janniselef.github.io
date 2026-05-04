@@ -37,7 +37,7 @@ date: 2026-04-19
       {% for img_path in item.gallery %}
         {% assign fn_ext   = img_path | split: '/' | last %}
         {% assign fn_base  = fn_ext   | split: '.' | first %}
-        {% assign web_path = img_path | replace: fn_ext, "web/" | append: fn_base | append: "-web.jpg" %}
+        {% assign web_path = img_path | replace: fn_ext, "web/smaller/" | append: fn_base | append: "-smaller.jpg" %}
         {% assign img_src  = cdn | append: web_path %}
         <div class="gallery-item"
              data-source="gallery"
@@ -64,11 +64,11 @@ date: 2026-04-19
         {% else %}
           {% assign fn_ext   = item.thumbnail | split: '/' | last %}
           {% assign fn_base  = fn_ext | split: '.' | first %}
-          {% assign web_path = item.thumbnail | replace: fn_ext, "web/" | append: fn_base | append: "-web.jpg" %}
+          {% assign web_path = item.thumbnail | replace: fn_ext, "web/smaller/" | append: fn_base | append: "-smaller.jpg" %}
           {% assign thumb_src = cdn | append: web_path %}
         {% endif %}
       {% else %}
-        {% assign thumb_src = cdn | append: "/assets/img/web/thumbnail-web.jpg" %}
+        {% assign thumb_src = cdn | append: "/assets/img/web/smaller/thumbnail-smaller.jpg" %}
       {% endif %}
       <div class="gallery-item"
            data-source="thumbnail"
@@ -95,11 +95,11 @@ date: 2026-04-19
         {% else %}
           {% assign fn_ext   = item.thumbnail | split: '/' | last %}
           {% assign fn_base  = fn_ext | split: '.' | first %}
-          {% assign web_path = item.thumbnail | replace: fn_ext, "web/" | append: fn_base | append: "-web.jpg" %}
+          {% assign web_path = item.thumbnail | replace: fn_ext, "web/smaller/" | append: fn_base | append: "-smaller.jpg" %}
           {% assign img_src  = cdn | append: web_path %}
         {% endif %}
       {% else %}
-        {% assign img_src = cdn | append: "/assets/img/web/thumbnail-web.jpg" %}
+        {% assign img_src = cdn | append: "/assets/img/web/smaller/thumbnail-smaller.jpg" %}
       {% endif %}
       <div class="gallery-item"
            data-source="thumbnail"
