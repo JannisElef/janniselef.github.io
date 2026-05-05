@@ -19,7 +19,7 @@
                 {% assign preview = cdn | append: web_thumbnail_path %}
             {% endif %}
         {% else %}
-            {% assign preview = cdn | append: "/assets/img/web/thumbnail-web.jpg" %}
+            {% assign preview = cdn | append: "/assets/img/web/webp/thumbnail-webp.webp" %}
         {% endif %}
 
             <img src="{{ preview }}" alt="{{ item.title }}" onerror="
