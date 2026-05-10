@@ -6,7 +6,7 @@ description: Wordle with maths.
 full_description: Wordle with maths - try to solve the equation puzzle.
 repo: JannisElef/mathle
 branch: main
-tags: [Active]
+tags: [Game, Finished]
 date: 2026-05-10
 
 redirect_url: https://janniselef.github.io/mathle/ # if project has its own website
