@@ -2,11 +2,11 @@
 layout: default
 title: CATAN Rise of the Inkas Player Pieces
 author: JannisElef
-description: Player Pieces to print for CATAN Rise of the Inkas
+description: Player Pieces to print for CATAN Rise of the Inkas.
 full_description: Player Pieces to print for CATAN Rise of the Inkas. Print a set in your own color or print additional pieces to fit the Rise of the Inka theme and play it like classic CATAN.
 repo: JannisElef/catan-rise-of-the-inkas-player-pieces
 branch: main
-tags: [Active]
+tags: [3D-Print, Finished]
 date: 2026-05-29
 
 gallery:
@@ -39,7 +39,7 @@ gallery:
   label="CATAN Inka Pieces"
   files="
     /assets/stl/CATAN_Inka-City.stl:#ffd900,
-    /assets/stl/CATAN_Inka-Settlement.stl:#3aaaff,
+    /assets/stl/CATAN_Inka-Settlement.stl:#4bb1ff,
     /assets/stl/CATAN_Inka-Road.stl:#afafaf,
   "
   filesize="716 KB"
@@ -58,6 +58,8 @@ images="
 %}
 
 # Pictures
+
+Here are some pictures to compare the 3D printed pieces (yellow) to the original (cyan).
 
 {% include image-grid.html 
 images="
