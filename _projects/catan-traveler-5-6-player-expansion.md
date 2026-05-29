@@ -29,7 +29,7 @@ gallery:
 
 # Model Preview
 
-The frame sits on top of the normal resource plates provided by the base game.
+The frame sits on top of the normal resource tiles provided by the base game.
 Here's a small cutout of the final playing area:
 
 {% include stl-viewer-multi.html 
@@ -67,7 +67,7 @@ src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTbzZHtwSfRhKjTt6309HIwnlXN
 
 ## Resource Tiles and Number Tokens
 
-In the CATAN-Traveler version the resource tiles are printed on the 6 plates that fit in the playing area.
+In the CATAN-Traveler version the resource tiles are printed on the 6 tiles that fit in the playing area.
 This reduces the number of possible games to be played by a lot.
 Same with the number tokens being fixed in place.
 
@@ -77,7 +77,7 @@ See the [preview](#model-preview) on how they look like or how the resource inla
 
 The inlays are made to snap so they hold themselves on the board to not get shook apart incase something bumps the game.
 This follows the Traveler-Edition's goal of being sturdy for outdoors or a car trip where things can get shaky.
-That's also the reason why the figures are press-fit into their place when placed to hold themselves and the resource plates beneath in position.
+That's also the reason why the figures are press-fit into their place when placed to hold themselves and the resource tiles beneath in position.
 
 
 
@@ -108,7 +108,7 @@ This is fixed by the 7 additional tiles to complete the ring, the more space the
 
 The two new sets of figures, the frame pieces, resource inlays and the number tokens fit neatly into the component sliders of two players.
 The other two sliders are packed with the card trays like before.
-Some frame pieces can be stored in the playing area like the other resource plates.
+Some frame pieces can be stored in the playing area like the other resource tiles.
 
 This means the 5-6 Player Expansion utilizes the last bit of unused space of the box. No additional storage solutions are required, it's ready to be taken and played everywhere!
 
