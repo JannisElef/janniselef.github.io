@@ -14,6 +14,7 @@ gallery:
   - /assets/img/CATAN_Inka-1.jpg
   - /assets/img/CATAN_Inka-top-1.jpg
   - /assets/img/CATAN_Inka-top-2.jpg
+  - /assets/img/CATAN_Inka-comparison.jpg
   - /assets/img/CATAN_Inka-Blender.png
 
 # redirect_url: https://janniselef.github.io/catan-rise-of-the-inkas-player-pieces/ # if project has its own website
@@ -67,6 +68,14 @@ images="
   /assets/img/CATAN_Inka-1.jpg,
   /assets/img/CATAN_Inka-top-1.jpg,
   /assets/img/CATAN_Inka-top-2.jpg
+"
+%}
+
+At last a direct comparison in cyan:
+
+{% include image-grid.html 
+images="
+  /assets/img/CATAN_Inka-comparison.jpg
 "
 %}
 
